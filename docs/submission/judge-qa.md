@@ -6,7 +6,7 @@ Short, honest answers. If a judge asks something not covered here, answer from `
 
 ### 1. Isn't this just a chatbot on WhatsApp?
 
-No. Nobody chats with Kutip. It is a daily scan, a ranked list, approval cards and a cash meter. Three of its four jobs use no AI. AI is used in one place: reading customer replies and slips. It never writes or sends a message to a customer. Reminders come from fixed templates, and a person presses send.
+No. Nobody chats with Kachingg. It is a daily scan, a ranked list, approval cards and a cash meter. Three of its four jobs use no AI. AI is used in one place: reading customer replies and slips. It never writes or sends a message to a customer. Reminders come from fixed templates, and a person presses send.
 
 ### 2. What if the AI reads a message wrong?
 
@@ -18,7 +18,7 @@ A misread can delay a match, but it cannot mark an invoice paid. Four safeguards
 
 ### 3. What if a customer lies and says they paid?
 
-Then nothing changes. In the demo, Kilang says "Dah settle la semalam" ("already settled yesterday") with no slip. There is no bank line, so the invoice is not marked paid. Kutip drafts a polite Malay reply asking for the slip or reference, and the clerk sends it. A fake slip has the same result: no matching bank line, no PAID.
+Then nothing changes. In the demo, Kilang says "Dah settle la semalam" ("already settled yesterday") with no slip. There is no bank line, so the invoice is not marked paid. Kachingg drafts a polite Malay reply asking for the slip or reference, and the clerk sends it. A fake slip has the same result: no matching bank line, no PAID.
 
 ### 4. Is the AI in the demo live?
 
@@ -38,7 +38,7 @@ Fair point; it is not a world first. Our version is for sellers whose orders arr
 
 ### 8. How does this fit Orbyte?
 
-Kutip is a module inside the Orbyte hub. Orbyte has no native accounting, so invoices and the payroll total come from accounting partners through Orbyte Connect (a CSV in the demo). It reuses Orbyte's roles, approvals inbox, client records and audit trail. It adds finance and sales, not another HR or admin feature. It also fits Orbyte's credit wallet. Orbyte's own platform page uses "Follows up the right invoice" as an example of AI with business context. We are not saying it is on Orbyte's roadmap; we built what the site describes.
+Kachingg is a module inside the Orbyte hub. Orbyte has no native accounting, so invoices and the payroll total come from accounting partners through Orbyte Connect (a CSV in the demo). It reuses Orbyte's roles, approvals inbox, client records and audit trail. It adds finance and sales, not another HR or admin feature. It also fits Orbyte's credit wallet. Orbyte's own platform page uses "Follows up the right invoice" as an example of AI with business context. We are not saying it is on Orbyte's roadmap; we built what the site describes.
 
 ### 9. Can it serve many SMEs, not just one haulage firm?
 
@@ -58,7 +58,7 @@ Two roles in the demo, simulated as Orbyte roles. The **Owner** decides credit c
 
 ### 13. How do you handle PDPA?
 
-The demo uses synthetic data only. In a real deployment, the SME is the data user under PDPA 2010 (as amended in 2024), and Orbyte/Kutip is its processor. Contact data is used only to follow up invoices, with opt-out per contact. Bukti keeps only the fields it needs, masks account numbers and encrypts slip images for a period the owner sets. The AI provider must not train on customer data, cross-border processing is disclosed, and in-region hosting is preferred. Breach-notification steps follow the 2024 amendments.
+The demo uses synthetic data only. In a real deployment, the SME is the data user under PDPA 2010 (as amended in 2024), and Orbyte/Kachingg is its processor. Contact data is used only to follow up invoices, with opt-out per contact. Bukti keeps only the fields it needs, masks account numbers and encrypts slip images for a period the owner sets. The AI provider must not train on customer data, cross-border processing is disclosed, and in-region hosting is preferred. Breach-notification steps follow the 2024 amendments.
 
 ### 14. What is real and what is simulated?
 
@@ -80,4 +80,4 @@ Then Bukti has fewer slips to read, and narrows to replies and promises ("bayar 
 
 ### 18. What's next?
 
-Run the live AI and record the result; interview sellers; score Bukti on the test set; add Sales and Accountant roles and CSV export. Roadmap: the official WhatsApp Business Platform, bank feeds through Connect partners, sector packs and a BM interface. Out of scope by design: Kutip moves no money, files nothing with the government, gives no legal or financial advice and never recommends a lender.
+Run the live AI and record the result; interview sellers; score Bukti on the test set; add Sales and Accountant roles and CSV export. Roadmap: the official WhatsApp Business Platform, bank feeds through Connect partners, sector packs and a BM interface. Out of scope by design: Kachingg moves no money, files nothing with the government, gives no legal or financial advice and never recommends a lender.

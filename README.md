@@ -1,8 +1,12 @@
-# Kutip
+<img src="docs/brand/kachingg-mark.svg" alt="Kachingg logo" width="64">
+
+# Kachingg
 
 **Never be surprised on payroll day, and stop giving credit to customers who don't pay.**
 
-Kutip is a cash-collection assistant for Malaysian micro and small businesses, built for the Orbyte business hub. It warns the owner before cash runs short, stops new credit to customers who already pay late, tells the team who to chase first, and uses AI to check customers' "dah bank in boss" messages against the bank statement.
+Kachingg is a cash-collection assistant for Malaysian micro and small businesses, built for the Orbyte business hub. It warns the owner before cash runs short, stops new credit to customers who already pay late, tells the team who to chase first, and uses AI to check customers' "dah bank in boss" messages against the bank statement.
+
+Formerly called Kutip during research; the research notes in `docs/research/` and `docs/idea/` keep the old name.
 
 > XMUM Hackathon · Domain 2: *Orbyte Smart SME Challenge — Less Busywork, Better Business* · sponsored by Alpha Red
 >
@@ -27,16 +31,16 @@ SME payment delays in Malaysia average **64 days**, and **76 days** in transport
 
 ## The idea
 
-A customer can always choose not to pay, and no app can change that. So Kutip focuses on what the owner **can** control:
+A customer can always choose not to pay, and no app can change that. So Kachingg focuses on what the owner **can** control:
 
 | | Feature | What it does |
 |---|---|---|
 | 1 | **Early warning** | Every morning it compares cash in the bank plus expected payments with the bills due soon. It warns the owner **10+ days before** a shortfall, while there is still time to act. |
-| 2 | **Credit check** | When a customer who is already 30+ days late orders again on credit, Kutip holds the order until the owner decides: give credit, ask for a deposit, cash on delivery, or call first. |
+| 2 | **Credit check** | When a customer who is already 30+ days late orders again on credit, Kachingg holds the order until the owner decides: give credit, ask for a deposit, cash on delivery, or call first. |
 | 3 | **Chase plan** | It ranks overdue invoices by how much each one closes the shortfall, and prepares WhatsApp reminders in the customer's language (BM, English, 中文). A clerk sends gentle ones; firm ones need the owner. |
 | 4 | **Bukti** *(the AI part)* | AI reads customer replies and payment slips. The invoice is marked paid **only if the money is actually in the bank statement**. Anything unclear goes to a person. |
 
-*Kutip* means "collect" in Malay. *Bukti* means "proof".
+*Kachingg* is the sound of the till when you get paid. *Bukti* means "proof".
 
 ## How it works
 
@@ -57,7 +61,7 @@ flowchart LR
 
 *All names and numbers are fictional.* The demo company is **Lori Laju Logistics**, a 12-person haulage firm in Klang with 6 lorries. Transport has the longest SME payment delays in Malaysia (76 days on average), and per-trip invoices mean many payment slips.
 
-On Tuesday at 08:00, Kutip spots a salary shortfall 11 days ahead:
+On Tuesday at 08:00, Kachingg spots a salary shortfall 11 days ahead:
 
 ```text
 ┌────────────────────────────────────────────────────────────────────┐
@@ -71,7 +75,7 @@ On Tuesday at 08:00, Kutip spots a salary shortfall 11 days ahead:
 │ [ ] Hold new credit for customers 30+ days late                    │
 │ [ ] Talk to my bank myself (note only)                             │
 ├────────────────────────────────────────────────────────────────────┤
-│ Kutip lists options only. It does not recommend a lender.          │
+│ Kachingg lists options only. It does not recommend a lender.          │
 └────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -122,11 +126,11 @@ Screens from the running app (synthetic data):
 
 The full script is in [`docs/PRD.md`](docs/PRD.md#13-preliminary-demo-script-about-3-4-minutes), and every expected log line is in section 13a.
 
-## Why Kutip is different
+## Why Kachingg is different
 
 Payment-reminder tools already exist: [Paidnice](https://www.paidnice.com/features) and [Peakflo](https://peakflo.co/whatsapp-ai-agents) abroad, and Bukku, SQL Account and AutoCount locally. They are built around *chasing*, and are aimed at bigger firms or users of particular accounting software.
 
-| | Typical reminder tools | Kutip |
+| | Typical reminder tools | Kachingg |
 |---|---|---|
 | Promise | "Chase customers automatically" | "No surprises on payroll day" |
 | Ranks who to chase by the next cash shortfall | Not found | ✓ |
@@ -139,11 +143,11 @@ Details and sources are in [`docs/research/02-competitor-scan.md`](docs/research
 
 ## Built for Orbyte
 
-Orbyte is a shared business hub for SMEs. Kutip is designed as a module inside it, not a standalone app:
+Orbyte is a shared business hub for SMEs. Kachingg is designed as a module inside it, not a standalone app:
 
 - **Data in** through Orbyte Connect, from accounting partners (or a CSV).
 - **Reuses Orbyte's platform**: client records, roles, review-and-approval flows and the audit trail.
-- **Adds something new.** Orbyte covers HR and admin (leave, claims, overtime, attendance, hiring); Kutip adds finance and sales.
+- **Adds something new.** Orbyte covers HR and admin (leave, claims, overtime, attendance, hiring); Kachingg adds finance and sales.
 - **Fits Orbyte's credit wallet**, paying per invoice chased and per slip read.
 - **Reusable across many businesses**, with packs for printing, catering supply, wholesale and transport.
 
@@ -156,7 +160,7 @@ Orbyte is a shared business hub for SMEs. Kutip is designed as a module inside i
 | **Sales** *(planned)* | Sees whether a customer is on hold |
 | **Accountant** *(planned)* | Read-only export of the aging report and activity log |
 
-**Out of scope, by design:** Kutip does not process payments, submit e-invoices or tax filings, or give legal or financial advice. It never recommends a lender. The demo uses synthetic data only, and PDPA handling for a real deployment is described in the docs.
+**Out of scope, by design:** Kachingg does not process payments, submit e-invoices or tax filings, or give legal or financial advice. It never recommends a lender. The demo uses synthetic data only, and PDPA handling for a real deployment is described in the docs.
 
 ## Status
 
@@ -186,7 +190,7 @@ Optional: set `ANTHROPIC_API_KEY` in `web/.env.local` to let Bukti read messages
 
 1. Import the repo at [replit.com/import](https://replit.com/import) (GitHub → this repository).
 2. The `.replit` file runs the app from `web/` with pnpm. Press **Run**; if it fails, ask Replit Agent to "run and publish the Next.js app in the web folder with pnpm".
-3. For live AI: either add an `ANTHROPIC_API_KEY` secret, or use Replit's managed Anthropic integration (paid Replit plan) and expose it to the app as `ANTHROPIC_API_KEY` and `ANTHROPIC_BASE_URL`. Replit's managed list does not include `claude-opus-5-5`, so also set the secret `KUTIP_AI_MODEL` to one it lists (for example `claude-opus-5`).
+3. For live AI: either add an `ANTHROPIC_API_KEY` secret, or use Replit's managed Anthropic integration (paid Replit plan) and expose it to the app as `ANTHROPIC_API_KEY` and `ANTHROPIC_BASE_URL`. Replit's managed list does not include `claude-opus-5-5`, so also set the secret `KACHINGG_AI_MODEL` to one it lists (for example `claude-opus-5`).
 4. **Publish** with Replit Deployments to get a public link.
 
 Without any key, the demo still runs on the cached readings.
@@ -209,7 +213,7 @@ Declared under handbook section 8.4.
 | Read this | For |
 |---|---|
 | [`docs/PRD.md`](docs/PRD.md) | **What to build:** goals, user stories, functional requirements with acceptance criteria, business rules, data model, permissions, demo script and expected log, synthetic data spec, Domain 2 traceability |
-| [`docs/orbyte-integration.md`](docs/orbyte-integration.md) | **Orbyte module (simulated):** what Kutip reads from and writes to Orbyte, our API assumptions with JSON examples, events, role mapping, mock vs real API |
+| [`docs/orbyte-integration.md`](docs/orbyte-integration.md) | **Orbyte module (simulated):** what Kachingg reads from and writes to Orbyte, our API assumptions with JSON examples, events, role mapping, mock vs real API |
 | [`docs/idea/kutip-bukti.md`](docs/idea/kutip-bukti.md) | The full idea: example screens, rules, roles, requirement mapping, risks, demo scope |
 | [`docs/domain-2/brief.md`](docs/domain-2/brief.md) | The hackathon brief as text (source of truth: [`Domain-2-brief.pdf`](docs/domain-2/Domain-2-brief.pdf)) |
 | [`docs/research/01-pain-research-shortlist.md`](docs/research/01-pain-research-shortlist.md) | How the idea was chosen: researched pains, evidence, shortlist, judge scores |

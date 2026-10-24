@@ -1,4 +1,4 @@
-# Kutip as an Orbyte module (simulated integration)
+# Kachingg as an Orbyte module (simulated integration)
 
 ## Why
 
@@ -12,21 +12,21 @@ and states:
 
 Its good-to-have list includes: "Reusable building block: create a connector, module or API that other solutions could build on."
 
-Orbyte has no public API. So Kutip is built as an Orbyte module against **our own documented API assumptions** (this page), and runs against a **simulated Orbyte** that serves a synthetic workspace for the demo company, Lori Laju Logistics Sdn Bhd. Everything simulated is labelled "simulated" in the app and in every API response (`"simulated": true` in the body, `x-simulated: true` header).
+Orbyte has no public API. So Kachingg is built as an Orbyte module against **our own documented API assumptions** (this page), and runs against a **simulated Orbyte** that serves a synthetic workspace for the demo company, Lori Laju Logistics Sdn Bhd. Everything simulated is labelled "simulated" in the app and in every API response (`"simulated": true` in the body, `x-simulated: true` header).
 
-Code: `web/src/orbyte/` (types, mock workspace, connector, mappers, demo replay), `web/src/app/api/orbyte-mock/v1/[resource]/route.ts` (simulated Orbyte), `web/src/app/api/kutip/v1/*` (Kutip's own API), and the Orbyte panel at the top of **Connect** (`web/src/components/connect/orbyte-panel.tsx`).
+Code: `web/src/orbyte/` (types, mock workspace, connector, mappers, demo replay), `web/src/app/api/orbyte-mock/v1/[resource]/route.ts` (simulated Orbyte), `web/src/app/api/kachingg/v1/*` (Kachingg's own API), and the Orbyte panel at the top of **Connect** (`web/src/components/connect/orbyte-panel.tsx`).
 
-## What Kutip reads from and writes to Orbyte
+## What Kachingg reads from and writes to Orbyte
 
 The object names follow Orbyte's navigation: Organization → Clients, Projects, Users, Wallet.
 
-| Direction | Orbyte object | What Kutip does with it |
+| Direction | Orbyte object | What Kachingg does with it |
 |---|---|---|
-| Reads | Clients | Customer name, contact person, WhatsApp, language. One Orbyte client per Kutip customer, linked by `kutipCustomerId` |
+| Reads | Clients | Customer name, contact person, WhatsApp, language. One Orbyte client per Kachingg customer, linked by `kachinggCustomerId` |
 | Reads | Projects | Delivery jobs (DO number, route) behind each invoice, e.g. `DO-8812 Shah Alam → Bukit Raja` |
-| Reads | Users | People and their Orbyte role, mapped to a Kutip role |
+| Reads | Users | People and their Orbyte role, mapped to a Kachingg role |
 | Reads | Wallet | Per-use credit balance (illustrative) |
-| Writes | Audit trail | Every Kutip activity-log line (`toOrbyteAudit`) |
+| Writes | Audit trail | Every Kachingg activity-log line (`toOrbyteAudit`) |
 | Writes | Approvals | Reminders, receipts, deductions, credit checks and hand-off questions waiting for a person (`pendingOrbyteApprovals`) |
 | Writes | Wallet | Debits per invoice chased and per slip read (illustrative prices; not implemented as a write in the demo) |
 
@@ -47,7 +47,7 @@ Unknown resources return `404` with `{ "simulated": true, "error": "not_found", 
 ```json
 {
   "id": "ORB-CL-0001",
-  "kutipCustomerId": "c-megabina",
+  "kachinggCustomerId": "c-megabina",
   "name": "Mega Bina Hardware Trading Sdn Bhd",
   "contactPerson": "Jessie",
   "whatsapp": "+60 12-000 0141",
@@ -75,7 +75,7 @@ Unknown resources return `404` with `{ "simulated": true, "error": "not_found", 
 ### `GET /v1/users`
 
 ```json
-{ "id": "ORB-US-0001", "kutipUserId": "u-owner", "name": "Lim Siew Lan", "orbyteRole": "Owner", "kutipRole": "owner" }
+{ "id": "ORB-US-0001", "kachinggUserId": "u-owner", "name": "Lim Siew Lan", "orbyteRole": "Owner", "kachinggRole": "owner" }
 ```
 
 ### `GET /v1/wallet`
@@ -90,26 +90,26 @@ Unknown resources return `404` with `{ "simulated": true, "error": "not_found", 
 }
 ```
 
-### Kutip → Orbyte records
+### Kachingg → Orbyte records
 
 Approval request (`pendingOrbyteApprovals(state)`):
 
 ```json
-{ "id": "ORB-AP-0003", "module": "kutip", "kind": "reminder", "title": "Tier 2 reminder · INV-2268 · Syarikat Hup Seng Trading", "requiredRole": "Owner", "refs": ["INV-2268"] }
+{ "id": "ORB-AP-0003", "module": "kachingg", "kind": "reminder", "title": "Tier 2 reminder · INV-2268 · Syarikat Hup Seng Trading", "requiredRole": "Owner", "refs": ["INV-2268"] }
 ```
 
 Audit event (`toOrbyteAudit(log, role)`):
 
 ```json
-{ "id": "ORB-AU-0006", "at": "2026-10-20T08:00", "actor": "Nurul", "action": "approved Tier 1 INV-2304, sent", "refs": ["INV-2304"], "source": "kutip" }
+{ "id": "ORB-AU-0006", "at": "2026-10-20T08:00", "actor": "Nurul", "action": "approved Tier 1 INV-2304, sent", "refs": ["INV-2304"], "source": "kachingg" }
 ```
 
-## Kutip's own API (the reusable building block)
+## Kachingg's own API (the reusable building block)
 
 | Endpoint | Returns |
 |---|---|
-| `GET /api/kutip/v1/manifest` | Module manifest: name, version, description, Orbyte objects it reads and writes, permissions per Orbyte role, events, webhook names |
-| `GET /api/kutip/v1/events` | Every `KutipEvent` from replaying the full demo script on the seed with the pure engine. Deterministic; `"simulated": true`, `"data": "synthetic"` |
+| `GET /api/kachingg/v1/manifest` | Module manifest: name, version, description, Orbyte objects it reads and writes, permissions per Orbyte role, events, webhook names |
+| `GET /api/kachingg/v1/events` | Every `KachinggEvent` from replaying the full demo script on the seed with the pure engine. Deterministic; `"simulated": true`, `"data": "synthetic"` |
 
 ### Events
 
@@ -133,7 +133,7 @@ Events never carry the bank balance, payroll or gap amounts. The only amounts ar
 
 ## Role mapping
 
-| Orbyte role | Kutip role | Person (synthetic) |
+| Orbyte role | Kachingg role | Person (synthetic) |
 |---|---|---|
 | Owner | Owner | Lim Siew Lan |
 | Finance clerk | Clerk | Nurul |
@@ -157,4 +157,4 @@ The engine, rules and UI do not change: only the connector's base URL and auth.
 
 All data on this page and behind these endpoints is synthetic: fictional companies, people and `+60 12-000 0xxx` numbers; no real banks, receipts or customers. No secrets are used.
 
-In a real deployment under Malaysia's PDPA 2010 (as amended in 2024), the SME is the data user and Kutip acts as its processor. Kutip would read only the client fields it needs to follow up invoices the customer has received, keep role-based access so a Clerk never sees cash figures, honour each contact's opt-out, and send Orbyte only audit lines and approval requests, never bank balances or payroll figures in events.
+In a real deployment under Malaysia's PDPA 2010 (as amended in 2024), the SME is the data user and Kachingg acts as its processor. Kachingg would read only the client fields it needs to follow up invoices the customer has received, keep role-based access so a Clerk never sees cash figures, honour each contact's opt-out, and send Orbyte only audit lines and approval requests, never bank balances or payroll figures in events.

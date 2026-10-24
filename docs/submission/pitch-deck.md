@@ -1,17 +1,17 @@
-# Kutip pitch deck (slide by slide)
+# Kachingg pitch deck (slide by slide)
 
 Eleven slides, about 5 minutes. Each slide has a title, 3-5 bullets and a speaker note. Every figure is either sourced in the repo's research docs or labelled as an estimate. All business names and data are fictional.
 
 ---
 
-## Slide 1. Kutip: never be surprised on payroll day
+## Slide 1. Kachingg: never be surprised on payroll day
 
 - A cash-collection module for the Orbyte business hub
-- Kutip ("collect") warns, holds credit and plans the chase
+- Kachingg warns, holds credit and plans the chase
 - Bukti ("proof") reads customers' payment replies, then checks the bank
 - XMUM Hackathon, Domain 2: Orbyte Smart SME Challenge
 
-**Speaker note.** "Kutip helps small businesses that sell on credit. It does not promise to make customers pay. It promises the owner will never be surprised on payroll day, and will stop giving credit to customers who don't pay."
+**Speaker note.** "Kachingg helps small businesses that sell on credit. It does not promise to make customers pay. It promises the owner will never be surprised on payroll day, and will stop giving credit to customers who don't pay."
 
 ---
 
@@ -31,7 +31,7 @@ Eleven slides, about 5 minutes. Each slide has a title, 3-5 bullets and a speake
 
 - The owner cannot control whether a customer pays
 - The owner can control: knowing early, deciding on credit, choosing whom to chase, keeping records true
-- Every Kutip feature sits in the "can control" column
+- Every Kachingg feature sits in the "can control" column
 - So it still delivers value when a customer never pays
 
 **Speaker note.** "No source shows that reminders make customers pay faster. So reminders are the delivery channel, not the promise. The promise rests on early warning and the credit check, which work even if a customer never pays."
@@ -93,7 +93,7 @@ Eleven slides, about 5 minutes. Each slide has a title, 3-5 bullets and a speake
 - Adds finance and sales, not another HR or admin feature
 - Sector packs (transport, printing, catering supply, wholesale) would change templates and thresholds; the rules stay the same
 
-**Speaker note.** "Orbyte's own platform page uses 'Follows up the right invoice' as an example of AI working with business context. We are not saying it is on Orbyte's roadmap. We are saying the site describes it, and we built it. Our API design also includes events such as gap.detected and proof.verified, so other modules could build on Kutip. That API is designed, not built yet."
+**Speaker note.** "Orbyte's own platform page uses 'Follows up the right invoice' as an example of AI working with business context. We are not saying it is on Orbyte's roadmap. We are saying the site describes it, and we built it. Our API design also includes events such as gap.detected and proof.verified, so other modules could build on Kachingg. That API is designed, not built yet."
 
 ---
 
@@ -129,4 +129,4 @@ Eleven slides, about 5 minutes. Each slide has a title, 3-5 bullets and a speake
 - **Next:** interview 5-10 Malaysian B2B sellers; score Bukti on a 30-50 message test set; test learnability with 2-3 first-time users
 - **Roadmap:** official WhatsApp Business Platform, bank feeds through Connect partners, sector packs, BM interface
 
-**Speaker note.** "We would rather be clear about what is simulated than overclaim. Out of scope by design: Kutip moves no money, files nothing with the government, gives no legal or financial advice, and never recommends a lender. Close: Kutip tells you who to chase first, and Bukti proves the money really arrived."
+**Speaker note.** "We would rather be clear about what is simulated than overclaim. Out of scope by design: Kachingg moves no money, files nothing with the government, gives no legal or financial advice, and never recommends a lender. Close: Kachingg tells you who to chase first, and Bukti proves the money really arrived."

@@ -1,6 +1,6 @@
-# Kutip web app
+# Kachingg web app
 
-The Kutip cash-collection demo, designed for the Orbyte business hub. See the [repository README](../README.md) for the product, and [`../docs/PRD.md`](../docs/PRD.md) for the spec.
+The Kachingg cash-collection demo, designed for the Orbyte business hub. See the [repository README](../README.md) for the product, and [`../docs/PRD.md`](../docs/PRD.md) for the spec.
 
 ```bash
 pnpm install
