@@ -28,7 +28,7 @@ const STEPS: Step[] = [
     n: 1,
     title: "Run the 08:00 scan",
     who: ["owner"],
-    look: "The early-warning card says salaries are short RM2,000 in 11 days and lists the owner's options. Pick the one that asks the diesel supplier to move the 5 Nov bill.",
+    look: "The early-warning card (Owner only) says salaries will be short in 11 days and lists the owner's options. Pick the one that asks the diesel supplier to move the 5 Nov bill.",
     refs: "FR-B1–B3 · R6",
     page: "today",
     scan: true,

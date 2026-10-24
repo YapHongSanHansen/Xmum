@@ -3,7 +3,7 @@
 // No `runtime` export: cacheComponents is on, so the default Node.js runtime applies.
 import { extract } from "@/lib/extract-server";
 
-export const maxDuration = 30;
+export const maxDuration = 15;
 
 export async function POST(request: Request) {
   let messageId: unknown;

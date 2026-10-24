@@ -58,7 +58,7 @@ export default function InboxPage() {
               key={selected.id}
               state={state}
               msg={selected}
-              run={runs[selected.id]}
+              run={runs[selected.id]?.loading || state.extractions[selected.id] ? runs[selected.id] : undefined}
               onRead={() => read(selected.id)}
               onEnlarge={setLightbox}
             />

@@ -197,9 +197,8 @@ export function chasePlan(s: State): PlanRow[] {
   const n = next ? Math.max(1, daysBetween(today, next.dueDate)) : 14;
 
   const rows: PlanRow[] = s.invoices
-    .filter((i) => i.status !== "paid" && daysOverdue(i, s.now) >= -3 && !(i.status === "part_paid" && i.openClaimMessageId === null && outstanding(i) === 0))
-    .filter((i) => daysOverdue(i, s.now) >= 1 || i.reminders.length === 0)
-    .filter((i) => daysOverdue(i, s.now) >= 1)
+    // Overdue, unpaid invoices only; Tier 0 courtesy reminders are P1 (PRD §22).
+    .filter((i) => i.status !== "paid" && daysOverdue(i, s.now) >= 1)
     .map((invoice) => {
       const customer = customerOf(s, invoice.customerId);
       const base = { invoice, customer, daysLate: daysOverdue(invoice, s.now), expected: 0, p: 0, closesGap: false, rank: null };

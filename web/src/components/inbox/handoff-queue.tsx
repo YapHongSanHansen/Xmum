@@ -87,6 +87,16 @@ function PromiseDateForm({ h, onConfirm }: { h: Handoff; onConfirm: (option: str
   const [picked, setPicked] = useState<string | null>(null);
   return (
     <div className="mt-3">
+      {h.options.length === 0 && (
+        <label className="flex items-center gap-2 text-sm text-slate-700">
+          Promised date
+          <input
+            type="date"
+            className="rounded-md border border-slate-300 px-2 py-1 text-sm"
+            onChange={(e) => setPicked(e.target.value || null)}
+          />
+        </label>
+      )}
       <div role="radiogroup" aria-label={h.question} className="flex flex-wrap gap-2">
         {h.options.map((d) => (
           <label

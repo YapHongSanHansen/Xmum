@@ -20,10 +20,11 @@ export async function readMessage(messageId: string): Promise<ReadResult> {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ messageId }),
+      signal: AbortSignal.timeout(12_000),
     });
     if (!res.ok) return offline(messageId, `offline (HTTP ${res.status})`);
     return (await res.json()) as ReadResult;
-  } catch {
-    return offline(messageId, "offline");
+  } catch (e) {
+    return offline(messageId, e instanceof DOMException && e.name === "TimeoutError" ? "timed out" : "offline");
   }
 }

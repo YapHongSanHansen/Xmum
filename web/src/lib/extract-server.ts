@@ -11,7 +11,7 @@ import type { Extraction, InboundMessage } from "../engine/model";
 import { seedState } from "../engine/seed";
 
 export const LIVE_MODEL = "claude-opus-5-5";
-const TIMEOUT_MS = 25_000;
+const TIMEOUT_MS = 9_000;
 
 export type ExtractResult =
   | { extraction: Extraction; model: string; cached: false; ms: number }
@@ -159,7 +159,11 @@ async function slipBase64(image: string): Promise<string> {
  * message id. Missing key, API error, timeout, refusal or invalid output all
  * return the cached extraction with a reason.
  */
+const liveCache = new Map<string, ExtractResult>();
+
 export async function extract(messageId: string): Promise<ExtractResult | null> {
+  const hit = liveCache.get(messageId);
+  if (hit) return hit;
   const msg = seedState().messages.find((m) => m.id === messageId);
   if (!msg) return null;
   const fallback = (reason: string) => cachedFor(messageId, reason) ?? null;
@@ -202,7 +206,9 @@ export async function extract(messageId: string): Promise<ExtractResult | null> 
     }
     const parsed = ExtractionSchema.safeParse(json);
     if (!parsed.success) return fallback("output failed validation");
-    return { extraction: parsed.data, model: response.model || LIVE_MODEL, cached: false, ms: Date.now() - started };
+    const result: ExtractResult = { extraction: parsed.data, model: response.model || LIVE_MODEL, cached: false, ms: Date.now() - started };
+    liveCache.set(messageId, result);
+    return result;
   } catch (e) {
     if (e instanceof Anthropic.APIConnectionTimeoutError) return fallback("timed out");
     if (e instanceof Anthropic.AuthenticationError) return fallback("API key rejected");

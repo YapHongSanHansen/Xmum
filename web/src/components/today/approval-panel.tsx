@@ -167,7 +167,9 @@ export default function ApprovalPanel({ row, onClose }: { row: PlanRow; onClose:
                   <Send className="h-4 w-4" aria-hidden />
                   Approve &amp; send (simulated)
                 </Button>
+                {!quiet && (
                 <a
+                  onClick={approve}
                   href={waShareLink(text)}
                   target="_blank"
                   rel="noreferrer"
@@ -177,9 +179,10 @@ export default function ApprovalPanel({ row, onClose }: { row: PlanRow; onClose:
                   Open in WhatsApp
                   <ExternalLink className="h-3 w-3 text-slate-400" aria-hidden />
                 </a>
+                )}
               </div>
               <div className="text-[11px] text-slate-500">
-                &ldquo;Open in WhatsApp&rdquo; opens WhatsApp and lets you pick the chat; no number is filled in. A person presses send.
+                &ldquo;Open in WhatsApp&rdquo; approves the reminder (logged), then opens WhatsApp to pick the chat; no number is filled in. A person presses send.
               </div>
             </>
           ) : (

@@ -374,8 +374,9 @@ describe("Bukti", () => {
     expect(refused(s, { type: "RESOLVE_HANDOFF", handoffId: s.handoffs[0].id, option: "2026-10-24" }).error).toBe("Pick one of the offered dates.");
   });
 
-  it("M4: a single confident date sets the promise directly", () => {
-    const one = withExtraction("m-hupseng", { promised_date_candidates: ["2026-10-30"], promised_date_confidence: 0.93 });
+  it("M4: a single confident, non-relative date sets the promise directly", () => {
+    // Relative weekdays (下礼拜五) are always ambiguous; see review-fixes.test.ts.
+    const one = withExtraction("m-hupseng", { promised_date_candidates: ["2026-10-30"], promised_date_confidence: 0.93, promised_date_quote: "才过数" });
     const s = act(act(scanned(), advance("2026-10-20T11:05")), extract("m-hupseng", one));
     expect(s.handoffs).toEqual([]);
     expect(invoiceOf(s, "INV-2268").promise).toEqual({ date: "2026-10-30", messageId: "m-hupseng" });

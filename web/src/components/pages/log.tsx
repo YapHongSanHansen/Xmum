@@ -61,6 +61,10 @@ function exportCsv(log: LogEntry[], now: string) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+/** FR-B5: the Clerk never sees cash or gap figures, so scan and R6 lines are redacted for that role. */
+const redactForClerk = (e: LogEntry) =>
+  e.kind === "SYSTEM" || e.rule === "R6" ? e.text.replace(/[−+-]?RM[\d,.]+/g, "RM•••") : e.text;
+
 export default function LogPage() {
   const log = useKutip((s) => s.state.log);
   const now = useKutip((s) => s.state.now);
@@ -195,7 +199,7 @@ export default function LogPage() {
                   <td className="px-3 py-2">
                     <ActorBadge e={e} />
                   </td>
-                  <td className="break-words px-3 py-2 text-[13px] text-slate-800">{e.text}</td>
+                  <td className="break-words px-3 py-2 text-[13px] text-slate-800">{role === "clerk" ? redactForClerk(e) : e.text}</td>
                   <td className="px-3 py-2">
                     <div className="flex flex-wrap gap-1">
                       {(e.refs ?? []).map((r) => (

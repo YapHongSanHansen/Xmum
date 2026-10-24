@@ -186,6 +186,7 @@ const REPLY_ASK_SLIP: Record<Lang, (contact: string) => string> = {
 };
 
 const pct = (c: number) => c.toFixed(2);
+const RELATIVE_WEEKDAY = /下礼拜|下星期|下周|next\s+(mon|tue|wed|thu|fri|sat|sun)|depan/i;
 
 function applyExtraction(s: State, a: Extract<Action, { type: "APPLY_EXTRACTION" }>) {
   if (s.extractions[a.messageId]) return;
@@ -202,7 +203,7 @@ function applyExtraction(s: State, a: Extract<Action, { type: "APPLY_EXTRACTION"
     rejected.push(`${field} (quote "${quote}")`);
     gateFields.push(field);
   };
-  if (ex.amount !== null && ex.amount_source === "text" && !quoteIsVerbatim(ex.amount_quote, m.text)) {
+  if (ex.amount !== null && ex.amount_source !== "image" && !quoteIsVerbatim(ex.amount_quote, m.text)) {
     drop("amount", ex.amount_quote);
     ex.amount = null;
   }
@@ -234,7 +235,13 @@ function applyExtraction(s: State, a: Extract<Action, { type: "APPLY_EXTRACTION"
 
   // Promise to pay
   if (ex.intent === "promise_to_pay" || (ex.amount === null && ex.promised_date_candidates.length)) {
-    const cands = ex.promised_date_candidates;
+    const cands = [...ex.promised_date_candidates];
+    // "Next Friday" / 下礼拜五 / "Jumaat depan" can mean this week or the next: never guess (M4).
+    if (cands.length === 1 && RELATIVE_WEEKDAY.test(ex.promised_date_quote ?? "")) {
+      const back = addDays(cands[0], -7);
+      cands.push(back >= dayOf(s.now) ? back : addDays(cands[0], 7));
+      cands.sort();
+    }
     const ambiguous = cands.length !== 1 || ex.promised_date_confidence < CONFIDENCE_MIN;
     log(s, "AI", "AI", `promise to pay; ${cands.length === 0 ? "no date found" : ambiguous ? `date ambiguous (${cands.map(fmtDate).join(" or ")})` : `date ${fmtDate(cands[0])}`}`, { ...aiMeta, confidence: ex.promised_date_confidence });
     if (!inv) return handoffUnmatched(s, m.id, null, "Which invoice is this promise for?");
@@ -510,8 +517,8 @@ export function apply(prev: State, action: Action): Result {
           const cn = { id: nextId(s, "CN"), invoiceId: inv.id, amount: ded.amount, reason: ded.reason, at: s.now };
           s.creditNotes.push(cn);
           inv.amount -= ded.amount;
-          inv.status = "paid";
-          log(s, "USER", me(s), `accepted ${fmtRM(cn.amount)} deduction: ${inv.number} PAID, credit note ${cn.id} drafted (not submitted)`, { refs: [inv.id, cn.id] });
+          inv.status = outstanding(inv) === 0 ? "paid" : "part_paid";
+          log(s, "USER", me(s), `accepted ${fmtRM(cn.amount)} deduction: ${inv.number} ${inv.status.toUpperCase()}, credit note ${cn.id} drafted (not submitted)`, { refs: [inv.id, cn.id] });
         } else {
           log(s, "USER", me(s), `rejected ${fmtRM(ded.amount)} deduction: still owed on ${inv.number}`, { refs: [inv.id] });
         }
