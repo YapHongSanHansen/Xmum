@@ -1,6 +1,6 @@
 "use client";
-// Simulated Orbyte hub frame (PRD §21). The store persists to localStorage, so
-// the shell renders only on the client to avoid a hydration mismatch.
+// Kutip app frame. The store persists to localStorage, so the shell renders
+// only on the client to avoid a hydration mismatch.
 import { useSyncExternalStore } from "react";
 import { X } from "lucide-react";
 import { cx } from "@/components/ui";
@@ -11,7 +11,6 @@ import InboxPage from "@/components/pages/inbox";
 import LogPage from "@/components/pages/log";
 import ConnectPage from "@/components/pages/connect";
 import GuidePage from "@/components/pages/guide";
-import ModulePage from "@/components/pages/module";
 import ApprovalsPage from "@/components/pages/approvals";
 import UsagePage from "@/components/pages/usage";
 import { Header } from "./header";
@@ -45,7 +44,7 @@ export default function Shell() {
         <Sidebar />
         <main className="min-w-0 flex-1 overflow-y-auto">
           <Toast />
-          <div className="mx-auto max-w-6xl px-4 py-5 lg:px-8 lg:py-7">
+          <div className="mx-auto max-w-[1100px] px-4 py-6 lg:px-10 lg:py-8">
             <CurrentPage />
           </div>
         </main>
@@ -71,8 +70,6 @@ function CurrentPage() {
       return <ConnectPage />;
     case "guide":
       return <GuidePage />;
-    case "module":
-      return <ModulePage />;
     case "approvals":
       return <ApprovalsPage />;
     default:

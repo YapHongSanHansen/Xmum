@@ -1,16 +1,18 @@
 "use client";
-// Hub header (PRD FR-O1) plus the demo controls (FR-H1, FR-A7, FR-F1).
+// Top bar: Kutip, the workspace, the demo disclosure and the role switch;
+// below it the demo controls (FR-H1, FR-A7, FR-F1).
 import { useRef, useState } from "react";
 import { ChevronDown, Clock, FastForward, Play, RotateCcw } from "lucide-react";
-import { Badge, Button, cx } from "@/components/ui";
+import { Button, cx } from "@/components/ui";
 import { dayOf, fmtDateTime, type Role } from "@/engine/model";
 import { DEMO_STOPS } from "@/engine/seed";
 import { useKutip } from "@/lib/store";
 import { Wordmark } from "./wordmark";
 
-const ROLES: { role: Role; label: string }[] = [
-  { role: "owner", label: "Lim Siew Lan · Owner" },
-  { role: "clerk", label: "Nurul · Clerk" },
+// `label` is the accessible name; `short` is what the switch shows.
+const ROLES: { role: Role; label: string; short: string }[] = [
+  { role: "owner", label: "Lim Siew Lan · Owner", short: "Owner" },
+  { role: "clerk", label: "Nurul · Clerk", short: "Clerk" },
 ];
 
 export function Header() {
@@ -20,39 +22,36 @@ export function Header() {
 
   return (
     <header className="shrink-0 bg-surface">
-      {/* Ledger top bar: 52px, light, hairline rule. Wraps onto two lines on a phone. */}
-      <div className="flex min-h-[52px] flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-hairline px-4 py-2 lg:px-6">
-        <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-1">
-          <span className="inline-flex items-center gap-2">
-            <Wordmark />
-            <span className="inline-flex h-[18px] items-center border border-line px-1.5 font-mono text-[10px] text-ink2">hub</span>
-          </span>
-          <span className="hidden h-5 w-px bg-line sm:block" aria-hidden />
-          <div className="flex min-w-0 items-baseline gap-2">
-            <span className="font-mono text-[11px] text-ink2">Workspace</span>
-            <span className="truncate text-[13px] font-medium text-ink">{state.business.name}</span>
-          </div>
-          <Badge tone="amber">Simulated hub · synthetic data</Badge>
+      {/* Identity row. On a phone the workspace drops to its own line under Kutip and the role switch. */}
+      <div className="flex min-h-[52px] flex-wrap items-center gap-x-3 gap-y-1.5 border-b border-hairline px-4 py-2 lg:px-6">
+        <Wordmark />
+        <div className="order-3 flex w-full min-w-0 items-center gap-2.5 sm:order-2 sm:w-auto sm:flex-1">
+          <span className="hidden h-4 w-px bg-line sm:block" aria-hidden />
+          <span className="truncate text-[13px] text-ink2">{state.business.name}</span>
+          <span className="inline-flex h-5 shrink-0 items-center border border-line px-1.5 text-[11px] text-ink2">Demo · synthetic data</span>
         </div>
-        <RoleSwitcher role={state.role} onChange={(role) => dispatch({ type: "SET_ROLE", role })} />
+        <div className="order-2 ml-auto sm:order-3">
+          <RoleSwitcher role={state.role} onChange={(role) => dispatch({ type: "SET_ROLE", role })} />
+        </div>
       </div>
 
-      <div className="flex min-h-10 flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-line bg-canvas px-4 py-1.5 lg:px-6">
-        <div className="flex flex-wrap items-center gap-2.5">
-          <span className="font-mono text-[11px] text-ink2">Demo clock</span>
-          <span className="inline-flex h-7 items-center gap-1.5 border border-line bg-surface px-2.5 font-mono text-[13px] font-medium tabular-nums text-ink">
-            <Clock className="h-3.5 w-3.5 text-ink2" aria-hidden />
-            {fmtDateTime(state.now)}
-          </span>
-          <AdvanceMenu now={state.now} onAdvance={(to) => dispatch({ type: "ADVANCE", to })} />
-          {needsScan && (
-            <Button size="sm" onClick={() => dispatch({ type: "RUN_SCAN" })}>
-              <Play className="h-3.5 w-3.5" aria-hidden />
-              Run 08:00 scan
-            </Button>
-          )}
+      {/* Demo controls: clock, advance, scan, reset. */}
+      <div className="relative flex min-h-9 flex-wrap items-center gap-x-2 gap-y-1 border-b border-line bg-canvas px-4 py-1 lg:px-6">
+        <span className="mr-1 inline-flex items-center gap-1.5 font-mono text-[13px] font-medium tabular-nums text-ink" title="Demo clock">
+          <Clock className="h-3.5 w-3.5 text-ink2" aria-hidden />
+          <span className="sr-only">Demo clock: </span>
+          {fmtDateTime(state.now)}
+        </span>
+        <AdvanceMenu now={state.now} onAdvance={(to) => dispatch({ type: "ADVANCE", to })} />
+        {needsScan && (
+          <Button size="sm" onClick={() => dispatch({ type: "RUN_SCAN" })}>
+            <Play className="h-3.5 w-3.5" aria-hidden />
+            Run 08:00 scan
+          </Button>
+        )}
+        <div className="ml-auto">
+          <ResetButton onReset={() => dispatch({ type: "RESET" })} />
         </div>
-        <ResetButton onReset={() => dispatch({ type: "RESET" })} />
       </div>
     </header>
   );
@@ -60,25 +59,24 @@ export function Header() {
 
 function RoleSwitcher({ role, onChange }: { role: Role; onChange: (r: Role) => void }) {
   return (
-    <div className="flex items-center gap-2">
-      <span className="font-mono text-[11px] text-ink2">Orbyte role</span>
-      <div className="inline-flex border border-line-strong" role="radiogroup" aria-label="Orbyte role">
-        {ROLES.map((r) => (
-          <button
-            key={r.role}
-            type="button"
-            role="radio"
-            aria-checked={role === r.role}
-            onClick={() => role !== r.role && onChange(r.role)}
-            className={cx(
-              "h-7 px-3 text-xs font-medium transition-colors [&+&]:border-l [&+&]:border-line-strong",
-              role === r.role ? "bg-navy text-white" : "bg-surface text-ink2 hover:bg-canvas hover:text-ink",
-            )}
-          >
-            {r.label}
-          </button>
-        ))}
-      </div>
+    <div className="inline-flex border border-line-strong" role="radiogroup" aria-label="Role">
+      {ROLES.map((r) => (
+        <button
+          key={r.role}
+          type="button"
+          role="radio"
+          aria-checked={role === r.role}
+          aria-label={r.label}
+          title={r.label}
+          onClick={() => role !== r.role && onChange(r.role)}
+          className={cx(
+            "h-7 px-3 text-xs font-medium transition-colors [&+&]:border-l [&+&]:border-line-strong",
+            role === r.role ? "bg-navy text-white" : "bg-surface text-ink2 hover:bg-canvas hover:text-ink",
+          )}
+        >
+          {r.short}
+        </button>
+      ))}
     </div>
   );
 }
@@ -86,7 +84,7 @@ function RoleSwitcher({ role, onChange }: { role: Role; onChange: (r: Role) => v
 function AdvanceMenu({ now, onAdvance }: { now: string; onAdvance: (to: string) => boolean }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="relative">
+    <div className="sm:relative">
       <Button size="sm" variant="secondary" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
         <FastForward className="h-3.5 w-3.5" aria-hidden />
         Advance to
@@ -112,8 +110,8 @@ function AdvancePanel({ now, onPick }: { now: string; onPick: (to: string) => vo
   const [custom, setCustom] = useState(now);
   const valid = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(custom) && custom > now;
   return (
-    <div className="absolute left-0 top-full z-40 mt-1.5 w-80 max-w-[calc(100vw-2rem)] border border-line-strong bg-surface p-1.5">
-      <div className="px-2 pb-1 pt-1.5 font-mono text-[11px] text-ink2">Demo script stops</div>
+    <div className="absolute inset-x-4 top-full z-40 mt-1.5 border sm:inset-x-auto sm:left-0 sm:w-80 border-line-strong bg-surface p-1.5">
+      <div className="px-2 pb-1 pt-1.5 text-xs text-ink2">Demo stops</div>
       {DEMO_STOPS.map((stop) => {
         const passed = stop.at <= now;
         return (
@@ -133,7 +131,7 @@ function AdvancePanel({ now, onPick }: { now: string; onPick: (to: string) => vo
         );
       })}
       <div className="mt-1.5 border-t border-hairline px-2 pb-1.5 pt-2.5">
-        <label className="mb-1 block font-mono text-[11px] text-ink2" htmlFor="advance-custom">
+        <label className="mb-1 block text-xs text-ink2" htmlFor="advance-custom">
           Custom time
         </label>
         <div className="flex items-center gap-2">
@@ -149,7 +147,7 @@ function AdvancePanel({ now, onPick }: { now: string; onPick: (to: string) => vo
             Advance
           </Button>
         </div>
-        <p className="mt-1.5 text-[11px] text-ink2">The clock only moves forward. Each 08:00 crossed runs that day&apos;s scan.</p>
+        <p className="mt-1.5 text-[11px] text-ink2">Forward only. Each 08:00 passed runs its scan.</p>
       </div>
     </div>
   );
@@ -169,9 +167,10 @@ function ResetButton({ onReset }: { onReset: () => void }) {
     timer.current = setTimeout(() => setArmed(false), 4000);
   };
   return (
-    <Button size="sm" variant={armed ? "danger" : "ghost"} onClick={click} className={armed ? "" : "text-ink2"}>
+    <Button size="sm" variant={armed ? "danger" : "ghost"} onClick={click} className={armed ? "" : "text-ink2 hover:bg-hairline"}>
       <RotateCcw className="h-3.5 w-3.5" aria-hidden />
-      {armed ? "Click again to reset" : "Reset demo"}
+      {/* On a phone the idle button is icon-only; its accessible name stays "Reset demo". */}
+      {armed ? "Click again to reset" : <span className="sr-only sm:not-sr-only">Reset demo</span>}
     </Button>
   );
 }

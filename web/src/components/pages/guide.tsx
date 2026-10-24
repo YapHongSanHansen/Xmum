@@ -1,8 +1,8 @@
 "use client";
 // Demo guide: the PRD §13 script as a checklist. Each tick is derived from
 // state, so it stays true after a reload and resets with the demo.
-import { ArrowRight, Check, FastForward, Lightbulb, Play, UserRound } from "lucide-react";
-import { Badge, Button, Card, PageTitle, cx } from "@/components/ui";
+import { ArrowRight, Check, FastForward, Play, UserRound } from "lucide-react";
+import { Badge, Button, PageTitle, cx } from "@/components/ui";
 import { dayOf, fmtDateTime, type Role, type State } from "@/engine/model";
 import { DEMO_START, DEMO_STOPS } from "@/engine/seed";
 import { useKutip, type Page } from "@/lib/store";
@@ -12,6 +12,8 @@ interface Step {
   title: string;
   who: Role[];
   look: string;
+  /** Optional figures line, shown in mono under the sentence. */
+  facts?: string;
   refs: string;
   page: Page;
   stop?: string;
@@ -28,7 +30,7 @@ const STEPS: Step[] = [
     n: 1,
     title: "Run the 08:00 scan",
     who: ["owner"],
-    look: "The early-warning card (Owner only) says salaries will be short in 11 days and lists the owner's options. Pick the one that asks the diesel supplier to move the 5 Nov bill.",
+    look: "Salaries are short in 11 days. Ask diesel to move the 5 Nov bill.",
     refs: "FR-B1–B3 · R6",
     page: "today",
     scan: true,
@@ -37,9 +39,9 @@ const STEPS: Step[] = [
   },
   {
     n: 2,
-    title: "Chase plan: approve the gentle reminders",
+    title: "Approve gentle reminders",
     who: ["clerk"],
-    look: "A ranked list with a rule ID and reason on every row; Pelita Frozen Foods is skipped (R2, promise 30 Oct). As Clerk, approve the Tier 1 reminders for INV-2304 and INV-2310.",
+    look: "Approve Tier 1 for INV-2304 and INV-2310. Pelita is skipped (R2, promise 30 Oct).",
     refs: "FR-C1–C4, C6 · R1–R3",
     page: "today",
     done: (s) => hasReminder(s, "INV-2304") && hasReminder(s, "INV-2310"),
@@ -50,18 +52,18 @@ const STEPS: Step[] = [
   },
   {
     n: 3,
-    title: "Approve the firm reminder to Hup Seng",
+    title: "Approve the firm reminder",
     who: ["owner"],
-    look: "The Tier 2 reminder for INV-2268 is in Chinese and only the Owner can approve it. WhatsApp opens prefilled through wa.me, or the send is simulated.",
+    look: "Tier 2 to Hup Seng for INV-2268, in Chinese. Owner only.",
     refs: "FR-C5–C8 · R5",
     page: "today",
     done: (s) => s.invoices.find((i) => i.id === "INV-2268")?.reminders.some((r) => r.tier === 2) ?? false,
   },
   {
     n: 4,
-    title: "Hup Seng replies: which Friday?",
+    title: "Hup Seng: which Friday?",
     who: ["clerk"],
-    look: "Bukti reads the reply and shows the exact words. The date is ambiguous, so a \"Which Friday?\" hand-off appears. Pick 30 Oct and Hup Seng's reminders pause (M5).",
+    look: "Bukti quotes the reply. Pick Fri 30 Oct; reminders pause (M5).",
     refs: "FR-E2, E3, E7–E9 · M4, M5",
     page: "inbox",
     stop: DEMO_STOPS[0].at,
@@ -69,9 +71,10 @@ const STEPS: Step[] = [
   },
   {
     n: 5,
-    title: "Credit check on a new booking",
+    title: "Credit check a booking",
     who: ["clerk", "owner"],
-    look: "As Clerk, enter a Hup Seng booking: Klang → Johor Bahru, RM2,400, 60-day credit. R4 holds it. As Owner, the card shows RM6,850 owed, 46 days late, promise 30 Oct, RM9,250 total. Choose \"ask 50% deposit\".",
+    look: "Book Hup Seng, Klang → Johor Bahru, on 60-day credit. R4 holds it for the Owner.",
+    facts: "RM2,400 · owes RM6,850 · 46 days late · promise 30 Oct · total RM9,250 → ask 50% deposit",
     refs: "FR-D1–D3 · R4",
     page: "bookings",
     stop: DEMO_STOPS[1].at,
@@ -80,9 +83,10 @@ const STEPS: Step[] = [
   },
   {
     n: 6,
-    title: "Mega Bina pays with a deduction",
+    title: "Mega Bina pays, less a deduction",
     who: ["clerk", "owner"],
-    look: "The 22 and 23 Oct scans run and a second warning (5 Nov diesel) appears. The 14:25 bank line and the slip arrive; Bukti's reading (live AI, or the labelled cached result) shows each field with its exact words and confidence, including the RM330 deduction linked to DO-8812. As Clerk, approve the VERIFIED RM2,770 receipt: only then does the 31 Oct meter turn green. As Owner, accept the deduction: INV-2304 is PAID and CN-0057 is drafted.",
+    look: "Clerk approves the verified receipt; only then is 31 Oct covered. Owner accepts the deduction.",
+    facts: "2nd warning 5 Nov · RM2,770 + RM330 (DO-8812) · 31 Oct +RM770 · INV-2304 PAID · CN-0057",
     refs: "FR-H1, E1–E6, E12, B4 · M1, M3",
     page: "inbox",
     stop: DEMO_STOPS[2].at,
@@ -95,9 +99,9 @@ const STEPS: Step[] = [
   },
   {
     n: 7,
-    title: "Kilang says paid, with no proof",
+    title: "Kilang says paid, no proof",
     who: ["clerk"],
-    look: "\"Dah settle la semalam\" has no slip and no bank line, so the invoice is not marked paid (M1). A BM reply asking for the slip is drafted; the Clerk sends it.",
+    look: "“Dah settle la semalam”: no slip, no bank line, so not paid (M1). Send the BM reply.",
     refs: "FR-E10 · M1",
     page: "inbox",
     stop: DEMO_STOPS[3].at,
@@ -107,7 +111,7 @@ const STEPS: Step[] = [
     n: 8,
     title: "Activity log",
     who: ["owner"],
-    look: "Every step above, in order, with its actor (person, rule ID, AI, inbound, bank) and demo time. Entries are append-only and export to CSV.",
+    look: "Every step with its actor, rule and time. Append-only, exports to CSV.",
     refs: "FR-G1–G2",
     page: "log",
     done: (s) => STEPS.slice(0, 7).every((st) => st.done(s)),
@@ -116,12 +120,7 @@ const STEPS: Step[] = [
 
 const WHO_LABEL: Record<Role, string> = { owner: "Owner", clerk: "Clerk" };
 
-const NOTICE = [
-  { title: "Rules, not AI, make decisions", text: "AI only reads messages and slips. Ranking, holds, matching and pauses come from numbered rules, shown on every row." },
-  { title: "Nothing is marked paid without a bank line", text: "A customer saying \"paid\" opens a claim. Only an equal-amount bank line verifies it." },
-  { title: "The clerk never sees cash figures", text: "Switch to Nurul: the gap shows as yes/no, and the balance and payroll amounts are hidden." },
-  { title: "Every step is logged", text: "Each action carries the demo time, the actor and the rule, in an append-only log." },
-];
+const NOTICE = ["Rules decide; AI only reads.", "Paid only with a matching bank line.", "The Clerk never sees cash figures.", "Every step is logged."];
 
 export default function GuidePage() {
   const s = useKutip((st) => st.state);
@@ -136,25 +135,19 @@ export default function GuidePage() {
     <div>
       <PageTitle
         title="Demo guide"
-        subtitle="The 3–4 minute demo script. Ticks update from the demo state as you go."
         right={
-          <div className="flex items-center gap-3 text-[13px]">
-            <span className="font-mono text-xs text-ink2">
-              Clock <span className="font-medium text-ink">{fmtDateTime(s.now)}</span>
-            </span>
-            <Badge tone={doneCount === STEPS.length ? "emerald" : "slate"}>
-              {doneCount} of {STEPS.length} done
-            </Badge>
-          </div>
+          <Badge tone={doneCount === STEPS.length ? "emerald" : "slate"}>
+            {doneCount} of {STEPS.length} done
+          </Badge>
         }
       />
 
-      <div className="mb-5 h-1.5 overflow-hidden bg-hairline">
+      <div className="mb-6 h-1 overflow-hidden bg-hairline">
         <div className="h-full bg-navy transition-[width] duration-500" style={{ width: `${(doneCount / STEPS.length) * 100}%` }} />
       </div>
 
-      <div className="grid items-start gap-5 lg:grid-cols-[1fr_300px]">
-        <ol className="space-y-3">
+      <div className="grid items-start gap-8 lg:grid-cols-[1fr_240px]">
+        <ol className="divide-y divide-hairline border border-line bg-surface">
           {STEPS.map((step, idx) => {
             const isDone = done[idx];
             const isNext = idx === nextIdx;
@@ -162,80 +155,68 @@ export default function GuidePage() {
             const canAdvance = !!step.stop && step.stop > s.now;
             const hint = !isDone && step.progress ? step.progress(s) : null;
             return (
-              <li key={step.n}>
-                <Card className={cx("px-4 py-3.5", isNext && "border-navy ring-1 ring-inset ring-navy", isDone && "bg-canvas")}>
-                  <div className="flex gap-3">
-                    <StatusDot n={step.n} done={isDone} next={isNext} />
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className={cx("text-[13px] font-semibold", isDone ? "text-ink2" : "text-ink")}>{step.title}</span>
-                        {step.who.map((r) => (
-                          <Badge key={r} tone={r === "owner" ? "violet" : "sky"}>
-                            {WHO_LABEL[r]}
-                          </Badge>
-                        ))}
-                        {stop && (
-                          <span className="font-mono text-[11px] text-ink2">{fmtDateTime(stop.at)}</span>
-                        )}
-                        {isNext && <Badge tone="emerald">next</Badge>}
-                        {hint && <Badge tone="amber">{hint}</Badge>}
-                      </div>
-                      <p className="mt-1 text-[13px] leading-relaxed text-ink2">{step.look}</p>
-                      <div className="mt-2.5 flex flex-wrap items-center gap-2">
-                        {step.scan && needsScan && dayOf(s.now) === FIRST_DAY && (
-                          <Button size="sm" onClick={() => dispatch({ type: "RUN_SCAN" })}>
-                            <Play className="h-3.5 w-3.5" aria-hidden />
-                            Run 08:00 scan
-                          </Button>
-                        )}
-                        {stop && canAdvance && (
-                          <Button size="sm" variant="secondary" onClick={() => dispatch({ type: "ADVANCE", to: stop.at })}>
-                            <FastForward className="h-3.5 w-3.5" aria-hidden />
-                            Advance to {fmtDateTime(stop.at)}
-                          </Button>
-                        )}
-                        {step.who
-                          .filter((r) => !isDone && r !== s.role)
-                          .map((r) => (
-                            <Button key={r} size="sm" variant="ghost" onClick={() => dispatch({ type: "SET_ROLE", role: r })}>
-                              <UserRound className="h-3.5 w-3.5" aria-hidden />
-                              Act as {WHO_LABEL[r]}
-                            </Button>
-                          ))}
-                        <Button size="sm" variant={isNext ? "primary" : "secondary"} onClick={() => go(step.page)}>
-                          Go
-                          <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+              <li key={step.n} className={cx("relative px-5 py-4", isNext && "bg-navy-soft/40")}>
+                {isNext && <span className="absolute inset-y-0 left-0 w-[3px] bg-navy" aria-hidden />}
+                <div className="flex gap-3.5">
+                  <StatusDot n={step.n} done={isDone} next={isNext} />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+                      <span className={cx("text-[14px] font-semibold", isDone ? "text-ink2" : "text-ink")}>{step.title}</span>
+                      <span className="text-xs text-ink2">{step.who.map((r) => WHO_LABEL[r]).join(" · ")}</span>
+                      {stop && !canAdvance && <span className="font-mono text-[11px] text-ink2">{fmtDateTime(stop.at)}</span>}
+                      {isNext && <span className="text-xs font-medium text-navy">Next</span>}
+                      {hint && <Badge tone="amber">{hint}</Badge>}
+                    </div>
+                    <p className="mt-1 text-[13px] leading-relaxed text-ink2">{step.look}</p>
+                    {step.facts && <p className="num mt-1 text-xs leading-relaxed text-ink">{step.facts}</p>}
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      {step.scan && needsScan && dayOf(s.now) === FIRST_DAY && (
+                        <Button size="sm" onClick={() => dispatch({ type: "RUN_SCAN" })}>
+                          <Play className="h-3.5 w-3.5" aria-hidden />
+                          Run 08:00 scan
                         </Button>
-                        <span className="ml-auto font-mono text-[10px] text-ink2">{step.refs}</span>
-                      </div>
+                      )}
+                      {stop && canAdvance && (
+                        <Button size="sm" variant="secondary" onClick={() => dispatch({ type: "ADVANCE", to: stop.at })}>
+                          <FastForward className="h-3.5 w-3.5" aria-hidden />
+                          Advance to {fmtDateTime(stop.at)}
+                        </Button>
+                      )}
+                      {step.who
+                        .filter((r) => !isDone && r !== s.role)
+                        .map((r) => (
+                          <Button key={r} size="sm" variant="ghost" onClick={() => dispatch({ type: "SET_ROLE", role: r })}>
+                            <UserRound className="h-3.5 w-3.5" aria-hidden />
+                            Act as {WHO_LABEL[r]}
+                          </Button>
+                        ))}
+                      <Button size="sm" variant={isNext ? "primary" : "secondary"} onClick={() => go(step.page)}>
+                        Go
+                        <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+                      </Button>
+                      <span className="ml-auto font-mono text-[10px] text-ink2">{step.refs}</span>
                     </div>
                   </div>
-                </Card>
+                </div>
               </li>
             );
           })}
         </ol>
 
-        <Card tone="good" className="lg:sticky lg:top-6">
-          <div className="flex items-center gap-2 border-b border-hairline px-4 py-3">
-            <Lightbulb className="h-4 w-4 text-emerald-700" aria-hidden />
-            <span className="eyebrow">What to notice</span>
-          </div>
-          <ul className="space-y-3 px-4 py-3">
+        <aside className="lg:sticky lg:top-6">
+          <h2 className="text-xs font-medium text-ink2">What to notice</h2>
+          <ul className="mt-3 space-y-2.5">
             {NOTICE.map((n) => (
-              <li key={n.title} className="flex gap-2">
-                <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-600" aria-hidden />
-                <div>
-                  <div className="text-[13px] font-semibold text-ink">{n.title}</div>
-                  <div className="text-xs leading-relaxed text-ink2">{n.text}</div>
-                </div>
+              <li key={n} className="flex gap-2 text-[13px] leading-snug text-ink">
+                <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-700" aria-hidden />
+                {n}
               </li>
             ))}
           </ul>
-          <div className="border-t border-hairline px-4 py-2.5 text-[11px] text-ink2">
-            Start state: seed loaded, clock {fmtDateTime(DEMO_START)}. Use &ldquo;Reset demo&rdquo; in the header to start over.
-          </div>
-        </Card>
+          <p className="mt-5 border-t border-hairline pt-3 text-xs text-ink2">
+            Reset demo returns to <span className="num">{fmtDateTime(DEMO_START)}</span>.
+          </p>
+        </aside>
       </div>
     </div>
   );

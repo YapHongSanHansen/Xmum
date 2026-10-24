@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Kutip design tokens: "Ledger" (shared with the team's Soapay UI).
+/* Kutip design tokens: Ledger.
    IBM Plex Sans + Mono, navy accent, 2px corners, hairline borders, no shadows,
    money and IDs in mono with tabular figures. Light only. */
 :root {
@@ -117,11 +117,12 @@ body {
   font-family: var(--font-plex-mono), ui-monospace, monospace;
   font-variant-numeric: tabular-nums;
 }
+/* Small section label: Plex Sans, sentence case, muted. Mono stays for figures only. */
 .eyebrow {
-  font-family: var(--font-plex-mono), ui-monospace, monospace;
+  font-family: var(--font-plex-sans), system-ui, sans-serif;
   font-size: 12px;
   font-weight: 500;
-  color: var(--accent);
+  color: var(--ink2);
 }
 
 /* Keyboard focus: one navy ring everywhere (white ring on the navy panel). */
