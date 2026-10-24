@@ -13,6 +13,7 @@ import ConnectPage from "@/components/pages/connect";
 import GuidePage from "@/components/pages/guide";
 import ModulePage from "@/components/pages/module";
 import ApprovalsPage from "@/components/pages/approvals";
+import UsagePage from "@/components/pages/usage";
 import { Header } from "./header";
 import { Sidebar } from "./sidebar";
 
@@ -63,6 +64,8 @@ function CurrentPage() {
       return <InboxPage />;
     case "log":
       return <LogPage />;
+    case "usage":
+      return <UsagePage />;
     case "connect":
       return <ConnectPage />;
     case "guide":

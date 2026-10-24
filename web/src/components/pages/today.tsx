@@ -11,6 +11,7 @@ import CashMeters from "@/components/today/cash-meters";
 import EarlyWarnings from "@/components/today/early-warnings";
 import ChasePlan from "@/components/today/chase-plan";
 import ApprovalPanel from "@/components/today/approval-panel";
+import WelcomePanel from "@/components/welcome/welcome-panel";
 
 export default function TodayPage() {
   const state = useKutip((s) => s.state);
@@ -23,6 +24,8 @@ export default function TodayPage() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-5">
+      <WelcomePanel />
+
       <PageTitle
         title="Today"
         subtitle={`${fmtDateTime(state.now)} · signed in as ${me.name} (${state.role === "owner" ? "Owner" : "Clerk"})`}

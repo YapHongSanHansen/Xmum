@@ -15,6 +15,7 @@ import {
   Users,
   Wallet,
   ClipboardCheck,
+  Coins,
 } from "lucide-react";
 import { cx } from "@/components/ui";
 import { useKutip, type Page } from "@/lib/store";
@@ -34,7 +35,7 @@ export function Sidebar() {
   const approvals = useKutip((s) => approvalsCount(s.state));
 
   const isModule = (name: string) => page === "module" && moduleName === name;
-  const kutipPages: Page[] = ["today", "bookings", "inbox", "log"];
+  const kutipPages: Page[] = ["today", "bookings", "inbox", "log", "usage"];
   const inKutip = kutipPages.includes(page);
 
   return (
@@ -90,6 +91,7 @@ export function Sidebar() {
               }
             />
             <SubItem icon={ScrollText} label="Activity log" active={page === "log"} onClick={() => go("log")} />
+            <SubItem icon={Coins} label="Usage & credits" active={page === "usage"} onClick={() => go("usage")} />
           </div>
         </div>
       </div>
