@@ -2,7 +2,7 @@
 // Inbox (PRD §7E, FR-E1–E12): customers' WhatsApp replies, Bukti's AI reading,
 // and the deterministic rules' verdict. Every change is an engine action.
 import { useCallback, useState } from "react";
-import { useKutip } from "@/lib/store";
+import { useKachingg } from "@/lib/store";
 import { readMessage } from "@/lib/extract-client";
 import { Badge, Card, CardHeader, Empty, PageTitle } from "@/components/ui";
 import { BankStatement } from "@/components/inbox/bank-statement";
@@ -13,8 +13,8 @@ import { MessageList } from "@/components/inbox/message-list";
 import { arrivedMessages } from "@/components/inbox/status";
 
 export default function InboxPage() {
-  const state = useKutip((s) => s.state);
-  const dispatch = useKutip((s) => s.dispatch);
+  const state = useKachingg((s) => s.state);
+  const dispatch = useKachingg((s) => s.dispatch);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [runs, setRuns] = useState<Record<string, RunInfo>>({});
   const [lightbox, setLightbox] = useState<string | null>(null);

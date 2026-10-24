@@ -3,7 +3,7 @@
 // 30+ days late goes ON HOLD and raises an Owner credit check (R4).
 import { useState, type FormEvent, type ReactNode } from "react";
 import { Wand2 } from "lucide-react";
-import { useKutip } from "@/lib/store";
+import { useKachingg } from "@/lib/store";
 import { Button, Card, CardHeader, RuleTag, cx } from "@/components/ui";
 import type { Booking } from "@/engine/model";
 
@@ -25,8 +25,8 @@ const inputCls =
 const NOTE_TONE = { good: "text-emerald-700", warn: "text-amber-800", bad: "text-rose-700" } as const;
 
 export default function BookingForm() {
-  const customers = useKutip((s) => s.state.customers);
-  const dispatch = useKutip((s) => s.dispatch);
+  const customers = useKachingg((s) => s.state.customers);
+  const dispatch = useKachingg((s) => s.dispatch);
   const [form, setForm] = useState(EMPTY);
   const [note, setNote] = useState<{ tone: "good" | "warn" | "bad"; text: string } | null>(null);
 
@@ -56,7 +56,7 @@ export default function BookingForm() {
       creditDays: form.terms === "credit" ? days : 0,
     });
     if (!ok) return;
-    const b = useKutip.getState().state.bookings.at(-1);
+    const b = useKachingg.getState().state.bookings.at(-1);
     setNote(
       b?.status === "on_hold"
         ? { tone: "warn", text: "Saved · on hold for an Owner credit check." }

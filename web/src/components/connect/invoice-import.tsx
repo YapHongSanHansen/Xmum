@@ -6,12 +6,12 @@ import { Upload } from "lucide-react";
 import { Badge, Button, Card, CardHeader, RuleTag } from "@/components/ui";
 import { fmtDate, fmtRM } from "@/engine/model";
 import { SAMPLE_INVOICE_CSV, parseInvoiceCsv } from "@/engine/imports";
-import { useKutip } from "@/lib/store";
+import { useKachingg } from "@/lib/store";
 import { CsvSource, FormatNote, InvalidRows, LedgerTable, cellCls, numCls, rowCls } from "./csv-source";
 
 export function InvoiceImport() {
-  const state = useKutip((s) => s.state);
-  const dispatch = useKutip((s) => s.dispatch);
+  const state = useKachingg((s) => s.state);
+  const dispatch = useKachingg((s) => s.dispatch);
   const [text, setText] = useState("");
   const [done, setDone] = useState<string | null>(null);
   const preview = useMemo(() => (text.trim() ? parseInvoiceCsv(text, state) : null), [text, state]);

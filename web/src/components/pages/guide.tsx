@@ -5,7 +5,7 @@ import { ArrowRight, Check, FastForward, Play, UserRound } from "lucide-react";
 import { Badge, Button, PageTitle, cx } from "@/components/ui";
 import { dayOf, fmtDateTime, type Role, type State } from "@/engine/model";
 import { DEMO_START, DEMO_STOPS } from "@/engine/seed";
-import { useKutip, type Page } from "@/lib/store";
+import { useKachingg, type Page } from "@/lib/store";
 
 interface Step {
   n: number;
@@ -123,9 +123,9 @@ const WHO_LABEL: Record<Role, string> = { owner: "Owner", clerk: "Clerk" };
 const NOTICE = ["Rules decide; AI only reads.", "Paid only with a matching bank line.", "The Clerk never sees cash figures.", "Every step is logged."];
 
 export default function GuidePage() {
-  const s = useKutip((st) => st.state);
-  const dispatch = useKutip((st) => st.dispatch);
-  const go = useKutip((st) => st.go);
+  const s = useKachingg((st) => st.state);
+  const dispatch = useKachingg((st) => st.dispatch);
+  const go = useKachingg((st) => st.go);
   const done = STEPS.map((st) => st.done(s));
   const doneCount = done.filter(Boolean).length;
   const nextIdx = done.findIndex((d) => !d);

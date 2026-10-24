@@ -1,4 +1,4 @@
-# Submission pack: Kutip (XMUM Hackathon, Domain 2, preliminary round)
+# Submission pack: Kachingg (XMUM Hackathon, Domain 2, preliminary round)
 
 Deadline as last seen on sdchack.my: **25 Oct 2026, 07:59 AM MYT**. Confirm it in the portal (see "Unconfirmed" below).
 

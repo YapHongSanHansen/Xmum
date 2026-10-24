@@ -1,10 +1,10 @@
 "use client";
-// Kutip app frame. The store persists to localStorage, so the shell renders
+// Kachingg app frame. The store persists to localStorage, so the shell renders
 // only on the client to avoid a hydration mismatch.
 import { useEffect, useSyncExternalStore } from "react";
 import { X } from "lucide-react";
 import { cx } from "@/components/ui";
-import { useKutip } from "@/lib/store";
+import { useKachingg } from "@/lib/store";
 import TodayPage from "@/components/pages/today";
 import BookingsPage from "@/components/pages/bookings";
 import InboxPage from "@/components/pages/inbox";
@@ -28,14 +28,14 @@ function useMounted() {
 
 export default function Shell() {
   const mounted = useMounted();
-  const page = useKutip((s) => s.page);
+  const page = useKachingg((s) => s.page);
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
   }, [page]);
   if (!mounted) {
     return (
       <div className="grid h-screen place-items-center bg-canvas font-mono text-xs text-ink2" aria-busy="true">
-        Loading Kutip…
+        Loading Kachingg…
       </div>
     );
   }
@@ -58,7 +58,7 @@ export default function Shell() {
 }
 
 function CurrentPage() {
-  const page = useKutip((s) => s.page);
+  const page = useKachingg((s) => s.page);
   switch (page) {
     case "today":
       return <TodayPage />;
@@ -82,8 +82,8 @@ function CurrentPage() {
 }
 
 function Toast() {
-  const toast = useKutip((s) => s.toast);
-  const clearToast = useKutip((s) => s.clearToast);
+  const toast = useKachingg((s) => s.toast);
+  const clearToast = useKachingg((s) => s.clearToast);
   if (!toast) return null;
   const error = toast.kind === "error";
   return (

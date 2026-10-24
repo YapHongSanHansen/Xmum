@@ -1,8 +1,8 @@
-# Kutip: never be surprised on payroll day
+# Kachingg: never be surprised on payroll day
 
 *A cash-collection module for the Orbyte hub. XMUM Hackathon, Domain 2. Preliminary proposal.*
 
-**In short.** Small Malaysian firms that sell on credit get paid late, then find out on payroll day that cash is short. Kutip warns the owner 10+ days before a shortfall, holds new credit for customers who already pay late, and ranks who to chase first. Its AI reader, Bukti, reads customers' "dah bank in boss" replies, but an invoice is marked paid only when the money is in the bank statement and a person approves.
+**In short.** Small Malaysian firms that sell on credit get paid late, then find out on payroll day that cash is short. Kachingg warns the owner 10+ days before a shortfall, holds new credit for customers who already pay late, and ranks who to chase first. Its AI reader, Bukti, reads customers' "dah bank in boss" replies, but an invoice is marked paid only when the money is in the bank statement and a person approves.
 
 All data is synthetic. Lori Laju Logistics and every customer, bank and message are fictional.
 
@@ -15,7 +15,7 @@ All data is synthetic. Lori Laju Logistics and every customer, bank and message 
 
 So the owner learns on payroll day that cash is short, keeps giving credit to late payers and chases on WhatsApp from memory. The clerk matches payment screenshots by hand.
 
-A customer can always choose not to pay. Kutip focuses on what the owner **can** control: knowing early, deciding on credit, choosing whom to chase, and keeping records true.
+A customer can always choose not to pay. Kachingg focuses on what the owner **can** control: knowing early, deciding on credit, choosing whom to chase, and keeping records true.
 
 **Users:** owners and clerks of B2B sellers with 2-30 staff. Demo business: Lori Laju Logistics, a 12-person haulage firm (transport has the longest delays).
 
@@ -47,9 +47,9 @@ In the demo, the 20 Oct scan shows 31 Oct salaries short RM2,000. On 23 Oct a RM
 
 *Status:* the live Claude call is built but **not yet run against the API**. The demo uses hand-written cached readings for its three messages, labelled in the UI; the fallback is the tested path. If interviews show customers rarely send slips, Bukti narrows to replies and promises.
 
-**Orbyte fit and reuse (must-have 5).** Kutip is a module inside Orbyte. Invoices come from accounting partners through Orbyte Connect. It reuses Orbyte's roles, approvals inbox, client records and audit trail, and adds finance, not HR or admin. The rules are not specific to haulage: a sector pack would change templates and thresholds, not the rules. A planned event API (`gap.detected`, `proof.verified`) would let other modules build on it.
+**Orbyte fit and reuse (must-have 5).** Kachingg is a module inside Orbyte. Invoices come from accounting partners through Orbyte Connect. It reuses Orbyte's roles, approvals inbox, client records and audit trail, and adds finance, not HR or admin. The rules are not specific to haulage: a sector pack would change templates and thresholds, not the rules. A planned event API (`gap.detected`, `proof.verified`) would let other modules build on it.
 
-**PDPA in a real deployment.** The SME is the data user under PDPA 2010 (amended 2024); Orbyte/Kutip is its processor. Contact data is used only to follow up invoices, with opt-out per contact. Bukti keeps only needed fields, masks account numbers and encrypts slips for an owner-set period. The AI provider must not train on the data; cross-border processing is disclosed.
+**PDPA in a real deployment.** The SME is the data user under PDPA 2010 (amended 2024); Orbyte/Kachingg is its processor. Contact data is used only to follow up invoices, with opt-out per contact. Bukti keeps only needed fields, masks account numbers and encrypts slips for an owner-set period. The AI provider must not train on the data; cross-border processing is disclosed.
 
 **Business model.** Orbyte's credit wallet, no per-seat fee. Illustrative prices: first 10 open invoices free, then RM0.50 each; RM1.50 per invoice chased in a month; RM0.30 per message or slip read; RM0.50 per credit check. An assumed month (40 open, 15 chased, 40 read, 4 checks) costs about RM51.50, under Bukku Grow's RM65/month for email reminders only.
 
@@ -63,7 +63,7 @@ In the demo, the 20 Oct scan shows 31 Oct salaries short RM2,000. On 23 Oct a RM
 |---|---|---|
 | Shortfalls warned ahead | 100%, at least 10 days before the bill | Data kept current |
 | Invoices marked paid without a bank line | 0 | Enforced by rule and test |
-| Credit orders from 30+ day late payers seen by the owner first | 100% | Orders entered in Kutip |
+| Credit orders from 30+ day late payers seen by the owner first | 100% | Orders entered in Kachingg |
 | Clerk time per slip matched | About 5 minutes saved | Estimate: 10 hours/month at about 120 slips/month |
 | Bukti amount accuracy | 95% or more | Synthetic test set; no score claimed yet |
 

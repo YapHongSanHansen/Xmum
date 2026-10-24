@@ -1,5 +1,5 @@
 "use client";
-// Orbyte on Connect: Kutip reads the (simulated) Orbyte workspace through the
+// Orbyte on Connect: Kachingg reads the (simulated) Orbyte workspace through the
 // connector and writes its audit trail and approvals back. Everything here is
 // simulated and synthetic (docs/orbyte-integration.md). The Clerk sees no cash
 // or gap figures: audit lines are redacted the same way as the activity log.
@@ -9,25 +9,25 @@ import { Badge, Button, Card, CardHeader, MetricRow, cx, tbl } from "@/component
 import { fmtDateTime, type Lang } from "@/engine/model";
 import { clientRows, httpOrbyteConnector, pendingOrbyteApprovals, readOrbyte, toOrbyteAudit } from "@/orbyte/connector";
 import type { OrbyteSnapshot } from "@/orbyte/types";
-import { useKutip } from "@/lib/store";
+import { useKachingg } from "@/lib/store";
 
 const LANG_LABEL: Record<Lang, string> = { en: "EN", bm: "BM", zh: "ZH" };
-const KUTIP_ROLE: Record<string, string> = { owner: "Owner", clerk: "Clerk" };
+const KACHINGG_ROLE: Record<string, string> = { owner: "Owner", clerk: "Clerk" };
 
 const API_LINKS: [string, string][] = [
   ["/api/orbyte-mock/v1/clients", "Orbyte clients (simulated)"],
   ["/api/orbyte-mock/v1/projects", "Orbyte projects (simulated)"],
   ["/api/orbyte-mock/v1/users", "Orbyte users (simulated)"],
   ["/api/orbyte-mock/v1/wallet", "Orbyte wallet (simulated)"],
-  ["/api/kutip/v1/manifest", "Kutip module manifest"],
-  ["/api/kutip/v1/events", "Kutip events (demo replay)"],
+  ["/api/kachingg/v1/manifest", "Kachingg module manifest"],
+  ["/api/kachingg/v1/events", "Kachingg events (demo replay)"],
 ];
 
 const SYNC_PREFIX = "synced from Orbyte";
 
 export function OrbytePanel() {
-  const s = useKutip((st) => st.state);
-  const dispatch = useKutip((st) => st.dispatch);
+  const s = useKachingg((st) => st.state);
+  const dispatch = useKachingg((st) => st.dispatch);
   const connector = useMemo(() => httpOrbyteConnector("/api/orbyte-mock/v1"), []);
   const [snap, setSnap] = useState<OrbyteSnapshot | null>(null);
   const [busy, setBusy] = useState(false);
@@ -100,30 +100,30 @@ export function OrbytePanel() {
         <div className="border-t border-line">
           <div className={tbl.wrap}>
             <table className={cx(tbl.table, "min-w-[560px]")}>
-              <caption className="sr-only">Orbyte clients mapped to Kutip customers</caption>
+              <caption className="sr-only">Orbyte clients mapped to Kachingg customers</caption>
               <thead>
                 <tr className={tbl.headRow}>
                   <th className={tbl.th}>Orbyte client</th>
                   <th className={tbl.th}>Orbyte id</th>
                   <th className={tbl.th}>Language</th>
-                  <th className={tbl.th}>Kutip customer</th>
+                  <th className={tbl.th}>Kachingg customer</th>
                   <th className={cx(tbl.th, "text-right")}>Open invoices</th>
                 </tr>
               </thead>
               <tbody>
-                {rows.map(({ client, kutipName, openInvoices }) => (
+                {rows.map(({ client, kachinggName, openInvoices }) => (
                   <tr key={client.id} className={cx(tbl.row, "h-12")}>
                     <td className={cx(tbl.td, "text-ink")}>{client.name}</td>
                     <td className={cx(tbl.td, "font-mono text-xs text-ink2")}>{client.id}</td>
                     <td className={cx(tbl.td, "text-xs text-ink2")}>{LANG_LABEL[client.language]}</td>
                     <td className={cx(tbl.td, "text-xs text-ink2")}>
-                      {kutipName ? (
+                      {kachinggName ? (
                         <span className="inline-flex items-center gap-1.5">
                           <ArrowRight className="h-3 w-3" aria-hidden />
-                          <span className="font-mono">{client.kutipCustomerId}</span>
+                          <span className="font-mono">{client.kachinggCustomerId}</span>
                         </span>
                       ) : (
-                        "Not in Kutip"
+                        "Not in Kachingg"
                       )}
                     </td>
                     <td className={cx(tbl.td, "text-right font-mono tabular-nums")}>{openInvoices}</td>
@@ -151,7 +151,7 @@ export function OrbytePanel() {
                 <span className="min-w-0">
                   <span className="text-ink">{u.orbyteRole}</span>
                   <ArrowRight className="mx-1.5 inline h-3 w-3 text-ink2" aria-label="maps to" />
-                  <span className="text-ink">{KUTIP_ROLE[u.kutipRole]}</span>
+                  <span className="text-ink">{KACHINGG_ROLE[u.kachinggRole]}</span>
                 </span>
                 <span className="truncate text-xs text-ink2">{u.name}</span>
               </li>

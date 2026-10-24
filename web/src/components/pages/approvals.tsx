@@ -1,8 +1,8 @@
 "use client";
-// Approvals inbox (PRD FR-O3): every Kutip decision waiting for a person, in
+// Approvals inbox (PRD FR-O3): every Kachingg decision waiting for a person, in
 // one list, with who may act. Acting happens on the page that owns the item.
 import { ArrowRight, CheckCircle2 } from "lucide-react";
-import { useKutip, type Page } from "@/lib/store";
+import { useKachingg, type Page } from "@/lib/store";
 import { Badge, Button, Card, CardHeader, Empty, MetricRow, PageTitle, RuleTag } from "@/components/ui";
 import { customerOf, dayOf, fmtDate, fmtRM, invoiceOf, type Role, type State } from "@/engine/model";
 import { chasePlan, forecast } from "@/engine/rules";
@@ -109,8 +109,8 @@ function pendingItems(s: State): Pending[] {
 }
 
 export default function ApprovalsPage() {
-  const state = useKutip((s) => s.state);
-  const go = useKutip((s) => s.go);
+  const state = useKachingg((s) => s.state);
+  const go = useKachingg((s) => s.go);
   const items = pendingItems(state);
   const mine = items.filter((i) => i.who.includes(state.role));
   const others = items.filter((i) => !i.who.includes(state.role));

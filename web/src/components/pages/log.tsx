@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { ArrowDownUp, Download, Lock, Search, X } from "lucide-react";
 import { Badge, Button, Card, Empty, PageTitle, RuleTag, cx, tbl } from "@/components/ui";
 import { fmtDateTime, type ActorKind, type LogEntry } from "@/engine/model";
-import { useKutip } from "@/lib/store";
+import { useKachingg } from "@/lib/store";
 
 const KINDS: ActorKind[] = ["SYSTEM", "RULE", "AI", "USER", "INBOUND", "BANK"];
 
@@ -59,7 +59,7 @@ function exportCsv(log: LogEntry[], now: string) {
   const url = URL.createObjectURL(new Blob([body], { type: "text/csv;charset=utf-8" }));
   const a = document.createElement("a");
   a.href = url;
-  a.download = `kutip-activity-log-${now.replace(/[:]/g, "")}.csv`;
+  a.download = `kachingg-activity-log-${now.replace(/[:]/g, "")}.csv`;
   document.body.appendChild(a);
   a.click();
   a.remove();
@@ -71,9 +71,9 @@ const redactForClerk = (e: LogEntry) =>
   e.kind === "SYSTEM" || e.rule === "R6" ? e.text.replace(/[−+-]?RM[\d,.]+/g, "RM•••") : e.text;
 
 export default function LogPage() {
-  const log = useKutip((s) => s.state.log);
-  const now = useKutip((s) => s.state.now);
-  const role = useKutip((s) => s.state.role);
+  const log = useKachingg((s) => s.state.log);
+  const now = useKachingg((s) => s.state.now);
+  const role = useKachingg((s) => s.state.role);
   const [query, setQuery] = useState("");
   const [kinds, setKinds] = useState<ActorKind[]>([]);
   const [newestFirst, setNewestFirst] = useState(false);

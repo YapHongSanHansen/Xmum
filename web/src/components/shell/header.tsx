@@ -1,12 +1,12 @@
 "use client";
-// Top bar: Kutip, the workspace, the demo disclosure and the role switch;
+// Top bar: Kachingg, the workspace, the demo disclosure and the role switch;
 // below it the demo controls (FR-H1, FR-A7, FR-F1).
 import { useRef, useState } from "react";
 import { Bell, BookOpen, Building2, ChevronDown, Clock, FastForward, Play, RotateCcw } from "lucide-react";
 import { Button, cx } from "@/components/ui";
 import { dayOf, fmtDateTime, type Role } from "@/engine/model";
 import { DEMO_STOPS } from "@/engine/seed";
-import { useKutip } from "@/lib/store";
+import { useKachingg } from "@/lib/store";
 import { Wordmark } from "./wordmark";
 import { Navigation } from "./navigation";
 import { approvalsCount } from "@/components/pages/approvals";
@@ -18,15 +18,15 @@ const ROLES: { role: Role; label: string; short: string }[] = [
 ];
 
 export function Header() {
-  const state = useKutip((s) => s.state);
-  const dispatch = useKutip((s) => s.dispatch);
-  const go = useKutip((s) => s.go);
+  const state = useKachingg((s) => s.state);
+  const dispatch = useKachingg((s) => s.dispatch);
+  const go = useKachingg((s) => s.go);
   const needsScan = !state.scannedDays.includes(dayOf(state.now));
   const pending = approvalsCount(state);
   return (
     <header className="app-header">
       <div className="header-main">
-        <button type="button" onClick={() => go("today")} aria-label="Kutip overview">
+        <button type="button" onClick={() => go("today")} aria-label="Kachingg overview">
           <Wordmark />
         </button>
         <Navigation />

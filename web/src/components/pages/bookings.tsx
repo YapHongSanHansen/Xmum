@@ -2,10 +2,10 @@
 import { PageTitle, MetricRow } from "@/components/ui";
 import BookingForm from "@/components/bookings/booking-form";
 import BookingList from "@/components/bookings/booking-list";
-import { useKutip } from "@/lib/store";
+import { useKachingg } from "@/lib/store";
 import { fmtRM } from "@/engine/model";
 export default function BookingsPage() {
-  const bookings = useKutip((s) => s.state.bookings);
+  const bookings = useKachingg((s) => s.state.bookings);
   const held = bookings.filter((b) => b.status === "on_hold");
   return (
     <div>

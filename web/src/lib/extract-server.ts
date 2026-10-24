@@ -11,9 +11,10 @@ import { CACHED_EXTRACTIONS, CACHED_MODEL } from "../engine/cached";
 import type { Extraction, InboundMessage } from "../engine/model";
 import { seedState } from "../engine/seed";
 
-// KUTIP_AI_MODEL overrides the model, e.g. when a proxy such as Replit's
-// managed Anthropic integration offers a different Claude model.
-export const LIVE_MODEL = process.env.KUTIP_AI_MODEL || "claude-opus-5-5";
+// KACHINGG_AI_MODEL overrides the model, e.g. when a proxy such as Replit's
+// managed Anthropic integration offers a different Claude model. The pre-rename
+// KUTIP_AI_MODEL is still read so an existing deployment's secret keeps working.
+export const LIVE_MODEL = process.env.KACHINGG_AI_MODEL || process.env.KUTIP_AI_MODEL || "claude-opus-5-5";
 // The SDK reads ANTHROPIC_API_KEY and ANTHROPIC_BASE_URL from the environment.
 // Behind a proxy (ANTHROPIC_BASE_URL set), beta features may not pass through.
 const VIA_PROXY = Boolean(process.env.ANTHROPIC_BASE_URL);

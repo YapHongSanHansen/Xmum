@@ -25,7 +25,7 @@ Expected values: `amount` and deduction amounts are in sen, the app's money unit
 
 ```bash
 cd web
-ANTHROPIC_API_KEY=... pnpm eval:bukti     # live run; uses claude-opus-5-5 unless KUTIP_AI_MODEL is set
+ANTHROPIC_API_KEY=... pnpm eval:bukti     # live run; uses claude-opus-5-5 unless KACHINGG_AI_MODEL is set
 pnpm test                                 # includes eval/bukti.test.ts (the set and the scorer)
 ```
 

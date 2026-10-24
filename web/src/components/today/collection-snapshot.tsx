@@ -1,14 +1,14 @@
 "use client";
 import { ArrowRight, Lightbulb, MessageCircle } from "lucide-react";
 import { Badge, Button, Card, CardHeader, Figure } from "@/components/ui";
-import { useKutip } from "@/lib/store";
+import { useKachingg } from "@/lib/store";
 import { dayOf, daysOverdue, fmtDate, fmtRM, outstanding } from "@/engine/model";
 import { chasePlan, forecast } from "@/engine/rules";
 import { inboxCount } from "@/components/shell/counts";
 
 export function CollectionSnapshot() {
-  const state = useKutip((s) => s.state);
-  const go = useKutip((s) => s.go);
+  const state = useKachingg((s) => s.state);
+  const go = useKachingg((s) => s.go);
   const open = state.invoices.filter((i) => outstanding(i) > 0 && i.status !== "paid");
   const buckets = [
     { label: "Not yet due", color: "#91bdf6", invoices: open.filter((i) => daysOverdue(i, state.now) <= 0) },
@@ -69,9 +69,9 @@ export function CollectionSnapshot() {
 }
 
 export function NextAction() {
-  const state = useKutip((s) => s.state);
-  const dispatch = useKutip((s) => s.dispatch);
-  const go = useKutip((s) => s.go);
+  const state = useKachingg((s) => s.state);
+  const dispatch = useKachingg((s) => s.dispatch);
+  const go = useKachingg((s) => s.go);
   const scanned = state.scannedDays.includes(dayOf(state.now));
   const gap = state.role === "owner" ? forecast(state).find((f) => f.gap > 0) : undefined;
   const ready = scanned ? chasePlan(state).filter((r) => r.state === "remind").length : 0;

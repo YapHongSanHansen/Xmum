@@ -1,8 +1,8 @@
 "use client";
 // R6 / FR-B3: early-warning cards, Owner only. A neutral checklist of the
-// owner's own levers; Kutip never names or recommends a lender.
+// owner's own levers; Kachingg never names or recommends a lender.
 import { Check, TriangleAlert } from "lucide-react";
-import { useKutip } from "@/lib/store";
+import { useKachingg } from "@/lib/store";
 import { Card, RuleTag, cx } from "@/components/ui";
 import { fmtDateTime, fmtRM, type State, type Warning } from "@/engine/model";
 import { forecast } from "@/engine/rules";
@@ -10,7 +10,7 @@ import { warningOptions } from "@/engine/reducer";
 import { daysAwayText } from "./bits";
 
 export default function EarlyWarnings() {
-  const state = useKutip((s) => s.state);
+  const state = useKachingg((s) => s.state);
   if (state.role !== "owner" || state.warnings.length === 0) return null;
   return (
     <div className="space-y-4">
@@ -22,7 +22,7 @@ export default function EarlyWarnings() {
 }
 
 function WarningCard({ state, w }: { state: State; w: Warning }) {
-  const dispatch = useKutip((s) => s.dispatch);
+  const dispatch = useKachingg((s) => s.dispatch);
   const outflow = state.outflows.find((o) => o.id === w.outflowId);
   const now = forecast(state).find((f) => f.outflowId === w.outflowId);
   const options = warningOptions(state, w.outflowId);

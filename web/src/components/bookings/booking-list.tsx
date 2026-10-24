@@ -3,7 +3,7 @@
 // bookings on hold. Only the Owner decides; the Clerk sees the card read-only.
 import { useState } from "react";
 import { CircleCheck } from "lucide-react";
-import { useKutip } from "@/lib/store";
+import { useKachingg } from "@/lib/store";
 import { Badge, Button, Card, CardHeader, Empty, RuleTag } from "@/components/ui";
 import { customerOf, fmtDate, fmtDateTime, fmtRM, fmtWeekday, outstanding, type Booking, type State } from "@/engine/model";
 import { creditExposure } from "@/engine/rules";
@@ -36,7 +36,7 @@ const DECISION_TEXT: Record<CreditDecision, (b: Booking) => string> = {
 };
 
 export default function BookingList() {
-  const state = useKutip((s) => s.state);
+  const state = useKachingg((s) => s.state);
   const bookings = [...state.bookings].reverse();
   const onHold = bookings.filter((b) => b.status === "on_hold").length;
 
@@ -100,7 +100,7 @@ function BookingRow({ state, b }: { state: State; b: Booking }) {
 }
 
 function CreditCheck({ state, b }: { state: State; b: Booking }) {
-  const dispatch = useKutip((s) => s.dispatch);
+  const dispatch = useKachingg((s) => s.dispatch);
   const [pct, setPct] = useState(50);
   const exp = creditExposure(state, b.customerId);
   const worst = exp.worstInvoice;

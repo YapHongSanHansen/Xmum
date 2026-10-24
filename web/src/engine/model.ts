@@ -1,4 +1,4 @@
-// Kutip domain model. Money is integer sen; times are local Asia/Kuala_Lumpur
+// Kachingg domain model. Money is integer sen; times are local Asia/Kuala_Lumpur
 // strings ("2026-10-20T08:00"), dates are "2026-10-20". See docs/PRD.md §9.
 
 export type Lang = "en" | "bm" | "zh";
