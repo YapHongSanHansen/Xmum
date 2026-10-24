@@ -47,11 +47,12 @@ export function Card({ children, className, tone }: { children: ReactNode; class
 }
 
 export function CardHeader({ title, kicker, right }: { title: ReactNode; kicker?: ReactNode; right?: ReactNode }) {
+  // One short sans title per card. The optional kicker is a quiet sans line above it.
   return (
-    <div className="flex items-start justify-between gap-3 border-b border-hairline px-4 py-3">
-      <div>
-        {kicker && <div className="eyebrow mb-0.5">{kicker}</div>}
-        <div className="text-[15px] font-semibold tracking-[-0.01em] text-ink">{title}</div>
+    <div className="flex items-start justify-between gap-3 border-b border-hairline px-5 py-4">
+      <div className="min-w-0">
+        {kicker && <div className="mb-0.5 text-xs text-ink2">{kicker}</div>}
+        <div className="text-[14px] font-semibold tracking-[-0.005em] text-ink">{title}</div>
       </div>
       {right}
     </div>
@@ -93,13 +94,17 @@ export function RuleTag({ id }: { id: string }) {
   );
 }
 
+/**
+ * Page heading: just the title. `eyebrow` and `subtitle` stay optional for callers
+ * and render as one quiet muted line; the header already shows workspace, clock and role.
+ */
 export function PageTitle({ title, subtitle, right, eyebrow }: { title: string; subtitle?: ReactNode; right?: ReactNode; eyebrow?: ReactNode }) {
   return (
-    <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-      <div className="max-w-[640px]">
-        <div className="eyebrow mb-2">{eyebrow ?? "Kutip · Lori Laju Logistics"}</div>
-        <h1 className="text-[26px] font-semibold leading-[1.15] tracking-[-0.02em] text-ink">{title}</h1>
-        {subtitle && <p className="mt-1.5 text-[13px] text-ink2 [text-wrap:pretty]">{subtitle}</p>}
+    <div className="mb-6 flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
+      <div className="min-w-0 max-w-[640px]">
+        {eyebrow && <div className="mb-1 text-xs text-ink2">{eyebrow}</div>}
+        <h1 className="text-[22px] font-semibold leading-[1.2] tracking-[-0.015em] text-ink">{title}</h1>
+        {subtitle && <p className="mt-1 text-xs text-ink2 [text-wrap:pretty]">{subtitle}</p>}
       </div>
       {right && <div className="flex items-center gap-2">{right}</div>}
     </div>
@@ -108,7 +113,7 @@ export function PageTitle({ title, subtitle, right, eyebrow }: { title: string; 
 
 export function Empty({ children }: { children: ReactNode }) {
   // Empty states teach the next step, so the copy keeps AA contrast (ink2, not the disabled ink3).
-  return <div className="border border-dashed border-line-strong px-4 py-6 text-center text-[13px] text-ink2">{children}</div>;
+  return <div className="border border-dashed border-line px-5 py-8 text-center text-[13px] text-ink2">{children}</div>;
 }
 
 /** Ledger navy summary panel: mono label/value rows on the accent colour. */
