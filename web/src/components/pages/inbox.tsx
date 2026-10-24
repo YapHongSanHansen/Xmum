@@ -40,15 +40,12 @@ export default function InboxPage() {
 
   return (
     <div>
-      <PageTitle
-        title="Inbox"
-        subtitle="Customer replies on WhatsApp (simulated). Bukti AI reads the words and slips; the rules decide. Nothing is marked paid without a matching bank line."
-      />
+      <PageTitle title="Inbox" subtitle="Nothing is paid without a bank line." />
 
       <HandoffQueue state={state} onOpen={setSelectedId} />
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
-        <div className="space-y-5">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
+        <div className="space-y-6">
           <MessageList state={state} selectedId={selected?.id ?? null} onSelect={setSelectedId} />
           <BankStatement state={state} />
         </div>
@@ -63,9 +60,7 @@ export default function InboxPage() {
               onEnlarge={setLightbox}
             />
           ) : (
-            <div className="border border-dashed border-line-strong px-4 py-10 text-center text-[13px] text-ink2">
-              Select a message to see Bukti&apos;s reading.
-            </div>
+            <div className="border border-dashed border-line-strong px-4 py-10 text-center text-[13px] text-ink2">Select a message.</div>
           )}
         </div>
       </div>
