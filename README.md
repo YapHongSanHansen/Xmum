@@ -148,7 +148,7 @@ Orbyte is a shared business hub for SMEs. Kutip is designed as a module inside i
 | | |
 |---|---|
 | ✅ | Problem research, competitor scan, idea brief |
-| ✅ | Product requirements document (draft v0.1, reviewed once by a builder) |
+| ✅ | Product requirements document (v0.2: haulage demo, stack decided, Orbyte hub frame) |
 | ⬜ | Team decisions: stack, LLM, demo sector, deadline (see PRD section 18) |
 | ⬜ | Preliminary-round MVP: the full journey running live on synthetic data |
 | ⬜ | Interviews with 5-10 Malaysian B2B sellers |

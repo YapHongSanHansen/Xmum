@@ -4,7 +4,7 @@
 |---|---|
 | Product | **Kutip** (working name; "collect" in Malay), with **Bukti** ("proof") as its AI reader |
 | Hackathon | XMUM, Domain 2: Orbyte Smart SME Challenge — Less Busywork, Better Business |
-| Version | 0.1 draft, 25 Oct 2026 |
+| Version | 0.2, 25 Oct 2026: demo business switched to a haulage firm (section 14); tech stack decided (section 20) |
 | Status | Draft, reviewed once by a builder. Section 18 lists open decisions the team must make; section 18a lists calls made during review, for the team to check |
 | Related | Brief: [`domain-2/brief.md`](domain-2/brief.md) (source of truth: [`Domain-2-brief.pdf`](domain-2/Domain-2-brief.pdf)) · Idea and example screens: [`idea/kutip-bukti.md`](idea/kutip-bukti.md) · Evidence: [`research/01-pain-research-shortlist.md`](research/01-pain-research-shortlist.md) · Competitors: [`research/02-competitor-scan.md`](research/02-competitor-scan.md) |
 
@@ -90,15 +90,15 @@ The evidence is real but thin: no source measures owner chasing time, and no sou
 
 | Persona | Who | Needs | Example (synthetic) |
 |---|---|---|---|
-| **Owner** | Runs the business, signs off on money decisions | Know early, decide on credit, approve firm messages | Tan Mei Ling, owner of CetakPantas Print |
-| **Clerk** | Admin or account clerk, issues invoices, records payments | A clear daily to-do list, quick approvals, no guessing | Aisyah |
+| **Owner** | Runs the business, signs off on money decisions | Know early, decide on credit, approve firm messages | Lim Siew Lan, owner of Lori Laju Logistics |
+| **Clerk** | Admin or account clerk, issues invoices, records payments | A clear daily to-do list, quick approvals, no guessing | Nurul |
 | **Sales** (P1) | Takes orders from customers | Know if a customer is on hold before promising credit | — |
 | **External accountant** (P1) | Prepares the books monthly | Read-only aging report and activity log | — |
-| **Customer** (indirect) | The business's B2B customer | Polite, correct reminders in their language; never chased after paying | Kafe Dua Beradik, Hock Lee Catering |
+| **Customer** (indirect) | The business's B2B customer | Polite, correct reminders in their language; never chased after paying | Mega Bina Hardware Trading, Syarikat Hup Seng Trading |
 
-**Target segment:** Malaysian B2B sellers with about 2-30 staff that sell on 30-90 day credit and chase payment on WhatsApp: printing and packaging, food and catering supply, wholesale and trading, B2B services, small transport operators.
+**Target segment:** Malaysian B2B sellers with about 2-30 staff that sell on 30-90 day credit and chase payment on WhatsApp: small transport and logistics operators, wholesale and trading, printing and packaging, food and catering supply, B2B services.
 
-**Demo business:** CetakPantas Print, a fictional 4-person printing shop in Seri Kembangan.
+**Demo business:** Lori Laju Logistics Sdn Bhd, a fictional 12-person haulage firm in Klang with 6 lorries. Chosen because transport/logistics has the longest SME payment delays in the Experian data (76 days) and the widest SME-vs-corporate gap; per-trip invoices mean many payment slips; and logistics is reported to be one of the sponsor's client sectors.
 
 ## 5. User stories
 
@@ -124,8 +124,8 @@ The evidence is real but thin: no source measures owner chasing time, and no sou
 
 | Phase | When | Scope |
 |---|---|---|
-| **P0** | Preliminary round | The full journey working live on synthetic data: setup/import, cash scan and early warning, credit check, chase plan with approvals and wa.me or simulated send, Bukti reading the three seeded replies (one with a slip, read by a live AI call; the other two may use cached results) with the bank check, hand-off cards, activity log, Owner and Clerk roles, demo clock. Must-haves explained in the proposal |
-| **P1** | Final round | All six Domain 2 must-haves fully built: multi-invoice allocation and deductions, Sales and Accountant roles, settings, CSV export, accuracy report on the test set, in-app PDPA notes, Orbyte Connect adapter interface, owner validation interviews |
+| **P0** | Preliminary round | The full journey working live on synthetic data: setup/import, cash scan and early warning, credit check, chase plan with approvals and wa.me or simulated send, Bukti reading the three seeded replies (one with a slip, read by a live AI call; the other two may use cached results) with the bank check, single-invoice receipts with a stated deduction, hand-off cards, activity log, Owner and Clerk roles, demo clock. Must-haves explained in the proposal |
+| **P1** | Final round | All six Domain 2 must-haves fully built: multi-invoice allocation, Sales and Accountant roles, settings, CSV export, accuracy report on the test set, in-app PDPA notes, Orbyte Connect adapter interface, owner validation interviews |
 | **P2** | Roadmap (slides only) | Official WhatsApp Business Platform, bank feeds through payment/banking partners, Bukti reading *order* messages to trigger the credit check, sector packs, optional financing-partner hand-off (owner-initiated, no recommendation), mobile app, BM user interface |
 
 ## 7. Functional requirements
@@ -138,7 +138,7 @@ Priority: **P0** = preliminary demo; **P1** = final round; **P2** = roadmap.
 |---|---|---|---|
 | FR-A1 | Import invoices from CSV (number, customer, amount, issue date, due date, terms, status) | P0 | Importing the seed CSV creates every invoice; invalid rows are listed with a reason and not imported |
 | FR-A2 | Customer profiles: name, contact person, WhatsApp number, language (BM/EN/ZH), quiet hours, notes | P0 | Each seeded customer shows its language and number; the language drives template choice |
-| FR-A3 | Recurring outflows: label, amount, due date, recurrence (monthly) | P0 | Payroll RM8,400 on the 31st and the 5 Nov supplier bill appear in the cash scan |
+| FR-A3 | Recurring outflows: label, amount, due date, recurrence (monthly) | P0 | Salaries RM24,500 on the 31st and the 5 Nov diesel fleet-card bill appear in the cash scan |
 | FR-A4 | Owner enters today's bank balance | P0 | Only the Owner can enter or see it; the value and who entered it are logged |
 | FR-A5 | Import a bank statement CSV (date, amount, description) | P0 | Lines appear for matching; the clerk sees credits only, never the balance |
 | FR-A6 | "Orbyte Connect" adapter interface for accounting partners, simulated with CSV | P1 | A documented interface (`InvoiceSource`) with a CSV implementation; the UI labels the source |
@@ -149,31 +149,31 @@ Priority: **P0** = preliminary demo; **P1** = final round; **P2** = roadmap.
 | ID | Requirement | Priority | Acceptance criteria |
 |---|---|---|---|
 | FR-B1 | Daily scan at 08:00 (local time) and a manual "Run scan" button | P0 | Running the scan on the seed at the demo clock produces the gap list and chase plan |
-| FR-B2 | Forecast per outflow date (rule F1, section 8) | P0 | Seed on Tue 20 Oct: 31 Oct payroll short RM2,000; 5 Nov supplier short RM8,800 |
+| FR-B2 | Forecast per outflow date (rule F1, section 8) | P0 | Seed on Tue 20 Oct: 31 Oct salaries short RM2,000; 5 Nov diesel short RM13,200 |
 | FR-B3 | Early-warning card (rule R6) with a neutral checklist of owner levers | P0 | Card appears for the 31 Oct shortfall; options are listed, chosen options are logged; no lender is named or recommended |
-| FR-B4 | Cash-gap meter per upcoming outflow (red/green), recomputed whenever an invoice is marked PAID (rule F1) | P0 | When INV-0412 is marked PAID (after the clerk approves the verified match, not before), 31 Oct turns green with "+RM1,180" |
+| FR-B4 | Cash-gap meter per upcoming outflow (red/green), recomputed whenever a receipt is approved (rule F1) | P0 | When the clerk approves the verified RM2,770 receipt for INV-2304 (not before), 31 Oct turns green with "+RM770" |
 | FR-B5 | Clerk sees only "gap: yes/no", never amounts of balance, payroll or gap | P0 | Logged in as Clerk, no balance, payroll or gap figure is visible anywhere |
 
 ### 7C. Chase plan and reminders
 
 | ID | Requirement | Priority | Acceptance criteria |
 |---|---|---|---|
-| FR-C1 | Tier each overdue invoice (rule R1) | P0 | Seed: Kafe Dua Beradik → Tier 1; Restoran Selera → Tier 1; Hock Lee → Tier 2 |
-| FR-C2 | Suppress reminders (rule R2) | P0 | Tadika Bintang is shown as skipped with "R2: promise 30 Oct not reached" |
-| FR-C3 | Rank by expected cash before the shortfall (rule R3) | P0 | Kafe Dua Beradik ranks first with the reason "closes the payroll gap" |
+| FR-C1 | Tier each overdue invoice (rule R1) | P0 | Seed: Mega Bina → Tier 1; Kilang Perabot Jaya → Tier 1; Hup Seng → Tier 2 |
+| FR-C2 | Suppress reminders (rule R2) | P0 | Pelita Frozen Foods is shown as skipped with "R2: promise 30 Oct not reached" |
+| FR-C3 | Rank by expected cash before the shortfall (rule R3) | P0 | Mega Bina ranks first with the reason "closes the salary gap" |
 | FR-C4 | Every row shows its rule ID and a one-line reason | P0 | No row in the plan lacks a rule ID |
-| FR-C5 | Fixed templates per tier per language, merge fields only (rule R5) | P0 | Tier 1 BM/EN and Tier 2 ZH templates render with invoice number, amount and due date; no AI-generated text |
+| FR-C5 | Fixed templates per tier per language, merge fields only (rule R5) | P0 | Tier 1 EN/BM and Tier 2 ZH templates render with invoice number, amount and due date; no AI-generated text |
 | FR-C6 | Approval by tier: Clerk or Owner may approve Tier 0/1; Owner only for Tier 2; Owner decides Tier 3 | P0 | As Clerk, the Tier 2 card shows no approve button |
 | FR-C7 | Send by wa.me link (opens WhatsApp with the text prefilled; a person presses send) or simulated send. Reminders approved inside the customer's quiet hours are QUEUED and released when quiet hours end (rule S1) | P0 | Approving at 08:00 opens a correct `https://wa.me/<number>?text=<encoded>` link, or marks the reminder "sent (simulated)"; approving at 22:00 marks it "queued until 08:00"; all are logged |
-| FR-C8 | Approval card shows: invoice, amount, days late, past reminders and replies, payment pattern, message preview, rule, and gap impact (rule G1). The Clerk sees "helps cover the next bill: yes/no" instead of amounts | P0 | The Owner's Hock Lee card shows "If paid by 30 Oct: 31 Oct payroll short RM2,000 → covered; 5 Nov supplier short RM8,800 → RM4,050". The Clerk's Kafe Dua Beradik card shows "helps cover the next bill: yes" and no amounts of balance, payroll or gap |
+| FR-C8 | Approval card shows: invoice, amount, days late, past reminders and replies, payment pattern, message preview, rule, and gap impact (rule G1). The Clerk sees "helps cover the next bill: yes/no" instead of amounts | P0 | The Owner's Hup Seng card shows "If paid by 30 Oct: 31 Oct salaries short RM2,000 → covered; 5 Nov diesel short RM13,200 → RM6,350". The Clerk's Mega Bina card shows "helps cover the next bill: yes" and no amounts of balance, salaries or gap |
 | FR-C9 | Card actions: approve & send, edit text, snooze to date, mark disputed, "I'll call instead" | P0 (approve, edit, snooze) / P1 (rest) | Each action is logged with the actor |
 
 ### 7D. Credit check
 
 | ID | Requirement | Priority | Acceptance criteria |
 |---|---|---|---|
-| FR-D1 | Trigger on a new credit order or invoice draft for a customer with any invoice overdue ≥ threshold (rule R4) | P0 | The Clerk enters a new Hock Lee order (RM2,850, credit) and an owner card is raised |
-| FR-D2 | Card shows: the new order, what is already owed and how late, any promise, and the total owed if accepted | P0 | Card shows RM4,750 owed, 42 days late, promise 30 Oct, total RM7,600 |
+| FR-D1 | Trigger on a new credit order or invoice draft for a customer with any invoice overdue ≥ threshold (rule R4) | P0 | The Clerk enters a new Hup Seng booking (Klang → Johor Bahru, 1 lorry, RM2,400, 60-day credit) and an owner card is raised |
+| FR-D2 | Card shows: the new order, what is already owed and how late, any promise, and the total owed if accepted | P0 | Card shows RM6,850 owed, 46 days late, promise 30 Oct, total RM9,250 |
 | FR-D3 | Owner options: accept on credit / ask a deposit (percentage) / cash on delivery / call first | P0 | The chosen option is stored on the order and logged; the order stays "on hold" until decided |
 | FR-D4 | Threshold is configurable (default 30 days) | P1 | Changing it to 14 days changes which customers trigger the check |
 
@@ -181,18 +181,18 @@ Priority: **P0** = preliminary demo; **P1** = final round; **P2** = roadmap.
 
 | ID | Requirement | Priority | Acceptance criteria |
 |---|---|---|---|
-| FR-E1 | Simulated collections inbox: inbound text plus optional image, linked to a customer by WhatsApp number | P0 | The seeded Kafe Dua Beradik message and slip appear in the inbox |
-| FR-E2 | AI extraction to structured fields: intent, amount, invoice reference, bank reference, payment date, promised date, deduction amount and reason; each with a confidence and the quoted source words | P0 | The demo message yields amount 3,180.00, invoice INV-0412, reference INV0412, each with a quote |
+| FR-E1 | Simulated collections inbox: inbound text plus optional image, linked to a customer by WhatsApp number | P0 | The seeded Mega Bina message and slip appear in the inbox |
+| FR-E2 | AI extraction to structured fields: intent, amount, invoice reference, bank reference, payment date, promised date, deduction amount and reason; each with a confidence and the quoted source words | P0 | The demo message yields amount 2,770.00, invoice INV-2304, reference INV2304, deduction 330.00 with reason "2 pallet tiles pecah at Bukit Raja", each with a quote |
 | FR-E3 | Verbatim gate: a field from text is shown only if its quote is an exact substring of the message (after whitespace normalisation); otherwise it is dropped and sent to a human | P0 | A unit test with a fabricated quote shows the field is rejected |
 | FR-E4 | Bank verification (rule M1): VERIFIED only when a bank line matches | P0 | With the bank line present, status is VERIFIED; with it removed, status stays CLAIM and no PAID is proposed |
-| FR-E5 | Allocation across invoices (rule M2) | P1 | A payment equal to two invoices is split across both; a difference is flagged |
-| FR-E6 | Deductions linked to a delivery or item (rule M3), owner accepts or rejects | P1 | "deduct RM330 for 2 pallet pecah" links to the matching delivery; only the Owner can accept |
+| FR-E5 | Allocation (rule M2): single invoice with or without a stated deduction (P0); combinations across several invoices (P1) | P0 / P1 | RM2,770 + stated deduction RM330 = INV-2304 RM3,100 → exact match with deduction; a payment equal to two invoices is split across both (P1) |
+| FR-E6 | Deductions linked to a delivery (rule M3), owner accepts or rejects | P0 | "Deduct RM330 for the 2 pallet tiles pecah at Bukit Raja" links to DO-8812 (destination Bukit Raja); only the Owner can accept; accepting marks INV-2304 PAID and drafts credit note CN-0057 (not submitted) |
 | FR-E7 | Hand-off (rule M4): low confidence or unmatched items go to a "Needs a human" queue with a specific question | P0 | "下礼拜五才过数" on Tue 20 Oct produces a card asking "Which Friday? 23 Oct / 30 Oct" |
-| FR-E8 | Pause reminders (rule M5) for invoices with a claim, promise or dispute | P0 | After the Hock Lee promise is confirmed, no Hock Lee reminder appears until 31 Oct |
+| FR-E8 | Pause reminders (rule M5) for invoices with a claim, promise or dispute | P0 | After the Hup Seng promise is confirmed, no Hup Seng reminder appears until 31 Oct |
 | FR-E9 | Promise tracking: promised date stored; a follow-up appears the day after it passes | P0 | Promise 30 Oct → follow-up appears on 31 Oct if unpaid |
-| FR-E10 | Claim with no slip and no bank line: not marked paid; a templated reply asking for the slip or reference is drafted for approval | P0 | "Dah settle la semalam" produces the BM draft reply and no PAID proposal |
+| FR-E10 | Claim with no slip and no bank line: not marked paid; a templated reply asking for the slip or reference is drafted for approval | P0 | Kilang Perabot Jaya's "Dah settle la semalam" produces the BM draft reply and no PAID proposal |
 | FR-E11 | Cached extraction fallback if the AI call fails or exceeds the timeout | P0 | With the AI key removed, the demo still completes using cached results, and the UI says "cached result" |
-| FR-E12 | Approval of matches: Clerk may approve VERIFIED matches with zero difference; anything changing what a customer owes needs the Owner | P0 (zero-difference) / P1 (rest) | As Clerk, approving the RM3,180 match marks INV-0412 PAID and is logged |
+| FR-E12 | Approval of receipts: the Clerk may approve a VERIFIED receipt whose slip amount equals the bank line; anything that changes what a customer owes (accepting a deduction, writing off) needs the Owner | P0 | As Clerk, approving the RM2,770 receipt marks INV-2304 PART_PAID with "RM330 deduction under review"; as Owner, accepting the deduction marks it PAID; both are logged |
 
 ### 7F. Roles and permissions (simulated)
 
@@ -207,14 +207,14 @@ Priority: **P0** = preliminary demo; **P1** = final round; **P2** = roadmap.
 |---|---|---|---|
 | FR-G1 | Append-only log; no edit or delete in the UI or API | P0 | No endpoint or button modifies past entries |
 | FR-G2 | Each entry: timestamp (demo clock), actor (user name / SYSTEM / rule ID / AI / INBOUND / BANK), action, references (invoice, customer, message), and for AI entries the model version and confidence | P0 | Running the section 13 script produces the entries in section 13a, in the same order with the same actors and actions (timestamps come from the demo clock) |
-| FR-G3 | Filter by customer or invoice | P1 | Filtering by INV-0412 shows only its entries |
+| FR-G3 | Filter by customer or invoice | P1 | Filtering by INV-2304 shows only its entries |
 | FR-G4 | Export log and aging report as CSV | P1 | Export opens in a spreadsheet with all columns |
 
 ### 7H. Settings and demo controls
 
 | ID | Requirement | Priority | Acceptance criteria |
 |---|---|---|---|
-| FR-H1 | Demo clock: a **frozen** "now" (default Tue 20 Oct 2026, 08:00, Asia/Kuala_Lumpur) that moves only through an "advance to" control. Every action is stamped with the current demo time. Advancing runs the 08:00 scan once for each day boundary crossed, in order. Seeded inbound messages and bank lines become visible once "now" passes their timestamp | P0 | From 21 Oct 10:20, advancing to Fri 23 Oct 14:30 runs the 22 and 23 Oct scans, then shows the 14:25 bank line and the 14:30 Kafe Dua Beradik reply |
+| FR-H1 | Demo clock: a **frozen** "now" (default Tue 20 Oct 2026, 08:00, Asia/Kuala_Lumpur) that moves only through an "advance to" control. Every action is stamped with the current demo time. Advancing runs the 08:00 scan once for each day boundary crossed, in order. Seeded inbound messages and bank lines become visible once "now" passes their timestamp | P0 | From 21 Oct 10:20, advancing to Fri 23 Oct 14:30 runs the 22 and 23 Oct scans, then shows the 14:25 bank line and the 14:30 Mega Bina reply |
 | FR-H2 | Templates, quiet hours, tier day-gates and the credit threshold are editable by the Owner | P1 | Edits take effect on the next scan and are logged |
 
 ## 8. Business rules
@@ -223,35 +223,36 @@ All rules are deterministic, given the data and the clock. Amounts are in MYR. D
 
 **F1 Forecast.** For each outflow date *d* within the horizon (30 days):
 `forecast(d) = cash + Σ expected inflows due on or before d − Σ outflows due on or before d`.
-- *cash* (P0) = the latest owner-entered bank balance + the amounts of invoices marked PAID after that entry. (P1: computed from bank lines directly.)
+- *cash* (P0) = the latest owner-entered bank balance + the receipts approved by a person after that entry. (P1: computed from bank lines directly.)
 - *Expected inflows* are invoices not yet overdue, due on or before *d*, not PAID and without a VERIFIED claim, whose customer has an on-time rate of at least 80% over at least 3 past invoices. Promises are **not** counted as expected inflows.
 - A shortfall exists when `forecast(d) < 0`; the gap is `−forecast(d)`.
 
-Seed check (Tue 20 Oct): 4,300 + 2,100 − 8,400 = −2,000 (31 Oct); 4,300 + 2,100 − 8,400 − 6,800 = −8,800 (5 Nov). After INV-0412 is PAID on 23 Oct: 7,480 + 2,100 − 8,400 = +1,180 (31 Oct); −5,620 (5 Nov).
+Seed check (Tue 20 Oct): 9,800 + 12,700 − 24,500 = −2,000 (31 Oct); 9,800 + 12,700 − 24,500 − 11,200 = −13,200 (5 Nov). After the RM2,770 receipt for INV-2304 is approved on 23 Oct: 12,570 + 12,700 − 24,500 = +770 (31 Oct); −10,430 (5 Nov).
 
 **G1 Gap impact and pay-by date.** For an invoice on an approval card: *pay-by* = the day before the earliest shortfall date, but no earlier than today + 3 days. The gap-impact line shows, for the earliest and the next shortfall date in the horizon, the gap before → after if only this invoice is paid by the pay-by date (everything else as in F1). The pay-by date is also the `pay_by` merge field in templates. The Clerk sees only "helps cover the next bill: yes/no".
-Seed check (Hock Lee, 20 Oct): pay-by 30 Oct; 31 Oct −2,000 → covered; 5 Nov −8,800 → −4,050.
+Seed check (Hup Seng, 20 Oct): pay-by 30 Oct; 31 Oct −2,000 → covered (+4,850); 5 Nov −13,200 → −6,350.
 
 **R1 Tier.** Tiers: 0 courtesy (allowed from D-3), 1 nudge (from D+1), 2 firm (from D+14), 3 owner escalation (from D+30). The sequence for one invoice is fixed: **Tier 1, Tier 1 again, Tier 2, Tier 3** (Tier 0 first if the invoice is not yet due). Each step needs (a) the previous reminder unanswered for 7+ days and (b) the day gate for that tier. If the day gate is not reached, the invoice waits at its current step. Tier 3 never sends a message: it creates an owner card (call / stop credit / refer to own lawyer), with no legal text generated.
-Seed check: Kafe Dua Beradik (18 days late, no reminders yet) → Tier 1. Hock Lee (41 days late, Tier 1 on 28 Sep and Tier 1 again on 6 Oct, both unanswered) → Tier 2. Restoran Selera (5 days, none) → Tier 1.
+Seed check: Mega Bina (18 days late, no reminders yet) → Tier 1. Hup Seng (45 days late, Tier 1 on 22 Sep and Tier 1 again on 30 Sep, both unanswered) → Tier 2. Kilang Perabot Jaya (8 days, none) → Tier 1.
 
 **R2 Suppress.** No reminder is proposed if any of: the invoice is disputed; a promised date has not passed; a payment or claim was logged in the last 2 days; the customer was sent any reminder in the last 5 days. The row still appears, greyed, with the reason. (Quiet hours do **not** suppress; see S1.)
 
 **S1 Send window.** Quiet hours (default: from 21:00 until 08:00 local, so 08:00 itself is not quiet; editable per customer in P1) never remove a reminder from the plan or block approval. A reminder approved inside quiet hours becomes QUEUED and is released (wa.me link enabled, or simulated send) when quiet hours end.
 
 **R3 Priority.** For each remindable overdue invoice: `expected = amount × p`, where *p* is the share of the customer's past invoices paid within N days of a reminder at this tier, and N = days until the next shortfall date. If the customer has fewer than 3 data points, p = 0.5. Rank by `expected`, highest first. Mark the smallest leading set whose cumulative `expected` covers the next gap as "closes the gap". Ties break by days overdue, then amount.
+Seed check (20 Oct, N = 11): Mega Bina 3,100 × 0.9 = 2,790 (closes the RM2,000 gap alone); Kilang Perabot Jaya 4,200 × 0.6 = 2,520; Hup Seng 6,850 × 0.3 = 2,055.
 
 **R4 Credit check.** When a new credit order or invoice draft is created for a customer who has any invoice overdue ≥ threshold (default 30 days), set the order to ON HOLD and raise an owner card (FR-D2, FR-D3). Cash on delivery and fully prepaid orders are not checked.
 
 **R5 Templates.** Messages come only from fixed templates per tier and language (BM, EN, ZH), filled with merge fields (customer contact name, invoice number, amount, due date, days overdue, `pay_by` from G1, sender name). The sender may edit before sending; the edit is logged. Because a wa.me link cannot attach a file, Tier 2 templates **offer** a statement ("reply if you need a statement") instead of saying one is attached; generating a statement PDF for the sender to attach is P1.
 
-**R6 Early warning.** When F1 shows a shortfall for an outflow due within 14 days, raise one owner card per outflow (re-raised only if the gap grows by more than 10%). In the seed this raises the 31 Oct payroll card on 20 Oct, and the 5 Nov supplier card on 22 Oct. The card lists a neutral checklist of the owner's own levers: ask a regular customer to pay early; ask a supplier to move a bill date; hold new credit for late payers; "talk to my bank myself". It never names, ranks or recommends a lender or financial product.
+**R6 Early warning.** When F1 shows a shortfall for an outflow due within 14 days, raise one owner card per outflow (re-raised only if the gap grows by more than 10%). In the seed this raises the 31 Oct salaries card on 20 Oct, and the 5 Nov diesel card on 22 Oct. The card lists a neutral checklist of the owner's own levers: ask a regular customer to pay early; ask a supplier to move a bill date; hold new credit for late payers; "talk to my bank myself". It never names, ranks or recommends a lender or financial product.
 
 **M1 Verify.** A slip or message only creates a CLAIM. A claim becomes VERIFIED only when a bank line exists with an equal amount, within 3 days of the claimed payment date, and a payer-name match (normalised, case-insensitive, at least one significant word of the customer name, or the invoice number in the description). Nothing becomes PAID without VERIFIED.
 
-**M2 Allocate (P1).** Try in order: an exact single-invoice match; an exact combination of up to 5 open invoices, oldest first; otherwise propose oldest-first allocation and flag the remaining difference for a person.
+**M2 Allocate.** Try in order: an exact single-invoice match (amount, or amount + stated deduction, equals the invoice) (P0); an exact combination of up to 5 open invoices, oldest first (P1); otherwise flag the difference for a person.
 
-**M3 Deductions (P1).** A stated deduction is linked to an invoice when its reason text matches a delivery reference, destination or item on that invoice. Only the Owner can accept or reject it; accepting drafts a credit note for the accounting system (never submitted).
+**M3 Deductions.** A stated deduction is linked to an invoice when its reason text matches a delivery reference, destination or item on that invoice. Only the Owner can accept or reject it; accepting marks the invoice PAID and drafts a credit note for the accounting system (never submitted).
 
 **M4 Hand-off.** Any extracted field below 0.85 confidence, any quote that fails the verbatim gate, any ambiguous date, and any unmatched amount goes to the "Needs a human" queue with one specific question.
 
@@ -264,7 +265,7 @@ Seed check: Kafe Dua Beradik (18 days late, no reminders yet) → Tier 1. Hock L
 | Entity | Fields |
 |---|---|
 | Customer | id, name, contact_name, whatsapp, language (bm/en/zh), quiet_hours (default 21:00-08:00), notes |
-| Invoice | id, number, customer_id, amount_sen, issue_date, due_date, terms_days, status (open / part_paid / paid / disputed), source |
+| Invoice | id, number, customer_id, amount_sen, issue_date, due_date, terms_days, status (open / part_paid / paid / disputed), source, delivery (DO number, route, destination) |
 | PaymentHistory | invoice_id, due_date, paid_date, last_reminder_tier, last_reminder_date (null if paid without a reminder). R3 uses `paid_date − last_reminder_date` per tier; F1 uses `paid_date ≤ due_date` for the on-time rate |
 | Outflow | id, label, amount_sen, due_date, recurrence |
 | CashPosition | date, bank_balance_sen, entered_by |
@@ -349,13 +350,13 @@ Illustrative API: `POST /receivables/invoices`, `GET /receivables/chase-plan?dat
 
 Starting state: seed loaded, clock Tue 20 Oct 2026 08:00. Seeded inbound messages appear in the inbox once the demo clock passes their timestamp.
 
-1. **Run scan** (Owner). The early-warning card shows "Short RM2,000 for payroll in 11 days" with the owner's options; pick "ask supplier to move the 5 Nov bill". *(FR-B1–B3)*
-2. **Chase plan.** Ranked list with rule IDs; Tadika shown as skipped. As Clerk, approve the gentle reminders. *(FR-C1–C4, C6)*
-3. **Approve the firm reminder** to Hock Lee in Chinese (Owner); WhatsApp opens prefilled, or the send is simulated. *(FR-C5–C8)*
-4. **Advance to Tue 20 Oct 11:05.** Hock Lee's reply arrives; the "Which Friday?" hand-off appears; the Clerk picks 30 Oct and Hock Lee's reminders pause. *(FR-E2, E3, E7, E8, E9)*
-5. **Advance to Wed 21 Oct 10:20. Credit check.** As Clerk, enter a new Hock Lee order (RM2,850, credit). Switch to Owner: the card shows RM4,750 owed, 42 days late, promise 30 Oct, RM7,600 total; choose "ask 50% deposit". *(FR-D1–D3)*
-6. **Advance to Fri 23 Oct 14:30.** The 22 and 23 Oct scans run; a second early-warning card (5 Nov supplier, raised on 22 Oct) is now visible. The 14:25 bank line and the Kafe Dua Beradik reply and slip arrive; a **live** AI call shows the fields with their exact words and confidence. The bank line matches (VERIFIED); as Clerk, approve; INV-0412 is PAID and only then does the 31 Oct meter turn green. *(FR-H1, FR-E1–E4, E12, FR-B4)*
-7. **Advance to 15:00.** Restoran Selera says "Dah settle la semalam" with no slip and no bank line: not marked paid, and a BM reply asking for the slip is drafted; the Clerk sends it. *(FR-E10)*
+1. **Run scan** (Owner). The early-warning card shows "Short RM2,000 for salaries in 11 days" with the owner's options; pick "ask supplier to move the 5 Nov bill". *(FR-B1–B3)*
+2. **Chase plan.** Ranked list with rule IDs; Pelita Frozen Foods shown as skipped. As Clerk, approve the gentle reminders. *(FR-C1–C4, C6)*
+3. **Approve the firm reminder** to Hup Seng in Chinese (Owner); WhatsApp opens prefilled, or the send is simulated. *(FR-C5–C8)*
+4. **Advance to Tue 20 Oct 11:05.** Hup Seng's reply arrives; the "Which Friday?" hand-off appears; the Clerk picks 30 Oct and Hup Seng's reminders pause. *(FR-E2, E3, E7, E8, E9)*
+5. **Advance to Wed 21 Oct 10:20. Credit check.** As Clerk, enter a new Hup Seng booking (Klang → Johor Bahru, RM2,400, 60-day credit). Switch to Owner: the card shows RM6,850 owed, 46 days late, promise 30 Oct, RM9,250 total; choose "ask 50% deposit". *(FR-D1–D3)*
+6. **Advance to Fri 23 Oct 14:30.** The 22 and 23 Oct scans run; a second early-warning card (5 Nov diesel, raised on 22 Oct) is now visible. The 14:25 bank line and the Mega Bina reply and slip arrive; a **live** AI call shows the fields with their exact words and confidence, including the RM330 deduction linked to DO-8812. The bank line matches (VERIFIED); as Clerk, approve the RM2,770 receipt; only then does the 31 Oct meter turn green. As Owner, accept the deduction; INV-2304 is PAID and credit note CN-0057 is drafted. *(FR-H1, FR-E1–E6, E12, FR-B4)*
+7. **Advance to 15:00.** Kilang Perabot Jaya says "Dah settle la semalam" with no slip and no bank line: not marked paid, and a BM reply asking for the slip is drafted; the Clerk sends it. *(FR-E10)*
 8. **Activity log.** Every step, with actor and rule. *(FR-G1–G2)*
 
 **P0 definition of done:** all P0 acceptance criteria pass; steps 1-8 run on a fresh clone from the README instructions; the repo is public and matches the demo.
@@ -366,63 +367,64 @@ Timestamps come from the frozen demo clock, so every action in a step carries th
 
 | # | Demo time | Actor | Action |
 |---|---|---|---|
-| 1 | 20 Oct 08:00 | SYSTEM | scan: 4 overdue; 31 Oct payroll short RM2,000; 5 Nov supplier short RM8,800 |
-| 2 | 20 Oct 08:00 | R6 | early warning raised: 31 Oct payroll short RM2,000 |
-| 3 | 20 Oct 08:00 | R2 | skipped INV-0405: promise 30 Oct not reached |
-| 4 | 20 Oct 08:00 | R3 | chase plan: 1 INV-0412 (closes the gap), 2 INV-0398, 3 INV-0420 |
-| 5 | 20 Oct 08:00 | Tan Mei Ling | early-warning option chosen: ask supplier to move the 5 Nov bill |
-| 6 | 20 Oct 08:00 | Aisyah | approved Tier 1 INV-0412, sent |
-| 7 | 20 Oct 08:00 | Aisyah | approved Tier 1 INV-0420, sent |
-| 8 | 20 Oct 08:00 | Tan Mei Ling | approved Tier 2 INV-0398, sent |
-| 9 | 20 Oct 11:05 | INBOUND | Hock Lee Catering message (received 11:02) |
+| 1 | 20 Oct 08:00 | SYSTEM | scan: 4 overdue; 31 Oct salaries short RM2,000; 5 Nov diesel short RM13,200 |
+| 2 | 20 Oct 08:00 | R6 | early warning raised: 31 Oct salaries short RM2,000 |
+| 3 | 20 Oct 08:00 | R2 | skipped INV-2296: promise 30 Oct not reached |
+| 4 | 20 Oct 08:00 | R3 | chase plan: 1 INV-2304 (closes the gap), 2 INV-2310, 3 INV-2268 |
+| 5 | 20 Oct 08:00 | Lim Siew Lan | early-warning option chosen: ask supplier to move the 5 Nov bill |
+| 6 | 20 Oct 08:00 | Nurul | approved Tier 1 INV-2304, sent |
+| 7 | 20 Oct 08:00 | Nurul | approved Tier 1 INV-2310, sent |
+| 8 | 20 Oct 08:00 | Lim Siew Lan | approved Tier 2 INV-2268, sent |
+| 9 | 20 Oct 11:05 | INBOUND | Syarikat Hup Seng Trading message (received 11:02) |
 | 10 | 20 Oct 11:05 | AI | promise to pay; date ambiguous (23 Oct or 30 Oct) |
 | 11 | 20 Oct 11:05 | M4 | hand-off raised: which Friday? |
-| 12 | 20 Oct 11:05 | Aisyah | confirmed promise date 30 Oct |
-| 13 | 20 Oct 11:05 | M5 | reminders paused for INV-0398 until 31 Oct |
+| 12 | 20 Oct 11:05 | Nurul | confirmed promise date 30 Oct |
+| 13 | 20 Oct 11:05 | M5 | reminders paused for INV-2268 until 31 Oct |
 | 14 | 21 Oct 08:00 | SYSTEM | scan: no new reminders (R2) |
-| 15 | 21 Oct 10:20 | Aisyah | entered order: Hock Lee Catering, RM2,850, credit |
-| 16 | 21 Oct 10:20 | R4 | credit check raised: INV-0398 42 days late, total RM7,600 |
-| 17 | 21 Oct 10:20 | Tan Mei Ling | credit decision: ask 50% deposit |
+| 15 | 21 Oct 10:20 | Nurul | entered booking: Syarikat Hup Seng Trading, RM2,400, credit |
+| 16 | 21 Oct 10:20 | R4 | credit check raised: INV-2268 46 days late, total RM9,250 |
+| 17 | 21 Oct 10:20 | Lim Siew Lan | credit decision: ask 50% deposit |
 | 18 | 22 Oct 08:00 | SYSTEM | scan |
-| 19 | 22 Oct 08:00 | R6 | early warning raised: 5 Nov supplier short RM8,800 |
+| 19 | 22 Oct 08:00 | R6 | early warning raised: 5 Nov diesel short RM13,200 |
 | 20 | 23 Oct 08:00 | SYSTEM | scan |
-| 21 | 23 Oct 14:30 | BANK | line 23/10 DUITNOW CR 3,180.00 KAFE DUA BERADIK INV0412 (14:25) |
-| 22 | 23 Oct 14:30 | INBOUND | Kafe Dua Beradik message + slip |
-| 23 | 23 Oct 14:30 | AI | amount RM3,180.00, invoice INV-0412 (with confidences) |
+| 21 | 23 Oct 14:30 | BANK | line 23/10 DUITNOW CR 2,770.00 MEGA BINA HARDW INV2304 (14:25) |
+| 22 | 23 Oct 14:30 | INBOUND | Mega Bina Hardware Trading message + slip |
+| 23 | 23 Oct 14:30 | AI | amount RM2,770.00, invoice INV-2304, deduction RM330.00 (with confidences) |
 | 24 | 23 Oct 14:30 | M1 | claim VERIFIED against bank line |
-| 25 | 23 Oct 14:30 | Aisyah | approved match: INV-0412 PAID |
-| 26 | 23 Oct 14:30 | SYSTEM | 31 Oct payroll: covered (+RM1,180) |
-| 27 | 23 Oct 15:00 | INBOUND | Restoran Selera Kampung message |
-| 28 | 23 Oct 15:00 | AI | says paid; no slip |
-| 29 | 23 Oct 15:00 | M1 | no bank line: claim not verified, not marked paid |
-| 30 | 23 Oct 15:00 | Aisyah | sent templated reply asking for the slip |
+| 25 | 23 Oct 14:30 | M3 | deduction linked to DO-8812 (Bukit Raja) |
+| 26 | 23 Oct 14:30 | Nurul | approved receipt RM2,770: INV-2304 PART_PAID, RM330 under review |
+| 27 | 23 Oct 14:30 | SYSTEM | 31 Oct salaries: covered (+RM770) |
+| 28 | 23 Oct 14:30 | Lim Siew Lan | accepted RM330 deduction: INV-2304 PAID, credit note CN-0057 drafted |
+| 29 | 23 Oct 15:00 | INBOUND | Kilang Perabot Jaya message |
+| 30 | 23 Oct 15:00 | AI | says paid; no slip |
+| 31 | 23 Oct 15:00 | M1 | no bank line: claim not verified, not marked paid |
+| 32 | 23 Oct 15:00 | Nurul | sent templated reply asking for the slip |
 
 ## 14. Synthetic data specification
 
-All names, numbers, banks and messages are fictional.
+All names, numbers, banks and messages are fictional. No real bank names or receipt layouts are used.
 
-- **Business:** CetakPantas Print (Seri Kembangan, 4 staff). Users: Tan Mei Ling (Owner), Aisyah (Clerk).
-- **Bank balance** on 20 Oct: RM4,300.
-- **Outflows:** payroll RM8,400 (monthly, 31st); paper supplier RM6,800 (5 Nov).
+- **Business:** Lori Laju Logistics Sdn Bhd (Klang, 12 staff, 6 lorries; lorry haulage for hardware, furniture and food distributors). Users: Lim Siew Lan (Owner), Nurul (Clerk).
+- **Bank balance** on 20 Oct: RM9,800 (entered by the Owner).
+- **Outflows:** salaries, drivers and staff, RM24,500 (monthly, 31st); diesel fleet-card bill RM11,200 (5 Nov).
 - **Overdue invoices** (as of 20 Oct):
 
-| Customer | Invoice | Amount | Due | Late | History |
-|---|---|---|---|---|---|
-| Kafe Dua Beradik Sdn Bhd (contact Encik Faizal, EN) | INV-0412 | RM3,180 | 2 Oct | 18 days | no reminders yet; usually pays about 4 days after a first nudge |
-| Hock Lee Catering Sdn Bhd (contact 李老板, ZH) | INV-0398 | RM4,750 | 9 Sep | 41 days | Tier 1 reminders on 28 Sep and 6 Oct, no reply; usually pays in 45-60 days |
-| Restoran Selera Kampung (contact Puan Rosnah, BM) | INV-0420 | RM860 | 15 Oct | 5 days | no reminders yet |
-| Tadika Bintang Kecil (BM) | INV-0405 | RM1,240 | 29 Sep | 21 days | promised to pay on 30 Oct |
+| Customer | Invoice | Amount | Due | Late | Delivery | History |
+|---|---|---|---|---|---|---|
+| Mega Bina Hardware Trading Sdn Bhd (contact Jessie, EN) | INV-2304 | RM3,100 | 2 Oct | 18 days | DO-8812, 12 Sep, Shah Alam → Bukit Raja | no reminders yet; pays within 11 days of a Tier 1 nudge about 90% of the time |
+| Syarikat Hup Seng Trading (contact 李老板, ZH) | INV-2268 | RM6,850 | 5 Sep | 45 days | DO-8744, 6 Aug, Klang → Ipoh | Tier 1 reminders on 22 Sep and 30 Sep, no reply; pays within 11 days of a Tier 2 reminder about 30% of the time |
+| Kilang Perabot Jaya Sdn Bhd (contact Encik Razak, BM) | INV-2310 | RM4,200 | 12 Oct | 8 days | DO-8820, 12 Sep, Muar → Port Klang | no reminders yet; about 60% at Tier 1 |
+| Pelita Frozen Foods Sdn Bhd (contact Puan Rosnah, BM) | INV-2296 | RM1,900 | 28 Sep | 22 days | DO-8801, 29 Aug, Klang → Seremban | promised to pay on 30 Oct |
 
-- **Expected inflows** from on-time customers, totalling RM2,100 due before 31 Oct (e.g. two invoices of RM1,300 and RM800 from customers with an on-time rate ≥ 80%).
+- **Expected inflows** from on-time customers, totalling RM12,700 due before 31 Oct: Kedai Elektrik Sinar Sdn Bhd RM7,500 due 27 Oct, and Gudang Sejuk Prima Sdn Bhd RM5,200 due 29 Oct (both with an on-time rate ≥ 80%).
 - **Current invoices:** about 15 open invoices in total: the 4 overdue above, the 2 expected ones, and the rest not yet due until after 31 Oct.
-- **Payment history:** separately, at least 10 paid past invoices per main customer (about 40-50 rows in total), each with its last reminder tier and date, so the rates below can be expressed.
+- **Payment history:** separately, at least 10 paid past invoices per main customer (about 40-60 rows in total), each with its last reminder tier and date, so the rates above can be expressed.
 - **Inbound messages:**
-  - Tue 20 Oct 11:02, Hock Lee: "老板，那张发票我们下礼拜五才过数，sorry ah" → promise, date ambiguous (23 Oct or 30 Oct); the clerk confirms 30 Oct. (The card quotes "下礼拜五才过数", which must be an exact substring for the verbatim gate.)
-  - Fri 23 Oct 14:30, Kafe Dua Beradik: "Dah bank in boss, RM3,180 for the cake box invoice ya. Slip attached" + a slip image from a fictional bank showing RM3,180.00, reference "INV0412".
-  - Fri 23 Oct 15:00, Restoran Selera: "Dah settle la semalam" with no slip.
-- **Payment histories** must be tuned so R3 gives the demo order: Kafe Dua Beradik pays within 11 days of a Tier 1 nudge about 90% of the time (expected ≈ RM2,860, which alone covers the RM2,000 gap); Hock Lee pays within 11 days of a Tier 2 reminder about 30% of the time; Restoran Selera about 70% at Tier 1.
-- **Bank CSV:** includes `23/10/2026 14:25, 3180.00, DUITNOW CR KAFE DUA BERADIK INV0412` (visible once the demo clock passes 14:25 on 23 Oct); no line for Restoran Selera.
-- **New order** (Wed 21 Oct 10:20): Hock Lee, 300 food boxes, RM2,850, 60-day credit.
+  - Tue 20 Oct 11:02, Hup Seng: "老板，那张发票我们下礼拜五才过数，sorry ah" → promise, date ambiguous (23 Oct or 30 Oct); the clerk confirms 30 Oct. (The card quotes "下礼拜五才过数", which must be an exact substring for the verbatim gate.)
+  - Fri 23 Oct 14:30, Mega Bina (Jessie): "Hi kak, payment for INV-2304 done ya. Bank in RM2,770 just now, deduct RM330 for the 2 pallet tiles pecah at Bukit Raja. Slip attached" + a slip image from a fictional bank ("Bank Cempaka") showing RM2,770.00, reference "INV2304".
+  - Fri 23 Oct 15:00, Kilang Perabot Jaya (Encik Razak): "Dah settle la semalam" with no slip.
+- **Bank CSV:** includes `23/10/2026 14:25, 2770.00, DUITNOW CR MEGA BINA HARDW INV2304` (visible once the demo clock passes 14:25 on 23 Oct); no line for Kilang Perabot Jaya.
+- **New booking** (Wed 21 Oct 10:20): Hup Seng, Klang → Johor Bahru, 1 lorry, RM2,400, 60-day credit.
 - **Test set (P1, start in P0):** 30-50 synthetic Manglish/BM/Chinese replies with expected fields ("dah bank in boss", "bayar separuh dulu", "hujung bulan depan", "下礼拜五才过数"), plus 5 slips in 3 fictional bank layouts.
 
 ## 15. Domain 2 requirement traceability
@@ -472,9 +474,9 @@ All names, numbers, banks and messages are fictional.
 ## 18. Open decisions (team)
 
 1. Team size, skills and the preliminary deadline: these decide how much of Bukti is live.
-2. Tech stack: reuse ChadBuddy's (Bun + TypeScript + Convex) or another stack.
-3. Which LLM for extraction, and where it is hosted.
-4. Demo sector: printing shop (current) or a wholesaler/logistics firm (more slips).
+2. ~~Tech stack~~ decided (section 20).
+3. ~~LLM~~ decided for the demo (section 20); production hosting region still open.
+4. ~~Demo sector~~ decided: haulage firm (section 14).
 5. Sponsor company name (Alpha Red Pro vs Alpha Red Solutions): confirm on Discord.
 6. Final product name.
 7. The default credit-check threshold (30 days) and whether deposit percentages are fixed or free.
@@ -487,7 +489,7 @@ A builder read this PRD cold and found places where rules, demo steps and tests 
 |---|---|---|
 | 1 | Quiet hours before 09:00 would have blocked the 08:00 demo | Quiet hours no longer suppress the plan; they only hold the send (new rule S1). Default changed to 21:00-08:00 |
 | 2 | Clock behaviour unclear; the log could not be reproduced | Frozen demo clock; actions stamped with demo time; one scan per day crossed; seeded items appear by timestamp (FR-H1). Exact expected log added (13a) |
-| 3 | No rule produced the card's gap impact or the pay-by date | New rule G1; the Hock Lee card now shows both 31 Oct and 5 Nov impacts; the Clerk sees yes/no only |
+| 3 | No rule produced the card's gap impact or the pay-by date | New rule G1; the firm-reminder card now shows both the 31 Oct and 5 Nov impacts; the Clerk sees yes/no only |
 | 4 | Unclear when the meter turns green and how cash changes | F1 `cash` = entered balance + invoices PAID since; the meter turns green on PAID, not on VERIFIED |
 | 5 | 15 invoices could not express the payment rates | About 15 current invoices plus 10+ historical paid invoices per main customer; PaymentHistory now stores reminder dates |
 | 6 | R1 sequence order ambiguous | Fixed sequence: Tier 1, Tier 1 again, Tier 2, Tier 3 |
@@ -511,3 +513,31 @@ A builder read this PRD cold and found places where rules, demo steps and tests 
 | COD | Cash on delivery |
 | Orbyte Connect | Orbyte's integration gateway to partner services |
 | PDPA | Malaysia's Personal Data Protection Act 2010 |
+
+## 20. Tech stack (decided 25 Oct 2026)
+
+Chosen for a working demo inside the preliminary deadline, a link judges can open with nothing to install, and a clean path to a real backend later.
+
+| Layer | Choice | Notes |
+|---|---|---|
+| App | Next.js 16 (App Router) + React 19 + TypeScript | One deployable unit; route handlers expose the API sketch in section 9.2 |
+| UI | Tailwind CSS 4 + shadcn/ui-style components | |
+| State (P0) | Client-side store (Zustand) persisted to `localStorage`, reset from the seed | No account or database needed for the demo; every state change goes through the engine and the activity log |
+| Rules engine | Pure TypeScript module (`web/src/engine`), no framework imports | Deterministic; unit-tested against every seed check in sections 8 and 14 (Vitest) |
+| AI | Claude Opus 5.5 (`claude-opus-5-5`) via the official `@anthropic-ai/sdk`, image + text input, structured JSON output validated with Zod | Server-side route only; the key stays in `ANTHROPIC_API_KEY`; cached extractions for every seeded message are the fallback (FR-E11) |
+| Tests | Vitest (engine), Playwright (demo script smoke test, P1) | |
+| Deploy | Vercel | |
+| P1 backend | A hosted database (e.g. Convex or Postgres) behind the same engine | Replaces the client store; engine unchanged |
+
+**Declaration (handbook 8.4):** the README must list every major tool, API and AI tool used, including AI coding assistants and AI-assisted research.
+
+## 21. Orbyte hub frame (simulated)
+
+Kutip is demoed as a module inside a simulated Orbyte hub, to show "fit the hub" (brief section 6) and "Orbyte fit and reuse" (must-have 5). The frame is the team's own design, not a copy of Orbyte's screens (the brief allows this), and is labelled as a simulation.
+
+| ID | Requirement | Priority | Acceptance criteria |
+|---|---|---|---|
+| FR-O1 | Hub shell: workspace header (company name, signed-in user and role), a module sidebar listing Orbyte's existing modules (People: eLeave, eClaim, eOT, Attendance; Work; eSign; Hiring; Connect) as present but not part of this demo, and **Kutip** as the new module | P0 | Kutip is the active module; other modules show a "part of Orbyte, not in this demo" state; the frame says "simulated" |
+| FR-O2 | Connect page: the data sources Kutip uses, each with status and what it provides: accounting partner (invoices, payroll total; simulated by CSV), bank statement (credits; CSV), WhatsApp (wa.me click-to-send; simulated inbox), clients records (shared Orbyte data) | P0 | Each source shows "simulated" and the last import time on the demo clock |
+| FR-O3 | Shared platform pieces are visibly reused: roles from Orbyte's org structure, approvals in an approvals inbox, and the activity log as Orbyte's audit trail | P0 | The role switcher is labelled as Orbyte roles; approvals show in one inbox |
+| FR-O4 | Billing preview: per-use credits in Orbyte's credit-wallet model (invoice chased, slip read), with illustrative prices only | P1 | Shows a month's illustrative usage; no real payment |
