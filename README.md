@@ -23,7 +23,7 @@ Called Kutip during research; the notes in `docs/research/` and `docs/idea/` kee
 | **SDG Track (1–17)**   | SDG 8 — Decent Work and Economic Growth (targets 8.3 and 8.2) |
 | **Team Leader**        | Hansen Yap Hong San                         |
 | **University**         | Taylor's University                         |
-| **Number of Members**  | ⚠️ TODO                                      |
+| **Number of Members**  | 1 (solo)                                    |
 
 ## Links
 
@@ -339,7 +339,7 @@ Declared under handbook section 8.4.
 | Tests | Vitest |
 | AI inside the product | ILMU Mini v3.3, a Malaysian model hosted in Malaysia, through Grafilab's Models API (OpenAI-compatible) reads customer replies and payment slips (Bukti); Claude Opus 5.5 (Anthropic API) is the alternative provider. Rules, not AI, make every decision |
 | Hosting | Vercel |
-| AI tools used to build | Claude Code (Anthropic) for research, documentation and code generation, reviewed and adapted by the team |
+| AI tools used to build | Claude Code (Anthropic) for research, documentation and code generation, reviewed and adapted before committing |
 | Data | Synthetic only: every business, person, bank, slip and message is fictional. No pre-existing project code is used |
 
 Full declaration: [`submission/SDC2026_Taygood_TechDeclaration.pdf`](submission/SDC2026_Taygood_TechDeclaration.pdf).
@@ -377,9 +377,7 @@ Full declaration: [`submission/SDC2026_Taygood_TechDeclaration.pdf`](submission/
 
 | Name        | Role                | GitHub                                   |
 | ----------- | ------------------- | ---------------------------------------- |
-| Hansen Yap Hong San | Team Lead (⚠️ TODO: role) | [@YapHongSanHansen](https://github.com/YapHongSanHansen) |
-| ⚠️ TODO: name | ⚠️ TODO: role | [@Ckayz](https://github.com/Ckayz) |
-| ⚠️ TODO: name | ⚠️ TODO: role | ⚠️ TODO |
+| Hansen Yap Hong San | Solo: research, product, design and engineering | [@YapHongSanHansen](https://github.com/YapHongSanHansen) |
 
 ## Docs
 
@@ -404,7 +402,7 @@ Full declaration: [`submission/SDC2026_Taygood_TechDeclaration.pdf`](submission/
 - [ ] Demo video link added
 - [x] Replit use declared (not used), with a statement in `submission/`
 - [x] RunPod use declared (not used), with a statement in `submission/`
-- [ ] Preliminary submission completed (`SDC2026_Taygood_Preliminary.pdf`) *(drafted; phone, member count, workshops and signature TODO)*
+- [ ] Preliminary submission completed (`SDC2026_Taygood_Preliminary.pdf`) *(drafted; phone, workshops and signature TODO)*
 - [ ] Technology declaration completed (`SDC2026_Taygood_TechDeclaration.pdf`) *(drafted; phone and signature TODO)*
 - [x] Submission files renamed with your team name (replace `TeamName`)
 - [x] "How to Run" steps verified
