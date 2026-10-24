@@ -19,7 +19,7 @@ import {
 } from "@/engine/model";
 import { CONFIDENCE_MIN } from "@/engine/rules";
 import { useKachingg } from "@/lib/store";
-import { Badge, Button, Card, CardHeader, RuleTag, cx } from "@/components/ui";
+import { Badge, Button, Card, CardHeader, RuleTag, cx, stagger } from "@/components/ui";
 import { ChatBackdrop, ChatBubble, SlipThumb } from "./bubble";
 import { HighlightedText, type QuoteMark } from "./highlight";
 import { MARK_CLASS, dayLabel, fieldRows, type FieldRow } from "./fields";
@@ -86,6 +86,7 @@ export function MessageDetail({
         </div>
       </Card>
 
+      {!rec && loading && <ReadingSkeleton />}
       {rec && <AiReadPanel rec={rec} rows={rows} run={run} />}
       {rec && <Outcome state={state} msg={msg} rec={rec} />}
     </div>
@@ -97,13 +98,17 @@ function SourceChip({ run, rec }: { run: RunInfo | undefined; rec: ExtractionRec
   if (run && !run.loading) {
     return (
       <span title={run.label}>
-        <Badge tone={run.failed ? "rose" : run.cached ? "amber" : "sky"}>{run.failed || !run.cached ? run.label : "Cached result"}</Badge>
+        <Badge tone={run.failed ? "rose" : run.cached ? "amber" : "sky"} pulse={!run.failed && !run.cached}>
+          {run.failed || !run.cached ? run.label : "Cached result"}
+        </Badge>
       </span>
     );
   }
   return (
     <span title={rec.model}>
-      <Badge tone={rec.cached ? "amber" : "sky"}>{rec.cached ? "Cached result" : `Live · ${rec.model}`}</Badge>
+      <Badge tone={rec.cached ? "amber" : "sky"} pulse={!rec.cached}>
+        {rec.cached ? "Cached result" : `Live · ${rec.model}`}
+      </Badge>
     </span>
   );
 }
@@ -113,9 +118,38 @@ function SourceChip({ run, rec }: { run: RunInfo | undefined; rec: ExtractionRec
 const pct = (c: number) => `${Math.round(c * 100)}%`;
 const FIELD_GRID = "grid grid-cols-[minmax(0,6.5rem)_minmax(0,1fr)_auto] gap-3 sm:grid-cols-[8.5rem_minmax(0,1fr)_auto]";
 
+/** The field table's shape while Bukti reads. Hidden from assistive tech: the button already says Bukti is reading. */
+function ReadingSkeleton() {
+  const widths = ["w-28", "w-20", "w-36", "w-24", "w-32"];
+  return (
+    <div className="panel panel-ai k-rise" aria-hidden>
+      <div className="panel-header">
+        <div className="k-shimmer h-6 w-28" />
+        <div className="k-shimmer h-6 w-20 rounded-full" />
+      </div>
+      <div className="px-5 pb-4">
+        <div className={cx(FIELD_GRID, "h-[30px] items-center border-b border-line")}>
+          <div className="k-shimmer h-3 w-10" />
+          <div className="k-shimmer h-3 w-12" />
+          <div className="k-shimmer h-3 w-16" />
+        </div>
+        <div className="divide-y divide-hairline">
+          {widths.map((w) => (
+            <div key={w} className={cx(FIELD_GRID, "min-h-[38px] items-center py-2.5")}>
+              <div className="k-shimmer h-3 w-16" />
+              <div className={cx("k-shimmer h-3.5 max-w-full", w)} />
+              <div className="k-shimmer h-3 w-8" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AiReadPanel({ rec, rows, run }: { rec: ExtractionRecord; rows: FieldRow[]; run: RunInfo | undefined }) {
   return (
-    <Card tone="ai">
+    <Card tone="ai" rise={0}>
       <CardHeader title="Bukti read" right={<SourceChip run={run} rec={rec} />} />
       <div className="px-5 pb-2">
         <div className={cx(FIELD_GRID, "h-[30px] items-center border-b border-line text-xs text-ink2")}>
@@ -124,8 +158,8 @@ function AiReadPanel({ rec, rows, run }: { rec: ExtractionRecord; rows: FieldRow
           <span className="text-right">Confidence</span>
         </div>
         <div className="divide-y divide-hairline">
-          {rows.map((r) => (
-            <div key={r.key} className={cx(FIELD_GRID, "min-h-[38px] items-start py-2.5 text-[13px]")}>
+          {rows.map((r, i) => (
+            <div key={r.key} className={cx(FIELD_GRID, "k-rise min-h-[38px] items-start py-2.5 text-[13px]")} style={stagger(i + 1)}>
               <div className="text-xs text-ink2">{r.label}</div>
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -230,7 +264,7 @@ function Outcome({ state, msg, rec }: { state: State; msg: InboundMessage; rec: 
   const promised = state.invoices.find((i) => i.promise?.messageId === msg.id) ?? null;
 
   return (
-    <Card>
+    <Card rise={2}>
       <CardHeader title="Checks" />
       <ul className="divide-y divide-hairline">
         {handoffs

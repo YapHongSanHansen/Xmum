@@ -1,10 +1,18 @@
 "use client";
 import { useState } from "react";
 import { CalendarDays, Sparkles } from "lucide-react";
-import { Badge, Card, CardHeader } from "@/components/ui";
+import { Badge, Card, CardHeader, stagger } from "@/components/ui";
+import { CountUp } from "@/components/motion";
 import { dayOf, fmtDate, fmtRM } from "@/engine/model";
 import { cashStages } from "@/lib/cash-outlook";
 import { useKachingg } from "@/lib/store";
+
+const compact = new Intl.NumberFormat("en-MY", { notation: "compact", maximumFractionDigits: 1 });
+/** Compact MYR for the chart labels, e.g. "−12.4K". `sen` may be mid-animation, so round first. */
+const fmtCompact = (sen: number) => {
+  const v = Math.round(sen);
+  return `${v < 0 ? "−" : ""}${compact.format(Math.abs(v) / 100)}`;
+};
 
 export default function CashFlow() {
   const state = useKachingg((s) => s.state);
@@ -17,7 +25,7 @@ export default function CashFlow() {
   const range = highest - lowest;
   const zero = (highest / range) * 100;
   return (
-    <Card>
+    <Card rise={0}>
       <CardHeader
         title="Cash outlook"
         kicker="A little clarity for the days ahead"
@@ -26,7 +34,7 @@ export default function CashFlow() {
       <div className="px-6 pb-2 text-[11px] text-ink2">Projected balance after each event · MYR</div>
       <div className="flow-chart" role="group" aria-label="Projected cash balances. Select an event for details.">
         <div className="flow-columns" style={{ gridTemplateColumns: `repeat(${stages.length}, minmax(90px, 1fr))` }}>
-          {stages.map((stage) => {
+          {stages.map((stage, i) => {
             const y = ((highest - stage.balance) / range) * 100;
             return (
               <button
@@ -39,15 +47,14 @@ export default function CashFlow() {
               >
                 <span className="flow-name">{stage.label}</span>
                 <span className="flow-value">
-                  {stage.balance < 0 ? "−" : ""}
-                  {new Intl.NumberFormat("en-MY", { notation: "compact", maximumFractionDigits: 1 }).format(Math.abs(stage.balance) / 100)}
+                  <CountUp value={stage.balance} format={fmtCompact} />
                 </span>
                 <div className="flow-plot" aria-hidden>
                   <div className="flow-zero" style={{ top: `${zero}%` }} />
                   <div
-                    className="flow-bar"
+                    className="flow-bar k-grow-y"
                     data-negative={stage.balance < 0}
-                    style={{ top: `${Math.min(y, zero)}%`, height: `${Math.abs(zero - y)}%` }}
+                    style={{ ...stagger(i + 1), top: `${Math.min(y, zero)}%`, height: `${Math.abs(zero - y)}%` }}
                   />
                 </div>
                 <span className="flow-date">{stage.id === "now" ? "Today" : fmtDate(stage.date)}</span>
@@ -72,7 +79,7 @@ export default function CashFlow() {
 export function ClerkOverview() {
   const state = useKachingg((s) => s.state);
   return (
-    <Card className="p-7">
+    <Card className="p-7" rise={0}>
       <span className="inline-flex rounded-full bg-sky-100 p-3 text-sky-700">
         <CalendarDays className="h-5 w-5" />
       </span>

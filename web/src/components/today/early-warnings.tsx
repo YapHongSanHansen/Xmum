@@ -14,14 +14,14 @@ export default function EarlyWarnings() {
   if (state.role !== "owner" || state.warnings.length === 0) return null;
   return (
     <div className="space-y-4">
-      {state.warnings.map((w) => (
-        <WarningCard key={w.id} state={state} w={w} />
+      {state.warnings.map((w, i) => (
+        <WarningCard key={w.id} index={i} state={state} w={w} />
       ))}
     </div>
   );
 }
 
-function WarningCard({ state, w }: { state: State; w: Warning }) {
+function WarningCard({ index, state, w }: { index: number; state: State; w: Warning }) {
   const dispatch = useKachingg((s) => s.dispatch);
   const outflow = state.outflows.find((o) => o.id === w.outflowId);
   const now = forecast(state).find((f) => f.outflowId === w.outflowId);
@@ -31,7 +31,7 @@ function WarningCard({ state, w }: { state: State; w: Warning }) {
   const stillShort = now !== undefined && now.forecast < 0;
   const raised = `Raised ${fmtDateTime(w.raisedAt)} at a gap of ${fmtRM(w.gap)} · ${outflow.label} ${fmtRM(outflow.amount)}`;
   return (
-    <Card tone={stillShort ? "warn" : "good"} className="space-y-4 p-6">
+    <Card tone={stillShort ? "warn" : "good"} className="space-y-4 p-6" rise={index}>
       <div className="flex items-start gap-2.5">
         <TriangleAlert className={cx("mt-0.5 h-4 w-4 shrink-0", stillShort ? "text-amber-700" : "text-emerald-700")} aria-hidden />
         <h3 className="text-[15px] font-semibold tracking-[-0.01em] text-ink" title={raised}>

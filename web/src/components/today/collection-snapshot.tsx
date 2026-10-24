@@ -1,6 +1,7 @@
 "use client";
 import { ArrowRight, Lightbulb, MessageCircle } from "lucide-react";
-import { Badge, Button, Card, CardHeader, Figure } from "@/components/ui";
+import { Badge, Button, Card, CardHeader, Figure, stagger } from "@/components/ui";
+import { CountUp } from "@/components/motion";
 import { useKachingg } from "@/lib/store";
 import { dayOf, daysOverdue, fmtDate, fmtRM, outstanding } from "@/engine/model";
 import { chasePlan, forecast } from "@/engine/rules";
@@ -25,19 +26,27 @@ export function CollectionSnapshot() {
     { label: "31+ days", color: "#ee5b9f", invoices: open.filter((i) => daysOverdue(i, state.now) > 30) },
   ];
   const unread = inboxCount(state);
+  // Dots pop in one after another across the buckets; the stagger is capped so the last lands by ~0.6s.
+  const offsets = buckets.map((_, b) => buckets.slice(0, b).reduce((n, x) => n + Math.min(x.invoices.length, 12), 0));
   return (
     <div className="grid gap-[18px] sm:grid-cols-[1.2fr_1fr]">
-      <Card>
+      <Card rise={2}>
         <CardHeader title="Receivables" right={<Badge>{open.length} open</Badge>} />
         <div className="px-6 pb-6">
-          <Figure>{fmtRM(open.reduce((sum, i) => sum + outstanding(i), 0))}</Figure>
+          <Figure>
+            <CountUp value={open.reduce((sum, i) => sum + outstanding(i), 0)} format={(v) => fmtRM(Math.round(v))} />
+          </Figure>
           <p className="mt-2 text-xs text-ink2">Outstanding across all customers</p>
           <div className="mt-7 grid grid-cols-4 gap-2" aria-label="Invoice ageing">
-            {buckets.map((bucket) => (
+            {buckets.map((bucket, b) => (
               <div key={bucket.label}>
                 <div className="flex min-h-12 max-w-20 flex-wrap content-end gap-1" aria-hidden>
                   {Array.from({ length: Math.min(bucket.invoices.length, 12) }, (_, i) => (
-                    <span key={i} className="h-3 w-3 rounded-[4px]" style={{ background: bucket.color }} />
+                    <span
+                      key={i}
+                      className="k-pop h-3 w-3 rounded-[4px]"
+                      style={{ ...stagger(Math.min(offsets[b] + i, 12) + 4, "35ms"), background: bucket.color }}
+                    />
                   ))}
                 </div>
                 <div className="mt-2 text-[10px] text-ink2">{bucket.label}</div>
@@ -47,10 +56,12 @@ export function CollectionSnapshot() {
           </div>
         </div>
       </Card>
-      <Card className="flex flex-col">
+      <Card className="flex flex-col" rise={3}>
         <CardHeader title="Bukti inbox" right={<MessageCircle className="h-5 w-5 text-ink2" />} />
         <div className="flex flex-1 flex-col px-6 pb-6">
-          <Figure>{unread}</Figure>
+          <Figure>
+            <CountUp value={unread} format={(v) => String(Math.round(v))} duration={500} />
+          </Figure>
           <p className="mt-3 text-xs leading-relaxed text-ink2">
             {unread > 0
               ? "Customer replies ready to review. Turn payment claims into verified receipts."
@@ -76,7 +87,7 @@ export function NextAction() {
   const gap = state.role === "owner" ? forecast(state).find((f) => f.gap > 0) : undefined;
   const ready = scanned ? chasePlan(state).filter((r) => r.state === "remind").length : 0;
   return (
-    <section className="insight-card" aria-label="Your next step">
+    <section className="insight-card k-rise" style={stagger(3)} aria-label="Your next step">
       <div className="flex items-center justify-between">
         <span className="inline-flex items-center gap-2 rounded-xl border border-white/40 bg-white/15 px-3 py-1.5 text-xs">
           <Lightbulb className="h-4 w-4" aria-hidden />

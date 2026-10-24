@@ -2,7 +2,7 @@
 // FR-C1–C4: today's chase plan. Every row carries its rule ID and a one-line reason.
 import { Ban, Check, Clock, Gavel, Phone } from "lucide-react";
 import { useKachingg } from "@/lib/store";
-import { Badge, Button, Card, CardHeader, Empty, RuleTag, cx, tbl } from "@/components/ui";
+import { Badge, Button, Card, CardHeader, Empty, RuleTag, cx, stagger, tbl } from "@/components/ui";
 import { dayOf, fmtRM, outstanding, type State } from "@/engine/model";
 import { chasePlan, type PlanRow } from "@/engine/rules";
 import { LANG_SHORT, TierBadge } from "./bits";
@@ -47,7 +47,7 @@ export default function ChasePlan({ selectedId, onReview }: { selectedId: string
   const remindCount = rows.filter((r) => r.state === "remind").length;
 
   return (
-    <Card>
+    <Card rise={0}>
       <CardHeader
         title="Collection plan"
         kicker="The right follow-up, in the right order"
@@ -75,8 +75,8 @@ export default function ChasePlan({ selectedId, onReview }: { selectedId: string
               </tr>
             </thead>
             <tbody>
-              {rows.map((row) => (
-                <PlanTableRow key={row.invoice.id} state={state} row={row} selected={row.invoice.id === selectedId} onReview={onReview} />
+              {rows.map((row, i) => (
+                <PlanTableRow key={row.invoice.id} index={i} state={state} row={row} selected={row.invoice.id === selectedId} onReview={onReview} />
               ))}
             </tbody>
           </table>
@@ -86,14 +86,29 @@ export default function ChasePlan({ selectedId, onReview }: { selectedId: string
   );
 }
 
-function PlanTableRow({ state, row, selected, onReview }: { state: State; row: PlanRow; selected: boolean; onReview: (id: string) => void }) {
+function PlanTableRow({
+  index,
+  state,
+  row,
+  selected,
+  onReview,
+}: {
+  index: number;
+  state: State;
+  row: PlanRow;
+  selected: boolean;
+  onReview: (id: string) => void;
+}) {
   const dispatch = useKachingg((s) => s.dispatch);
   const muted = row.state === "skipped" || row.state === "waiting";
   const isOwner = state.role === "owner";
   const queued = row.state === "sent_today" && row.invoice.reminders.some((r) => r.status === "queued" && dayOf(r.at) === dayOf(state.now));
 
   return (
-    <tr className={cx(tbl.row, "transition-colors", muted ? "text-ink2" : "hover:bg-canvas/60", selected && "bg-navy-soft hover:bg-navy-soft")}>
+    <tr
+      className={cx(tbl.row, "k-rise transition-colors", muted ? "text-ink2" : "hover:bg-canvas/60", selected && "bg-navy-soft hover:bg-navy-soft")}
+      style={stagger(Math.min(index, 8) + 2)}
+    >
       <td className={cx(tbl.td, selected && "shadow-[inset_2px_0_0_var(--accent)]")}>
         <div className={cx("font-medium", muted ? "text-ink2" : "text-ink")}>{row.customer.name}</div>
         <div className="text-xs text-ink2">
