@@ -4,8 +4,8 @@
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { useKutip, type Page } from "@/lib/store";
 import { Badge, Button, Card, CardHeader, Empty, PageTitle, RuleTag } from "@/components/ui";
-import { customerOf, fmtDate, fmtRM, invoiceOf, type Role, type State } from "@/engine/model";
-import { chasePlan } from "@/engine/rules";
+import { customerOf, dayOf, fmtDate, fmtRM, invoiceOf, type Role, type State } from "@/engine/model";
+import { chasePlan, forecast } from "@/engine/rules";
 
 interface Pending {
   key: string;
@@ -21,16 +21,19 @@ function pendingItems(s: State): Pending[] {
   const owner = s.role === "owner";
   for (const w of s.warnings.filter((x) => x.chosen.length === 0)) {
     const o = s.outflows.find((x) => x.id === w.outflowId)!;
+    const gapNow = forecast(s).find((f) => f.outflowId === w.outflowId)?.gap ?? 0;
+    if (gapNow === 0) continue;
     items.push({
       key: w.id,
       rule: "R6",
       title: `Early warning: ${fmtDate(o.dueDate)} ${o.short}`,
-      detail: owner ? `Short ${fmtRM(w.gap)}; choose what to do` : "Cash note for the Owner",
+      detail: owner ? `Short ${fmtRM(gapNow)}; choose what to do` : "Cash note for the Owner",
       who: ["owner"],
       page: "today",
     });
   }
-  for (const r of chasePlan(s)) {
+  // The chase plan exists only after today's 08:00 scan.
+  for (const r of s.scannedDays.includes(dayOf(s.now)) ? chasePlan(s) : []) {
     if (r.state === "remind" && r.tier !== null) {
       items.push({
         key: `rem-${r.invoice.id}`,

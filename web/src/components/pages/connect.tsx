@@ -131,7 +131,15 @@ export default function ConnectPage() {
           Kutip&apos;s permissions follow the hub roles: {s.users.map((u) => `${u.name} (${u.role === "owner" ? "Owner" : "Clerk"})`).join(", ")}. The
           header switcher is labelled &ldquo;Orbyte role&rdquo;.
         </ReuseCard>
-        <ReuseCard title="Approvals inbox" source="Orbyte approvals">
+        <ReuseCard
+          title="Approvals inbox"
+          source="Orbyte approvals"
+          action={
+            <Button size="sm" variant="secondary" onClick={() => go("approvals")}>
+              Open approvals
+            </Button>
+          }
+        >
           Firm reminders, credit checks, receipts and deductions wait for a person to decide, in one place, by role. Nothing is sent or marked paid on its own.
         </ReuseCard>
         <ReuseCard

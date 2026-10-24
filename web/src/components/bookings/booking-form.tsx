@@ -130,7 +130,7 @@ export default function BookingForm() {
             <RuleTag id="R4" />
             <span>Credit orders for customers 30+ days late go on hold. COD and prepaid are not checked.</span>
           </div>
-          <Button type="submit" disabled={!valid}>
+          <Button type="submit" disabled={!valid} className="whitespace-nowrap">
             <Plus className="h-4 w-4" aria-hidden />
             Save booking
           </Button>

@@ -25,11 +25,11 @@ export function BankStatement({ state }: { state: State }) {
             <tbody className="text-slate-800">
               {lines.map((b) => (
                 <tr key={b.id} className="border-t border-slate-100 align-top">
-                  <td className="py-1 pr-2 whitespace-nowrap">{fmtDateTime(b.at)}</td>
+                  <td className="py-1 pr-3 whitespace-nowrap">{fmtDateTime(b.at)}</td>
                   <td className="py-1 text-right whitespace-nowrap">{fmtRM(b.amount, { cents: true })}</td>
                   <td className="py-1 pl-3 break-words [overflow-wrap:anywhere]">{b.description}</td>
                   <td className="py-1 pl-2">
-                    {b.matchedInvoiceId ? <Badge tone="emerald">{invoiceOf(state, b.matchedInvoiceId).number}</Badge> : <span className="text-slate-400">—</span>}
+                    {b.matchedInvoiceId ? <Badge tone="emerald" className="whitespace-nowrap">{invoiceOf(state, b.matchedInvoiceId).number}</Badge> : <span className="text-slate-400">—</span>}
                   </td>
                 </tr>
               ))}

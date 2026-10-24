@@ -168,6 +168,15 @@ pnpm dev           # http://localhost:3000
 
 Optional: set `ANTHROPIC_API_KEY` in `web/.env.local` to let Bukti read messages live with Claude. Without it, Bukti uses saved results for the three demo messages and labels them "cached result". Use **Reset demo** in the header to start the script again.
 
+## Run it on Replit
+
+1. Import the repo at [replit.com/import](https://replit.com/import) (GitHub → this repository).
+2. The `.replit` file runs the app from `web/` with pnpm. Press **Run**; if it fails, ask Replit Agent to "run and publish the Next.js app in the web folder with pnpm".
+3. For live AI: either add an `ANTHROPIC_API_KEY` secret, or use Replit's managed Anthropic integration (paid Replit plan) and expose it to the app as `ANTHROPIC_API_KEY` and `ANTHROPIC_BASE_URL`. Replit's managed list does not include `claude-opus-5-5`, so also set the secret `KUTIP_AI_MODEL` to one it lists (for example `claude-opus-5`).
+4. **Publish** with Replit Deployments to get a public link.
+
+Without any key, the demo still runs on the cached readings.
+
 ## Tools and AI declaration
 
 Declared under handbook section 8.4.
@@ -177,7 +186,7 @@ Declared under handbook section 8.4.
 | App | Next.js 16, React 19, TypeScript, Tailwind CSS 4, Zustand, Zod, lucide-react |
 | Tests | Vitest |
 | AI inside the product | Claude Opus 5.5 (Anthropic API) reads customer replies and payment slips (Bukti). Rules, not AI, make every decision |
-| Hosting | Vercel |
+| Hosting | Replit (Deployments) and Vercel |
 | AI tools used to build | Claude Code (Anthropic) for research, documentation and code generation, reviewed and adapted by the team |
 | Data | Synthetic only: every business, person, bank, slip and message is fictional. No pre-existing project code is used |
 

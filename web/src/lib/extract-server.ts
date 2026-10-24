@@ -10,7 +10,12 @@ import { CACHED_EXTRACTIONS, CACHED_MODEL } from "../engine/cached";
 import type { Extraction, InboundMessage } from "../engine/model";
 import { seedState } from "../engine/seed";
 
-export const LIVE_MODEL = "claude-opus-5-5";
+// KUTIP_AI_MODEL overrides the model, e.g. when a proxy such as Replit's
+// managed Anthropic integration offers a different Claude model.
+export const LIVE_MODEL = process.env.KUTIP_AI_MODEL || "claude-opus-5-5";
+// The SDK reads ANTHROPIC_API_KEY and ANTHROPIC_BASE_URL from the environment.
+// Behind a proxy (ANTHROPIC_BASE_URL set), beta features may not pass through.
+const VIA_PROXY = Boolean(process.env.ANTHROPIC_BASE_URL);
 const TIMEOUT_MS = 9_000;
 
 export type ExtractResult =
@@ -185,8 +190,7 @@ export async function extract(messageId: string): Promise<ExtractResult | null> 
     const response = await client.beta.messages.create({
       model: LIVE_MODEL,
       max_tokens: 4096,
-      betas: ["server-side-fallback-2026-07-01"],
-      fallbacks: "default",
+      ...(VIA_PROXY ? {} : { betas: ["server-side-fallback-2026-07-01"], fallbacks: "default" as const }),
       system: systemPrompt(msg),
       messages: [{ role: "user", content }],
       output_config: { effort: "low", format: { type: "json_schema", schema: EXTRACTION_JSON_SCHEMA } },

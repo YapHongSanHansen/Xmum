@@ -162,7 +162,7 @@ export default function ApprovalPanel({ row, onClose }: { row: PlanRow; onClose:
               <div className="flex flex-wrap items-center gap-2">
                 <Button onClick={approve}>
                   <Send className="h-4 w-4" aria-hidden />
-                  Approve &amp; send (simulated)
+                  {quiet ? "Approve & queue until 08:00" : "Approve & send (simulated)"}
                 </Button>
                 {!quiet && (
                 <a
@@ -178,9 +178,9 @@ export default function ApprovalPanel({ row, onClose }: { row: PlanRow; onClose:
                 </a>
                 )}
               </div>
-              <div className="text-[11px] text-slate-500">
+              {!quiet && <div className="text-[11px] text-slate-500">
                 &ldquo;Open in WhatsApp&rdquo; approves the reminder (logged), then opens WhatsApp to pick the chat; no number is filled in. A person presses send.
-              </div>
+              </div>}
             </>
           ) : (
             <div className="flex items-start gap-2 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-900">
