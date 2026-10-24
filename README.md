@@ -148,7 +148,8 @@ Orbyte is a shared business hub for SMEs. Kutip is designed as a module inside i
 | | |
 |---|---|
 | ✅ | Problem research, competitor scan, idea brief |
-| 🔄 | Product requirements document |
+| ✅ | Product requirements document (draft v0.1, reviewed once by a builder) |
+| ⬜ | Team decisions: stack, LLM, demo sector, deadline (see PRD section 18) |
 | ⬜ | Preliminary-round MVP: the full journey running live on synthetic data |
 | ⬜ | Interviews with 5-10 Malaysian B2B sellers |
 
@@ -156,10 +157,11 @@ Orbyte is a shared business hub for SMEs. Kutip is designed as a module inside i
 
 | Read this | For |
 |---|---|
+| [`docs/PRD.md`](docs/PRD.md) | **What to build:** goals, user stories, functional requirements with acceptance criteria, business rules, data model, permissions, demo script and expected log, synthetic data spec, Domain 2 traceability |
 | [`docs/idea/kutip-bukti.md`](docs/idea/kutip-bukti.md) | The full idea: example screens, rules, roles, requirement mapping, risks, demo scope |
 | [`docs/domain-2/brief.md`](docs/domain-2/brief.md) | The hackathon brief as text (source of truth: [`Domain-2-brief.pdf`](docs/domain-2/Domain-2-brief.pdf)) |
 | [`docs/research/01-pain-research-shortlist.md`](docs/research/01-pain-research-shortlist.md) | How the idea was chosen: researched pains, evidence, shortlist, judge scores |
 | [`docs/research/02-competitor-scan.md`](docs/research/02-competitor-scan.md) | What already exists, and the gap |
 | [`docs/research/data/`](docs/research/data/) | Raw JSON from the research runs |
 
-**For AI agents:** read the brief first, then the idea brief, then the research. The PDF is the source of truth for requirements. Research notes came from multi-agent runs and were spot-checked by hand; corrections are marked in place. Re-verify any figure before it goes into the pitch.
+**For AI agents:** read the brief first, then the PRD (the build spec), then the idea brief and the research. Where the PRD and the idea brief differ on rules or numbers, the PRD wins. The PDF is the source of truth for requirements. Research notes came from multi-agent runs and were spot-checked by hand; corrections are marked in place. Re-verify any figure before it goes into the pitch.

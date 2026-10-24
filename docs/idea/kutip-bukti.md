@@ -41,7 +41,7 @@ So every month the owner chases customers by hand on WhatsApp ("boss, can pay al
 
 Every promise in the pitch is in the right-hand column, so the product still delivers value when a customer never pays.
 
-Some late payers are not refusing: they forgot, lost the invoice, or pay on a fixed day such as the 25th. A reminder at the right time with the statement attached may help them. That is a reasonable guess but it is **not proven**, so it should not lead the pitch.
+Some late payers are not refusing: they forgot, lost the invoice, or pay on a fixed day such as the 25th. A reminder at the right time with the invoice details may help them. That is a reasonable guess but it is **not proven**, so it should not lead the pitch.
 
 ## 3. Who it is for
 
@@ -128,11 +128,12 @@ The options are a neutral checklist of the owner's own business levers. Kutip re
 │ INV-0398 · RM4,750 · due 9 Sep · 41 days late                      │
 │ Reminders: 28 Sep (no reply) · 6 Oct (no reply)                    │
 │ Pays usually: 45–60 days · Language on file: 中文                  │
-│ If paid by 30 Oct: 5 Nov gap drops RM8,800 → RM4,050               │
+│ If paid by 30 Oct:  31 Oct payroll  short RM2,000 → covered        │
+│                     5 Nov supplier  short RM8,800 → RM4,050        │
 ├────────────────────────────────────────────────────────────────────┤
 │ 李老板您好，我是CetakPantas的美玲。INV-0398（RM4,750）             │
 │ 已经逾期41天。麻烦在10月30日前安排付款，或回复付款日期。           │
-│ 附上对账单，谢谢！                                                 │
+│ 如需对账单请回复，谢谢！                                           │
 ├────────────────────────────────────────────────────────────────────┤
 │ [ Approve & open WhatsApp ]  [ Edit ]  [ Snooze ]  [ I'll call ]   │
 └────────────────────────────────────────────────────────────────────┘
@@ -211,7 +212,7 @@ The AI only reads. Rule M1 decides: the invoice is marked paid only if a matchin
 └────────────────────────────────────────────────────────────────────┘
 ```
 
-**Step 6: everything is in the activity log.**
+**Step 6: everything is in the activity log.** (Timestamps here are illustrative. The exact expected log for the demo script is in [`../PRD.md`](../PRD.md) section 13a.)
 
 ```text
 ┌────────────────────────────────────────────────────────────────────┐
@@ -251,8 +252,8 @@ These rules came out of the idea stage and are a starting point, not final.
 
 | Rule | What it does |
 |---|---|
-| R1 Tier | D-3 courtesy, D+1 nudge, D+14 firm with statement attached, D+30 (or a firm reminder unanswered for 7 days) becomes an owner-only escalation card with no automatic message |
-| R2 Suppress | Skip if the invoice is disputed, a promised date has not passed, a payment was logged in the last 2 days, it is quiet hours (before 9am or after 8pm), or the customer was messaged in the last 5 days |
+| R1 Tier | Fixed sequence per invoice: Tier 1 nudge, Tier 1 again, Tier 2 firm (offers a statement), Tier 3 owner-only escalation card with no automatic message. Each step needs the previous reminder unanswered for 7+ days and a day gate (Tier 1 from D+1, Tier 2 from D+14, Tier 3 from D+30) |
+| R2 Suppress | Skip if the invoice is disputed, a promised date has not passed, a payment was logged in the last 2 days, or the customer was messaged in the last 5 days. Quiet hours (21:00-08:00) only hold the send, they do not remove the row (PRD rule S1) |
 | R3 Priority | Expected cash before the next shortfall date = amount × the customer's own historical rate of paying within N days at this tier (default 50% for new customers). Pick the smallest set that covers the gap |
 | **R4 Credit check** (headline) | A new credit order or invoice draft for a customer with an invoice 30+ days overdue raises an owner card before goods leave: accept on credit / ask a deposit / cash on delivery / call first. The card shows what is already owed, any promise, and the total owed if accepted |
 | R5 Templates | Language and template come from the customer profile. Fixed templates per tier per language, merge fields only. AI never writes messages to customers |
