@@ -40,6 +40,19 @@ export const advance = (to: string): Action => ({ type: "ADVANCE", to });
 /** Seed with the 20 Oct 08:00 scan already run (demo step 1, before any choice). */
 export const scanned = () => run(seedState(), [{ type: "RUN_SCAN" }]);
 
+/**
+ * Seeded business history (engine/history.ts): bookings, read messages and matched
+ * bank credits that exist before the demo opens. Tests about what the demo itself
+ * creates or reveals filter these out with `demoOnly`.
+ */
+const SEED = seedState();
+const HISTORY_IDS = new Set([
+  ...SEED.bookings.map((b) => b.id),
+  ...Object.keys(SEED.extractions),
+  ...SEED.bankLines.filter((b) => b.matchedInvoiceId !== null).map((b) => b.id),
+]);
+export const demoOnly = <T extends { id: string }>(xs: T[]): T[] => xs.filter((x) => !HISTORY_IDS.has(x.id));
+
 /** Mutable copy of a state, for building fixtures the seed does not contain. */
 export const draft = (s: State): State => structuredClone(s);
 
@@ -88,7 +101,7 @@ export function playDemo(): DemoRun {
     { type: "ENTER_BOOKING", customerId: "c-hupseng", route: "Klang → Johor Bahru", amount: 240000, terms: "credit", creditDays: 60 },
     as("owner"),
   ]);
-  s = act(s, { type: "DECIDE_CREDIT", bookingId: s.bookings[0].id, decision: "deposit_requested", depositPct: 50 });
+  s = act(s, { type: "DECIDE_CREDIT", bookingId: s.bookings.find((b) => b.status === "on_hold")!.id, decision: "deposit_requested", depositPct: 50 });
   const credit = s;
   s = run(s, [advance("2026-10-23T14:30"), extract("m-megabina")]);
   const verified = s;
