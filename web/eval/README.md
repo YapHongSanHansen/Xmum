@@ -2,7 +2,7 @@
 
 Measures how well Bukti reads customers' WhatsApp payment replies (PRD FR-E2, NFR-4). It scores what the product would act on, not the raw model output: every live reading goes through the engine's own verbatim gate (`APPLY_EXTRACTION` in `src/engine/reducer.ts`) and 0.85 confidence threshold (`CONFIDENCE_MIN` in `src/engine/rules.ts`) before it is compared with the hand labels.
 
-**No live score has been recorded yet.** The set and the scorer are tested; the model has not been run against them.
+**Live score (25 Oct 2026, two identical runs), ILMU Mini v3.3 via Grafilab:** amount exact match **100% (40/40)**, meeting the NFR-4 target of 95%; invoice number 97.4%; intent 90.0%; promised date 83.8% (most date misses list an extra candidate, which sends the message to a person, so they fail safe); 0 fields dropped by the verbatim gate. Full output: `results/2026-10-25-ilmu-mini-v3.3-run2.txt`. The expected labels are the team's own and have not been checked by a second person.
 
 ## The test set
 

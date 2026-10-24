@@ -1,0 +1,29 @@
+Bukti eval: 40 synthetic messages, model ilmu/ilmu-mini-v3.3 (Grafilab)
+........................................
+Answered by: ilmu/ilmu-mini-v3.3
+Scored 40 of 40 messages; not scored: 0
+
+Per-field accuracy (after the verbatim gate; below 0.85 confidence counts as held, not a match)
+  field              match  scored  held  accuracy
+  intent                36      40     0     90.0%
+  amount                40      40     0    100.0%
+  invoice_ref           38      39     0     97.4%
+  deduction_amount      40      40     0    100.0%
+  deduction_reason      40      40     0    100.0%
+  promised_date         31      37     0     83.8%
+
+Amount exact match: 100.0% (40/40); NFR-4 target 95%: meets
+Fields dropped by the verbatim gate: 0
+
+Mismatches and held fields: 11
+  mismatch b02  intent            expected paid_claim | got other
+  mismatch b07  intent            expected paid_claim | got other
+  mismatch b33  intent            expected paid_claim | got partial_payment
+  mismatch b34  invoice_ref       expected #2478 | got none
+  mismatch b14  promised_date     expected 2026-10-21 | got 2026-10-21, 2026-10-28
+  mismatch b15  promised_date     expected 2026-10-22 | got none
+  mismatch b16  promised_date     expected 2026-10-21 | got 2026-10-21, 2026-10-28
+  mismatch b18  promised_date     expected 2026-10-26 | got 2026-10-30, 2026-11-06
+  mismatch b36  promised_date     expected 2026-11-02, 2026-11-09 | got 2026-10-26, 2026-11-02
+  mismatch b37  promised_date     expected 2026-11-05 | got 2026-11-05, 2026-11-12
+  mismatch b23  intent            expected partial_payment | got promise_to_pay

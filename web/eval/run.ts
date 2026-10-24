@@ -5,7 +5,7 @@
 // never used here.
 import type { InboundMessage } from "../src/engine/model";
 import { CONFIDENCE_MIN } from "../src/engine/rules";
-import { extractMessage, LIVE_MODEL } from "../src/lib/extract-server";
+import { extractMessage, GRAFILAB_MODEL, LIVE_MODEL } from "../src/lib/extract-server";
 import { gateWithEngine } from "./gate";
 import { EVAL_SET, FIELDS, type EvalItem } from "./messages";
 import { accuracy, NFR4_AMOUNT_TARGET, scoreItem, summarize, type NotScored, type ScoredRun } from "./score";
@@ -39,9 +39,10 @@ async function readAll(items: EvalItem[]): Promise<Outcome[]> {
 }
 
 async function main(): Promise<number> {
-  console.log(`Bukti eval: ${EVAL_SET.length} synthetic messages, model ${LIVE_MODEL}`);
-  if (!process.env.ANTHROPIC_API_KEY) {
-    console.log("ANTHROPIC_API_KEY not set: live eval not run, no score reported.");
+  const model = process.env.GRAFILAB_API_KEY ? `${GRAFILAB_MODEL} (Grafilab)` : LIVE_MODEL;
+  console.log(`Bukti eval: ${EVAL_SET.length} synthetic messages, model ${model}`);
+  if (!process.env.GRAFILAB_API_KEY && !process.env.ANTHROPIC_API_KEY) {
+    console.log("No GRAFILAB_API_KEY or ANTHROPIC_API_KEY set: live eval not run, no score reported.");
     return 0;
   }
 

@@ -181,10 +181,10 @@ cd web
 pnpm install
 pnpm test          # rules engine: every seed check and the demo script
 pnpm dev           # http://localhost:3000
-pnpm eval:bukti    # Bukti accuracy on 40 synthetic replies (needs ANTHROPIC_API_KEY; Node 22.18+)
+pnpm eval:bukti    # Bukti accuracy on 40 synthetic replies (needs GRAFILAB_API_KEY or ANTHROPIC_API_KEY; Node 22.18+)
 ```
 
-Optional: set `ANTHROPIC_API_KEY` in `web/.env.local` to let Bukti read messages live with Claude. Without it, Bukti uses saved results for the three demo messages and labels them "cached result". Use **Reset demo** in the header to start the script again.
+Optional: set `GRAFILAB_API_KEY` in `web/.env.local` to let Bukti read messages live with ILMU Mini v3.3 through Grafilab (Malaysian model cloud; override with `GRAFILAB_MODEL`), or `ANTHROPIC_API_KEY` for Claude. Without it, Bukti uses saved results for the three demo messages and labels them "cached result". Use **Reset demo** in the header to start the script again.
 
 ## Run it on Replit
 
@@ -203,7 +203,7 @@ Declared under handbook section 8.4.
 |---|---|
 | App | Next.js 16, React 19, TypeScript, Tailwind CSS 4, Zustand, Zod, lucide-react |
 | Tests | Vitest |
-| AI inside the product | Claude Opus 5.5 (Anthropic API) reads customer replies and payment slips (Bukti). Rules, not AI, make every decision |
+| AI inside the product | ILMU Mini v3.3, a Malaysian model hosted in Malaysia, through Grafilab's Models API (OpenAI-compatible) reads customer replies and payment slips (Bukti); Claude Opus 5.5 (Anthropic API) is the alternative provider. Live score on the 40-message test set: amount 100% exact. Rules, not AI, make every decision |
 | Hosting | Replit (Deployments) and Vercel |
 | AI tools used to build | Claude Code (Anthropic) for research, documentation and code generation, reviewed and adapted by the team |
 | Data | Synthetic only: every business, person, bank, slip and message is fictional. No pre-existing project code is used |

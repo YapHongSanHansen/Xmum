@@ -1,5 +1,5 @@
 // Bukti's AI step (PRD FR-E2, FR-E11). Server only: reads one message (and its
-// slip image), asks Claude for the structured fields and validates them with
+// slip image), asks the model (Grafilab if GRAFILAB_API_KEY is set, else Claude) for the fields, validates them with
 // zod. extractMessage() is the live call alone, shared with web/eval; extract()
 // serves the route and falls back to the cached extraction on any failure. It
 // never decides whether anything is paid; the engine's rules do that.
@@ -19,6 +19,16 @@ export const LIVE_MODEL = process.env.KACHINGG_AI_MODEL || process.env.KUTIP_AI_
 // Behind a proxy (ANTHROPIC_BASE_URL set), beta features may not pass through.
 const VIA_PROXY = Boolean(process.env.ANTHROPIC_BASE_URL);
 const TIMEOUT_MS = 9_000;
+
+// Grafilab (Malaysian model cloud, OpenAI-compatible) is used first when
+// GRAFILAB_API_KEY is set. GRAFILAB_MODEL picks the model; slips are sent as
+// images unless GRAFILAB_VISION=0 (for a text-only model). GRAFILAB_REASONING_EFFORT
+// (e.g. "none", "low") is passed through when set, to keep the read fast.
+export const GRAFILAB_MODEL = process.env.GRAFILAB_MODEL || "ilmu/ilmu-mini-v3.3";
+const GRAFILAB_BASE_URL = (process.env.GRAFILAB_BASE_URL || "https://llm.grafilab.ai/v1").replace(/\/+$/, "");
+const GRAFILAB_VISION = process.env.GRAFILAB_VISION !== "0";
+const GRAFILAB_REASONING = process.env.GRAFILAB_REASONING_EFFORT ?? "none";
+const GRAFILAB_TIMEOUT_MS = Number(process.env.GRAFILAB_TIMEOUT_MS) || TIMEOUT_MS;
 
 export type ExtractResult =
   | { extraction: Extraction; model: string; cached: false; ms: number }
@@ -174,6 +184,7 @@ export type LiveRead =
  */
 export async function extractMessage(msg: InboundMessage): Promise<LiveRead> {
   const fail = (reason: string): LiveRead => ({ ok: false, reason });
+  if (process.env.GRAFILAB_API_KEY) return extractWithGrafilab(msg);
   if (!process.env.ANTHROPIC_API_KEY) return fail("no API key");
 
   const started = Date.now();
@@ -217,6 +228,87 @@ export async function extractMessage(msg: InboundMessage): Promise<LiveRead> {
     if (e instanceof Anthropic.AuthenticationError) return fail("API key rejected");
     if (e instanceof Anthropic.RateLimitError) return fail("rate limited");
     if (e instanceof Anthropic.APIError) return fail(`API error ${e.status ?? ""}`.trim());
+    return fail("AI call failed");
+  }
+}
+
+/** Plain-language output contract for models without JSON-schema output. */
+export const JSON_REPLY_TEMPLATE = [
+  "Reply with ONE filled-in JSON object and nothing else (no prose, no schema). Use exactly these keys:",
+  "{",
+  '  "intent": one of "paid_claim" | "partial_payment" | "promise_to_pay" | "dispute_or_deduction" | "other",',
+  '  "amount": number or null, "amount_quote": string or null, "amount_source": "text" | "image" | null, "amount_confidence": number 0-1,',
+  '  "invoice_ref": string or null, "invoice_ref_quote": string or null, "invoice_ref_confidence": number 0-1,',
+  '  "bank_reference": string or null, "bank_reference_confidence": number 0-1,',
+  '  "deduction_amount": number or null, "deduction_reason": string or null, "deduction_quote": string or null, "deduction_confidence": number 0-1,',
+  '  "promised_date_candidates": array of "YYYY-MM-DD" strings (empty if none), "promised_date_quote": string or null, "promised_date_confidence": number 0-1,',
+  '  "has_slip": true | false',
+  "}",
+].join("\n");
+
+/** The model's text as JSON: drops a <think> block and ``` fences around the object. */
+export function parseModelJson(text: string): unknown {
+  const body = text.replace(/<think>[\s\S]*?<\/think>/g, "").trim();
+  const fenced = body.match(/```(?:json)?\s*([\s\S]*?)```/);
+  const raw = fenced ? fenced[1] : body.slice(body.indexOf("{"), body.lastIndexOf("}") + 1);
+  return JSON.parse(raw);
+}
+
+/**
+ * The same reading through Grafilab's OpenAI-compatible chat completions.
+ * Same prompt, same JSON contract, same zod check; the engine's verbatim gate
+ * and confidence threshold still apply after this.
+ */
+export async function extractWithGrafilab(msg: InboundMessage, fetchImpl: typeof fetch = fetch): Promise<LiveRead> {
+  const fail = (reason: string): LiveRead => ({ ok: false, reason });
+  const started = Date.now();
+  const sendImage = Boolean(msg.image) && GRAFILAB_VISION;
+  const intro = !msg.image
+    ? "No image is attached."
+    : sendImage
+      ? "A transfer-slip image is attached."
+      : "A transfer slip is attached but you cannot see it: set has_slip to true and take every field from the message text only.";
+  const userText = `${intro}\nMessage text (between the markers):\n<<<\n${msg.text}\n>>>`;
+  const content: unknown[] = [{ type: "text", text: userText }];
+  if (sendImage && msg.image) content.unshift({ type: "image_url", image_url: { url: `data:image/png;base64,${await slipBase64(msg.image)}` } });
+
+  try {
+    const res = await fetchImpl(`${GRAFILAB_BASE_URL}/chat/completions`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${process.env.GRAFILAB_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: GRAFILAB_MODEL,
+        temperature: 0,
+        max_tokens: 8192,
+        response_format: { type: "json_object" },
+        ...(GRAFILAB_REASONING ? { reasoning_effort: GRAFILAB_REASONING } : {}),
+        messages: [
+          {
+            role: "system",
+            content: `${systemPrompt(msg)}\n\n${JSON_REPLY_TEMPLATE}`,
+          },
+          { role: "user", content: sendImage ? content : userText },
+        ],
+      }),
+      signal: AbortSignal.timeout(GRAFILAB_TIMEOUT_MS),
+    });
+    if (res.status === 401) return fail("API key rejected");
+    if (res.status === 429) return fail("rate limited or no credit");
+    if (!res.ok) return fail(`API error ${res.status}`);
+    const body = (await res.json()) as { model?: string; choices?: { message?: { content?: string }; finish_reason?: string }[] };
+    const choice = body.choices?.[0];
+    if (choice?.finish_reason === "length") return fail("output cut off");
+    let json: unknown;
+    try {
+      json = parseModelJson(choice?.message?.content ?? "");
+    } catch {
+      return fail("invalid JSON from model");
+    }
+    const parsed = ExtractionSchema.safeParse(json);
+    if (!parsed.success) return fail("output failed validation");
+    return { ok: true, extraction: parsed.data, model: body.model || GRAFILAB_MODEL, ms: Date.now() - started };
+  } catch (e) {
+    if (e instanceof Error && (e.name === "TimeoutError" || e.name === "AbortError")) return fail("timed out");
     return fail("AI call failed");
   }
 }
