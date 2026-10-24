@@ -94,35 +94,35 @@ export default function LogPage() {
   const canExport = role === "owner";
 
   return (
-    <div>
+    <div className="mx-auto max-w-[1100px]">
       <PageTitle
         title="Activity log"
         subtitle={
-          <span className="inline-flex items-center gap-1.5">
+          <span className="inline-flex items-center gap-1.5" title="Entries cannot be edited or deleted">
             <Lock className="h-3.5 w-3.5" aria-hidden />
-            Append-only: entries cannot be edited or deleted. Also serves as the Orbyte audit trail.
+            Append-only
           </span>
         }
         right={
-          <div className="flex flex-col items-end gap-1">
+          <div className="flex items-center gap-2">
+            {!canExport && <span className="text-xs text-ink2">Owner only</span>}
             <Button variant="secondary" size="sm" disabled={!canExport || log.length === 0} onClick={() => exportCsv(log, now)}>
               <Download className="h-3.5 w-3.5" aria-hidden />
-              Export CSV ({log.length})
+              Export CSV
             </Button>
-            {!canExport && <span className="text-[11px] text-ink2">Export: Owner only. Clerk can view.</span>}
           </div>
         }
       />
 
-      <Card className="mb-4 px-4 py-3">
+      <div className="mb-4">
         <div className="flex flex-wrap items-center gap-3">
-          <div className="relative w-full sm:w-72">
+          <div className="relative w-full sm:w-56">
             <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink2" aria-hidden />
             <input
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search text or refs, e.g. INV-2304"
+              placeholder="Search, e.g. INV-2304"
               aria-label="Search the activity log"
               className="h-8 w-full rounded-[2px] border border-line-strong bg-surface pl-8 pr-7 text-[13px] text-ink placeholder:text-ink3"
             />
@@ -166,12 +166,12 @@ export default function LogPage() {
             {newestFirst ? "Newest first" : "Oldest first"}
           </Button>
         </div>
-      </Card>
+      </div>
 
       {log.length === 0 ? (
-        <Empty>No entries yet. Run the 08:00 scan to start the day.</Empty>
+        <Empty>No entries yet. Run the 08:00 scan.</Empty>
       ) : rows.length === 0 ? (
-        <Empty>No entries match this filter. Clear the search or press &ldquo;All&rdquo; to see every entry.</Empty>
+        <Empty>No entries match.</Empty>
       ) : (
         <Card className={tbl.wrap}>
           <table className={cx(tbl.table, "min-w-[760px] table-fixed")}>
@@ -185,10 +185,12 @@ export default function LogPage() {
             <thead>
               <tr className={tbl.headRow}>
                 <th className={cx(tbl.th, "text-right")}>#</th>
-                <th className={tbl.th}>Demo time</th>
+                <th className={tbl.th} title="Demo clock, Asia/Kuala_Lumpur">
+                  Time
+                </th>
                 <th className={tbl.th}>Actor</th>
                 <th className={tbl.th}>Action</th>
-                <th className={tbl.th}>Refs · AI</th>
+                <th className={tbl.th}>Refs</th>
               </tr>
             </thead>
             <tbody>
@@ -227,8 +229,8 @@ export default function LogPage() {
           </table>
         </Card>
       )}
-      <p className="mt-3 text-[11px] text-ink2">
-        Showing {rows.length} of {log.length} entries. Times are the frozen demo clock (Asia/Kuala_Lumpur).
+      <p className="mt-3 text-xs text-ink2">
+        <span className="num">{rows.length}</span> of <span className="num">{log.length}</span> entries
       </p>
     </div>
   );

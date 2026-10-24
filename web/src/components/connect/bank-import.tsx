@@ -5,11 +5,11 @@
 // raw file is never shown to the Clerk.
 import { useMemo, useState } from "react";
 import { Upload } from "lucide-react";
-import { Badge, Button, Card, CardHeader, RuleTag } from "@/components/ui";
+import { Button, Card, CardHeader, RuleTag } from "@/components/ui";
 import { fmtDateTime, fmtRM } from "@/engine/model";
 import { SAMPLE_BANK_CSV, bankPreviewFor, parseBankCsv, type BankRow } from "@/engine/imports";
 import { useKutip } from "@/lib/store";
-import { CsvSource, InvalidRows, LedgerTable, cellCls, numCls, rowCls } from "./csv-source";
+import { CsvSource, FormatNote, InvalidRows, LedgerTable, cellCls, numCls, rowCls } from "./csv-source";
 
 export function BankImport() {
   const state = useKutip((s) => s.state);
@@ -39,12 +39,16 @@ export function BankImport() {
 
   return (
     <Card>
-      <CardHeader kicker="FR-A5 · fictional Bank Cempaka" title="Import bank statement (CSV)" right={<Badge tone="violet">Owner · Clerk</Badge>} />
-      <div className="space-y-3 px-4 py-3">
-        <p className="text-xs text-ink2">
-          Columns: <span className="font-mono">date, amount, description</span>; credits positive, debits negative. Credit lines appear for matching{" "}
-          <RuleTag id="M1" />. {owner ? "Debit lines are kept for you only; a balance column is ignored." : "Debits and balances are Owner only and are not shown."}
-        </p>
+      <CardHeader title="Bank statement (CSV)" />
+      <div className="space-y-3 px-5 py-4">
+        <div className="flex items-center gap-1.5 text-xs text-ink2">
+          <span>{owner ? "Credits to matching; debits stay with you" : "Credit lines only; debits are Owner only"}</span>
+          <RuleTag id="M1" />
+        </div>
+        <FormatNote>
+          Columns: <span className="font-mono">date, amount, description</span>; credits positive, debits negative.
+          {owner && " A balance column is ignored."}
+        </FormatNote>
         <CsvSource
           label="Bank statement CSV"
           text={text}
@@ -62,15 +66,15 @@ export function BankImport() {
 
         {preview && !preview.error && (
           <>
-            {credits > 0 && <Lines title="Credit lines · for matching" rows={preview.credits} />}
-            {owner && debits > 0 && <Lines title="Debit lines · Owner only" rows={preview.debits} debit />}
+            {credits > 0 && <Lines title="Credits" rows={preview.credits} />}
+            {owner && debits > 0 && <Lines title="Debits · Owner only" rows={preview.debits} debit />}
             {owner && preview.balanceIgnored && (
-              <div className="text-[11px] text-ink2">The file&apos;s balance column was ignored. Cash for the forecast comes from the balance you enter (F1).</div>
+              <div className="text-xs text-ink2">File balance ignored; the forecast uses your entered balance (F1).</div>
             )}
             <InvalidRows rows={preview.invalid} />
             {!owner && preview.hiddenDebits > 0 && (
-              <div className="text-[11px] text-ink2">
-                {preview.hiddenDebits} debit line{preview.hiddenDebits === 1 ? " is" : "s are"} not shown: debits are Owner only.
+              <div className="text-xs text-ink2">
+                {preview.hiddenDebits} debit line{preview.hiddenDebits === 1 ? "" : "s"} hidden (Owner only)
               </div>
             )}
             <div className="flex flex-wrap items-center gap-2">
@@ -78,14 +82,14 @@ export function BankImport() {
                 <Upload className="h-4 w-4" aria-hidden />
                 {label}
               </Button>
-              <span className="text-[11px] text-ink2">A line only proposes a match; a person approves every receipt.</span>
+              <span className="text-xs text-ink2">A person approves every receipt</span>
             </div>
           </>
         )}
 
         {owner && state.bankDebits.length > 0 && (
-          <div className="border-t border-hairline pt-2 text-[11px] text-ink2">
-            Debit lines on file: {state.bankDebits.length} (Owner only)
+          <div className="border-t border-hairline pt-2 text-xs text-ink2">
+            Debits on file: <span className="num">{state.bankDebits.length}</span>
           </div>
         )}
       </div>
@@ -96,7 +100,7 @@ export function BankImport() {
 function Lines({ title, rows, debit }: { title: string; rows: BankRow[]; debit?: boolean }) {
   return (
     <div className="space-y-1.5">
-      <div className="font-mono text-[11px] font-medium text-ink2">{title}</div>
+      <div className="text-xs font-medium text-ink2">{title}</div>
       <LedgerTable head={[{ label: "Line" }, { label: "Date" }, { label: "Amount", right: true }, { label: "Description" }]}>
         {rows.map((r) => (
           <tr key={r.line} className={rowCls}>
