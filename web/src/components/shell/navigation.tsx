@@ -27,6 +27,7 @@ export function Navigation() {
             onClick={() => go(key)}
             className="nav-item"
             data-active={page === key}
+            data-tour={`nav-${key}`}
             aria-current={page === key ? "page" : undefined}
           >
             {label}

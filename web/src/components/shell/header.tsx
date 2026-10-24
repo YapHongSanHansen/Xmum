@@ -2,7 +2,7 @@
 // Top bar: Kachingg, the workspace, the demo disclosure and the role switch;
 // below it the demo controls (FR-H1, FR-A7, FR-F1).
 import { useRef, useState } from "react";
-import { Bell, BookOpen, Building2, ChevronDown, Clock, FastForward, Play, RotateCcw } from "lucide-react";
+import { Bell, BookOpen, Building2, ChevronDown, Clock, FastForward, Play, RotateCcw, Sparkles } from "lucide-react";
 import { Button, cx } from "@/components/ui";
 import { dayOf, fmtDateTime, type Role } from "@/engine/model";
 import { DEMO_STOPS } from "@/engine/seed";
@@ -22,6 +22,7 @@ export function Header() {
   const state = useKachingg((s) => s.state);
   const dispatch = useKachingg((s) => s.dispatch);
   const go = useKachingg((s) => s.go);
+  const startTour = useKachingg((s) => s.startTour);
   const needsScan = !state.scannedDays.includes(dayOf(state.now));
   const pending = approvalsCount(state);
   // The approvals dot pops briefly whenever the pending count changes.
@@ -80,7 +81,11 @@ export function Header() {
               Scan
             </Button>
           )}
-          <button type="button" onClick={() => go("guide")} className="btn btn-ghost btn-sm" aria-label="Demo guide">
+          <button type="button" onClick={startTour} className="btn btn-ghost btn-sm" aria-label="Start tour">
+            <Sparkles className="h-3.5 w-3.5" aria-hidden />
+            <span className="hidden sm:inline">Start tour</span>
+          </button>
+          <button type="button" onClick={() => go("guide")} className="btn btn-ghost btn-sm" aria-label="Demo guide" data-tour="guide">
             <BookOpen className="h-3.5 w-3.5" aria-hidden />
             <span className="hidden sm:inline">Guide</span>
           </button>
@@ -98,7 +103,7 @@ function RoleSwitcher({ role, onChange }: { role: Role; onChange: (r: Role) => v
       <span className="text-[10px]" aria-hidden>
         Orbyte role
       </span>
-      <div className="inline-flex gap-0.5 rounded-lg bg-[#e6e7eb] p-0.5" role="group" aria-label="Orbyte role">
+      <div className="inline-flex gap-0.5 rounded-lg bg-[#e6e7eb] p-0.5" role="group" aria-label="Orbyte role" data-tour="role">
         {ROLES.map((r) => (
           <button
             key={r.role}

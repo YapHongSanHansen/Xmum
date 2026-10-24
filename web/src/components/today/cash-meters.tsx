@@ -14,7 +14,7 @@ export default function CashMeters() {
   const owner = state.role === "owner";
   const rows = forecast(state);
   return (
-    <Card className="flex flex-col" rise={1}>
+    <Card className="flex flex-col" rise={1} data-tour={owner ? "cash-available" : undefined}>
       <CardHeader
         title={owner ? "Cash available" : "Upcoming bills"}
         right={
