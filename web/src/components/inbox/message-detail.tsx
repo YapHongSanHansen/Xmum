@@ -262,6 +262,8 @@ function Outcome({ state, msg, rec }: { state: State; msg: InboundMessage; rec: 
   const ex = rec.extraction;
   const isPromise = ex.intent === "promise_to_pay" || (ex.amount === null && ex.promised_date_candidates.length > 0);
   const promised = state.invoices.find((i) => i.promise?.messageId === msg.id) ?? null;
+  // A reply with no payment content (e.g. "ok noted") has nothing for the bank check to verify.
+  const nothingToCheck = ex.intent === "other" && !isPromise && !receipt && handoffs.length === 0;
 
   return (
     <Card rise={2}>
@@ -281,6 +283,8 @@ function Outcome({ state, msg, rec }: { state: State; msg: InboundMessage; rec: 
             status={promised?.promise ? `${promised.number} promised ${dayLabel(promised.promise.date)}` : "No date confirmed yet"}
             detail={promised?.promise ? `Reminders paused until ${fmtDate(addDays(promised.promise.date, 1))}` : undefined}
           />
+        ) : nothingToCheck ? (
+          <CheckRow rule="M1" label="Bank" tone="plain" status="No payment mentioned: nothing to check" />
         ) : (
           <BankCheck state={state} receipt={receipt} noLine={handoffs.some((h) => h.kind === "claim_unverified")} />
         )}

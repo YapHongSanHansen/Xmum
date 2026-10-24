@@ -1,11 +1,17 @@
 "use client";
 // The simulated bank CSV, as far as the demo clock has reached (rule M1 input).
+import { useState } from "react";
 import { fmtDateTime, fmtRM, invoiceOf, type State } from "@/engine/model";
 import { visibleBankLines } from "@/engine/rules";
-import { Badge, Card, CardHeader, Empty, cx, tbl } from "@/components/ui";
+import { Badge, Button, Card, CardHeader, Empty, cx, tbl } from "@/components/ui";
+
+/** Lines shown before "Show all": the newest first, so today's credits sit on top. */
+const FIRST = 8;
 
 export function BankStatement({ state }: { state: State }) {
-  const lines = visibleBankLines(state);
+  const [all, setAll] = useState(false);
+  const newest = [...visibleBankLines(state)].reverse();
+  const lines = all ? newest : newest.slice(0, FIRST);
   return (
     <Card>
       <CardHeader
@@ -55,6 +61,13 @@ export function BankStatement({ state }: { state: State }) {
             })}
           </tbody>
         </table>
+      )}
+      {newest.length > FIRST && (
+        <div className="border-t border-hairline px-4 py-2 text-right">
+          <Button size="sm" variant="ghost" onClick={() => setAll((v) => !v)}>
+            {all ? "Show latest only" : `Show all ${newest.length} lines`}
+          </Button>
+        </div>
       )}
     </Card>
   );
