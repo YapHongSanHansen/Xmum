@@ -79,7 +79,7 @@ One journey, end to end:
 - **Human approval:** the clerk approves gentle reminders; the owner approves firm reminders, credit decisions and deductions.
 - **Outcome:** a WhatsApp reminder from a fixed BM/English/Chinese template, an invoice verified, the cash meter updated, and an append-only activity log.
 
-**AI is used in one place, where it adds value.** Bukti reads messy replies and payment slips ("Bank in RM2,770, deduct RM330 for the 2 pallet tiles pecah") into structured fields using Claude Opus 5.5, a vision-capable LLM returning schema-validated JSON. Every field must quote the customer's exact words or it is dropped; fields below 85% confidence go to a person with one question; nothing is marked paid unless a matching bank line exists. AI never decides anything about money and never writes to customers.
+**AI is used in one place, where it adds value.** Bukti reads messy replies and payment slips ("Bank in RM2,770, deduct RM330 for the 2 pallet tiles pecah") into structured fields using ILMU Mini v3.3, a Malaysian vision LLM on Grafilab. Every field must quote the customer's exact words or it is dropped; fields below 85% confidence go to a person with one question; nothing is marked paid unless a matching bank line exists. AI never decides anything about money and never writes to customers.
 
 **Workshop skills we apply:** GenAI APIs (image input and structured output, with a cached fallback); database design (an entity model for invoices, claims, promises and the audit log, money stored as integer sen, ready to move from the browser store to a hosted database in Phase 2); and cloud deployment (the Next.js app and its server-side AI route deploy to Vercel, with the API key kept in environment variables).
 
@@ -89,12 +89,12 @@ One journey, end to end:
 **Frontend:** Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4, lucide-react.
 **Data (Phase 1):** synthetic seed in a Zustand store persisted to the browser; money as integer sen. **Phase 2:** hosted database (Convex or Postgres) behind the same engine.
 **Rules engine:** pure TypeScript, deterministic; 182 Vitest tests replay every rule and the full demo script.
-**AI:** Claude Opus 5.5 via the Anthropic API (official SDK); image + text in, JSON out, validated with Zod; cached results as fallback.
+**AI:** ILMU Mini v3.3 via Grafilab's OpenAI-compatible Models API (hosted in Malaysia); image + text in, JSON out, validated with Zod; Claude Opus 5.5 (Anthropic) as alternative provider; cached results as fallback. Live test: amount 100% exact on 40 synthetic replies.
 **Messaging:** WhatsApp click-to-chat (wa.me) links; a person presses send. **Hosting:** Vercel, live at kachingg-app.vercel.app. **Orbyte:** `OrbyteConnector` + simulated Orbyte API; Kachingg exposes `/api/kachingg/v1` (manifest, events) for other modules. **Code:** public GitHub repo.
 
 **Block diagram**
 - Browser UI (simulated Orbyte hub, Owner/Clerk roles) → Rules engine (forecast, credit check, chase plan, bank match) → Human approval → Outcome + activity log
-- Customer reply + slip → /api/extract (Next.js server route) → Anthropic API → validated fields with exact quotes → Rules engine
+- Customer reply + slip → /api/extract (Next.js server route) → Grafilab Models API (ILMU Mini v3.3) → validated fields with exact quotes → Rules engine
 - Synthetic invoices, bank CSV, messages and slips → Rules engine (stand-in for Orbyte Connect)
 
 **Sponsor-provided GenAI API or cloud platform:** No. We use the sponsor's Orbyte concept (shared hub, roles, Connect, audit trail) as the frame for the module, simulated inside our app. No sponsor API, credits or cloud are used.
@@ -135,7 +135,7 @@ Supporting: SDG 9.3 (small enterprises' integration into value chains).
 - **100%** of cash shortfalls in our test scenarios warned **at least 10 days** ahead (baseline: 0 days).
 - **0%** of invoices marked paid without a bank line (enforced by rule and by test).
 - **70% less** clerk time per slip: from about 5 minutes to 1.5 minutes or less, in timed trials with 3 or more first-time users.
-- **95% or higher** exact-match accuracy on amounts across a 30-50 message BM/English/Chinese test set.
+- **95% or higher** exact-match accuracy on amounts across a 40-message BM/English/Chinese test set (first live run: 100%).
 - First-time users approve a reminder and a payment match in **under 10 minutes** without training.
 
 ### prelim.checklist
@@ -157,8 +157,9 @@ Yes
 Next.js 16 and React 19 | Code (web framework and UI) | MIT
 Tailwind CSS 4 and lucide-react | Code (styling and icons) | MIT; ISC
 Zustand 5 and Zod 4 | Code (state store and schema validation) | MIT
-Anthropic TypeScript SDK 1.3 | Code (API client) | Apache-2.0
-Claude Opus 5.5 (Anthropic) | Model (pre-trained, called via API) | Anthropic Commercial Terms of Service
+ILMU Mini v3.3 (ILMU, via Grafilab) | Model (pre-trained, called via API) | Grafilab terms of service
+Anthropic TypeScript SDK 1.3 | Code (API client, alternative provider) | Apache-2.0
+Claude Opus 5.5 (Anthropic) | Model (alternative provider, via API) | Anthropic Commercial Terms of Service
 
 ### prelim.employment_yesno
 TODO
@@ -177,7 +178,7 @@ The user opens Kachingg in a browser: a Next.js 16 / React 19 app presented as a
 
 Every state change goes through a pure TypeScript rules engine: cash forecast and early warning, credit check, chase-plan ranking, the exact-quote check, bank-line matching and approval rights. Each step is written to an append-only activity log.
 
-When a customer reply arrives, the browser calls the app's server route /api/extract (Vercel hosting, confirmed by the team). The route sends the message text and slip image to the Anthropic API (Claude Opus 5.5) and validates the JSON reply with Zod. On any error or timeout it returns a cached extraction labelled "cached result". The fields go back to the engine, which decides; the AI never changes money state.
+When a customer reply arrives, the browser calls the app's server route /api/extract (Vercel hosting, confirmed by the team). The route sends the message text and slip image to Grafilab (ILMU Mini v3.3, hosted in Malaysia) and validates the JSON reply with Zod. On any error or timeout it returns a cached extraction labelled "cached result". The fields go back to the engine, which decides; the AI never changes money state.
 
 Approved reminders open WhatsApp through wa.me click-to-chat links, so a person presses send. The preliminary build uses no database (a hosted one is planned for Phase 2). The API key exists only as a server environment variable.
 
@@ -190,7 +191,8 @@ Zustand 5 and Zod 4.6 | Client state store; validation of the AI's JSON output |
 Vitest 5.0 and ESLint 9 | Unit tests (182 passing) and linting | MIT
 
 ### tech.apis
-Anthropic Messages API (Anthropic) | Bukti: reads a customer reply and slip image into structured fields with Claude Opus 5.5 | Paid, pay-as-you-go. Optional: cached results are used without a key
+Grafilab Models API (Grafilab, Malaysia) | Bukti: reads a customer reply and slip image into structured fields with ILMU Mini v3.3 (OpenAI-compatible chat completions) | Credit-based; cached results are used without a key
+Anthropic Messages API (Anthropic) | Alternative provider for Bukti (Claude Opus 5.5) | Paid, pay-as-you-go; not used when the Grafilab key is set
 WhatsApp click-to-chat links, wa.me (Meta) | Opens WhatsApp with an approved reminder prefilled; a person presses send. A link, not an API call | Free
 Simulated Orbyte API (ours) | /api/orbyte-mock/v1: clients, projects, users, wallet; stands in for Orbyte using our documented API assumptions | Not applicable (synthetic)
 Kachingg module API (ours) | /api/kachingg/v1: manifest and events (gap.detected, credit.held, proof.verified…) for other Orbyte modules | Not applicable
@@ -199,12 +201,14 @@ No other external APIs | Bank and accounting data are synthetic CSV | Not applic
 ### tech.cloud
 Vercel | Hosts the Next.js app and the /api/extract route, as confirmed by the team; live URL to be added. API key is a server environment variable | Plan and region to be confirmed
 GitHub | Public code repository and commit history | Free
-Anthropic API (cloud inference) | Runs Claude Opus 5.5 for Bukti | Pay-as-you-go; hosted by Anthropic outside Malaysia
+Grafilab (cloud inference) | Runs ILMU Mini v3.3 for Bukti | Credits; model region Malaysia
+Anthropic API (cloud inference) | Alternative provider (Claude Opus 5.5) | Pay-as-you-go; outside Malaysia
 Orbyte (Alpha Red Solutions) | Sponsor workspace: a synthetic client and project record for the app; no runtime integration (Orbyte has no public API) | Sponsor account; region not stated
 No database or authentication service | Demo state lives in the browser and resets from the seed; roles are simulated | Not applicable
 
 ### tech.models
-Claude Opus 5.5 (claude-opus-5-5) | Anthropic, via API | Pre-trained, used as-is with a prompt and JSON schema; no fine-tuning | Anthropic Commercial Terms of Service
+ILMU Mini v3.3 (ilmu/ilmu-mini-v3.3) | ILMU, via Grafilab Models API | Pre-trained, used as-is with a prompt and JSON template; no fine-tuning | Grafilab terms of service
+Claude Opus 5.5 (claude-opus-5-5) | Anthropic, via API (alternative) | Pre-trained, used as-is; no fine-tuning | Anthropic Commercial Terms of Service
 
 ### tech.datasets
 Kachingg demo seed (Lori Laju Logistics) | This repo: web/src/engine/seed.ts | Synthetic, team-created | Apache-2.0 (this repo) | N
@@ -239,7 +243,7 @@ Not essential. The prototype runs without the live Orbyte platform, as the brief
 ### tech.privacy
 > 6.1 Data Handling & Privacy. Maximum 150 words.
 
-No real user data is collected. The prototype uses synthetic data only: every business, person, invoice, bank line, message and slip is fictional, and slips use a made-up bank. Demo state is kept in the viewer's browser and cleared by Reset demo; we run no database. When Bukti reads a message, the synthetic text and slip image are sent to the Anthropic API over HTTPS; the key stays on the server.
+No real user data is collected. The prototype uses synthetic data only: every business, person, invoice, bank line, message and slip is fictional, and slips use a made-up bank. Demo state is kept in the viewer's browser and cleared by Reset demo; we run no database. When Bukti reads a message, the synthetic text and slip image are sent to Grafilab (model hosted in Malaysia) over HTTPS; the key stays on the server.
 
 For a real deployment under Malaysia's PDPA 2010 (as amended in 2024): the SME is the data user and Kachingg/Orbyte its processor; contact data is used only to follow up invoices; clerks never see cash figures; extraction keeps only needed fields and masks account numbers; slip images are encrypted with an owner-set retention limit; the AI provider must not train on customer data; cross-border processing is disclosed, with in-region hosting preferred.
 
@@ -249,8 +253,8 @@ For a real deployment under Malaysia's PDPA 2010 (as amended in 2024): the SME i
 - **Misreading:** the model may misread an amount or invoice number, or invent a quote. Mitigation: each field must quote the message exactly or it is dropped; fields under 0.85 confidence go to a person; nothing is marked paid without a matching bank line; AI never writes customer messages.
 - **Ambiguous Manglish, BM and Chinese** (for example "next Friday"): handed to a person with one question instead of guessed.
 - **Single provider, outages, rate limits, latency:** a 9-second timeout and cached extractions keep the demo working; the AI step sits behind one server route, so the provider can be swapped.
-- **Unmeasured accuracy:** a 40-message BM/English/Chinese test set and scorer are built (`pnpm eval:bukti`, 95% exact-amount target); the live score is pending an API key, and the live AI path is less tested than the cached path.
-- **Data residency:** the provider is hosted outside Malaysia.
+- **Accuracy:** on our 40-message BM/English/Chinese test set (two identical live runs) amounts are 100% exact, intent 90%, promised dates 84%; date misses list extra dates, which sends them to a person. Labels are our own.
+- **Data residency:** the model runs in Malaysia through Grafilab; the Anthropic alternative is hosted outside Malaysia.
 
 ### tech.checklist
 - [x] All APIs, cloud services, AI tools, models, and datasets used in the project are declared in this document.
@@ -279,7 +283,7 @@ If the organisers require Replit use for the final round, the repository can be 
 ### runpod_pou
 **Statement: RunPod was not used.**
 
-Our team did not use RunPod. Kachingg's only AI step reads one short message and one slip image per customer reply, so it calls a hosted model (Claude Opus 5.5 via the Anthropic API) rather than running a GPU model. The rules engine needs no GPU.
+Our team did not use RunPod. Kachingg's only AI step reads one short message and one slip image per customer reply, so it calls a hosted model (ILMU Mini v3.3 via Grafilab's Models API) rather than running a GPU model. The rules engine needs no GPU.
 
 - **Why not self-host now:** the step is small and infrequent, and a hosted API gave us image input and structured output on day one.
 - **Where RunPod would fit:** in a real deployment, Malaysian data-residency preferences (PDPA cross-border transfer) could justify an open-weight vision model on a GPU endpoint such as RunPod Serverless. The /api/extract route is the single place that would change.
