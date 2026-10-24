@@ -1,12 +1,13 @@
 "use client";
-// FR-C5–C8: the approval drawer for one remindable invoice. Text comes only from
-// the fixed R5 template; the sender may edit it, and the edit is logged.
+// FR-C5–C9: the approval drawer for one remindable invoice. Text comes only from
+// the fixed R5 template; the sender may edit it, and the edit is logged. Snooze,
+// mark disputed and "I'll call instead" follow the same tier rules as approve.
 import { useEffect, useState, type ReactNode } from "react";
-import { ExternalLink, Lock, MessageCircle, Moon, RotateCcw, Send, Truck, X } from "lucide-react";
+import { CalendarClock, ExternalLink, Lock, MessageCircle, Moon, Phone, RotateCcw, Send, TriangleAlert, Truck, X } from "lucide-react";
 import { useKutip } from "@/lib/store";
 import { Badge, Button, RuleTag, cx } from "@/components/ui";
-import { dayOf, daysBetween, fmtDate, fmtDateTime, fmtRM, outstanding, userOf } from "@/engine/model";
-import { canApprove, gapImpact, inQuietHours, payBy, renderReminder, shortfalls, waShareLink, type PlanRow } from "@/engine/rules";
+import { addDays, dayOf, daysBetween, fmtDate, fmtDateTime, fmtRM, outstanding, userOf } from "@/engine/model";
+import { HORIZON_DAYS, canApprove, gapImpact, inQuietHours, payBy, renderReminder, shortfalls, waShareLink, type PlanRow } from "@/engine/rules";
 import { LANG_LABEL, TierBadge, tierName } from "./bits";
 
 export default function ApprovalPanel({ row, onClose }: { row: PlanRow; onClose: () => void }) {
@@ -181,6 +182,7 @@ export default function ApprovalPanel({ row, onClose }: { row: PlanRow; onClose:
               {!quiet && <div className="text-[11px] text-slate-500">
                 &ldquo;Open in WhatsApp&rdquo; approves the reminder (logged), then opens WhatsApp to pick the chat; no number is filled in. A person presses send.
               </div>}
+              <CardActions invoiceId={invoice.id} invoiceNumber={invoice.number} today={dayOf(state.now)} onDone={onClose} />
             </>
           ) : (
             <div className="flex items-start gap-2 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-900">
@@ -193,6 +195,64 @@ export default function ApprovalPanel({ row, onClose }: { row: PlanRow; onClose:
           )}
         </footer>
       </aside>
+    </div>
+  );
+}
+
+/** FR-C9: the other card actions. Each is an engine action, role-checked and logged with the actor. */
+function CardActions({ invoiceId, invoiceNumber, today, onDone }: { invoiceId: string; invoiceNumber: string; today: string; onDone: () => void }) {
+  const dispatch = useKutip((s) => s.dispatch);
+  const [until, setUntil] = useState(addDays(today, 3));
+  const [confirmDispute, setConfirmDispute] = useState(false);
+  const first = addDays(today, 1);
+  const last = addDays(today, HORIZON_DAYS);
+  const validUntil = until >= first && until <= last;
+  const done = (ok: boolean) => ok && onDone();
+
+  return (
+    <div className="space-y-2 border-t border-slate-200 pt-3">
+      <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Or instead</div>
+      <div className="flex flex-wrap items-center gap-2">
+        <label className="flex items-center gap-1.5 text-xs text-slate-600">
+          <span className="sr-only">Snooze until</span>
+          <input
+            type="date"
+            value={until}
+            min={first}
+            max={last}
+            onChange={(e) => setUntil(e.target.value)}
+            className="h-7 rounded-[2px] border border-line px-1.5 font-mono text-xs text-ink"
+          />
+        </label>
+        <Button size="sm" variant="secondary" disabled={!validUntil} onClick={() => done(dispatch({ type: "SNOOZE_REMINDER", invoiceId, until }))}>
+          <CalendarClock className="h-3.5 w-3.5" aria-hidden />
+          Snooze to {validUntil ? fmtDate(until) : "date"}
+        </Button>
+        <Button size="sm" variant="secondary" onClick={() => done(dispatch({ type: "CALL_INSTEAD", invoiceId }))}>
+          <Phone className="h-3.5 w-3.5" aria-hidden />
+          I&apos;ll call instead
+        </Button>
+        {!confirmDispute && (
+          <Button size="sm" variant="danger" onClick={() => setConfirmDispute(true)}>
+            <TriangleAlert className="h-3.5 w-3.5" aria-hidden />
+            Mark disputed
+          </Button>
+        )}
+      </div>
+      {confirmDispute && (
+        <div className="flex flex-wrap items-center gap-2 border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-800">
+          <span className="flex-1">Mark {invoiceNumber} disputed? Reminders pause until the dispute is settled (M5).</span>
+          <Button size="sm" variant="danger" onClick={() => done(dispatch({ type: "MARK_DISPUTED", invoiceId }))}>
+            Confirm dispute
+          </Button>
+          <Button size="sm" variant="ghost" onClick={() => setConfirmDispute(false)}>
+            Cancel
+          </Button>
+        </div>
+      )}
+      <div className="text-[11px] text-slate-500">
+        Snooze returns the reminder on that date. A call is recorded as a phone follow-up and counts as contact for 5 days <RuleTag id="R2" />. Each is logged with your name.
+      </div>
     </div>
   );
 }

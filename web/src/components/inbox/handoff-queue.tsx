@@ -1,9 +1,11 @@
 "use client";
 // "Needs a human" queue (rule M4, FR-E7, FR-E10). Each card asks one specific
 // question; answers go to the engine as RESOLVE_HANDOFF, which checks the role.
+// Below it, "already paid" claims with no bank line that still pause reminders
+// (M5), which only the Owner can reject (REJECT_CLAIM, PRD §22 row 2).
 import { useState } from "react";
-import { HelpCircle, Send } from "lucide-react";
-import { customerOf, invoiceOf, timeOf, type Handoff, type State } from "@/engine/model";
+import { Ban, HelpCircle, Send } from "lucide-react";
+import { customerOf, fmtDateTime, invoiceOf, timeOf, type Handoff, type Invoice, type State } from "@/engine/model";
 import { useKutip } from "@/lib/store";
 import { Badge, Button, Card, CardHeader, RuleTag, cx } from "@/components/ui";
 import { ChatBackdrop, ChatBubble } from "./bubble";
@@ -16,9 +18,29 @@ const KIND_LABEL: Record<Handoff["kind"], string> = {
   unmatched: "Unmatched",
 };
 
+/** Unverified claims whose hand-off is closed (e.g. the slip was asked for): reminders stay paused (M5). */
+function waitingClaims(s: State): Invoice[] {
+  return s.invoices.filter(
+    (i) =>
+      i.openClaimMessageId !== null &&
+      !s.receipts.some((r) => r.invoiceId === i.id && r.messageId === i.openClaimMessageId) &&
+      !s.handoffs.some((h) => h.messageId === i.openClaimMessageId && h.resolved === null),
+  );
+}
+
 export function HandoffQueue({ state, onOpen }: { state: State; onOpen: (messageId: string) => void }) {
   const open = openHandoffs(state);
-  if (!open.length) return null;
+  const waiting = waitingClaims(state);
+  if (!open.length && !waiting.length) return null;
+  return (
+    <>
+      {open.length > 0 && <OpenHandoffs state={state} open={open} onOpen={onOpen} />}
+      {waiting.length > 0 && <WaitingClaims state={state} invoices={waiting} onOpen={onOpen} />}
+    </>
+  );
+}
+
+function OpenHandoffs({ state, open, onOpen }: { state: State; open: Handoff[]; onOpen: (messageId: string) => void }) {
   return (
     <Card tone="warn" className="mb-5">
       <CardHeader
@@ -123,6 +145,62 @@ function PromiseDateForm({ h, onConfirm }: { h: Handoff; onConfirm: (option: str
   );
 }
 
+function WaitingClaims({ state, invoices, onOpen }: { state: State; invoices: Invoice[]; onOpen: (messageId: string) => void }) {
+  const isOwner = state.role === "owner";
+  return (
+    <Card className="mb-5">
+      <CardHeader
+        kicker={
+          <span className="inline-flex items-center gap-1.5">
+            <RuleTag id="M5" /> Paused
+          </span>
+        }
+        title={`Says paid, not in the bank · ${invoices.length}`}
+        right={<span className="text-[11px] text-slate-500">Never marked paid without a matching bank line</span>}
+      />
+      <ul className="divide-y divide-hairline">
+        {invoices.map((inv) => {
+          const msg = state.messages.find((m) => m.id === inv.openClaimMessageId)!;
+          const asked = state.handoffs.find((h) => h.messageId === msg.id && h.kind === "claim_unverified" && h.resolved === "send_reply");
+          return (
+            <li key={inv.id} className="flex flex-wrap items-center gap-3 px-4 py-3 text-sm">
+              <Badge>{inv.number}</Badge>
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-slate-900">{customerOf(state, inv.customerId).name}</div>
+                <div className="text-xs text-slate-500">
+                  Said paid {fmtDateTime(msg.receivedAt)}
+                  {asked ? ` · slip requested by ${asked.resolvedBy}` : ""} · reminders paused until the bank shows it or the Owner rejects the claim
+                </div>
+              </div>
+              <Button variant="ghost" size="sm" onClick={() => onOpen(msg.id)}>
+                Open message
+              </Button>
+              <RejectClaimButton isOwner={isOwner} invoiceId={inv.id} />
+            </li>
+          );
+        })}
+      </ul>
+    </Card>
+  );
+}
+
+/** Owner only (§9.3: changes what a customer is treated as owing). The engine checks the role too. */
+function RejectClaimButton({ isOwner, invoiceId }: { isOwner: boolean; invoiceId: string }) {
+  const dispatch = useKutip((s) => s.dispatch);
+  return (
+    <Button
+      size="sm"
+      variant="secondary"
+      disabled={!isOwner}
+      title={isOwner ? "No bank line arrived: drop the claim and let reminders resume" : "Only the Owner can reject a payment claim"}
+      onClick={() => dispatch({ type: "REJECT_CLAIM", invoiceId })}
+    >
+      <Ban className="h-3.5 w-3.5" aria-hidden />
+      Reject claim
+    </Button>
+  );
+}
+
 function ClaimUnverifiedForm({ state, h, onResolve }: { state: State; h: Handoff; onResolve: (option: string) => void }) {
   const isOwner = state.role === "owner";
   return (
@@ -150,8 +228,13 @@ function ClaimUnverifiedForm({ state, h, onResolve }: { state: State; h: Handoff
         >
           Mark paid anyway
         </Button>
+        {h.invoiceId && <RejectClaimButton isOwner={isOwner} invoiceId={h.invoiceId} />}
       </div>
-      {!isOwner && <p className="text-[11px] text-slate-500">Mark paid anyway is Owner only: it changes what the customer owes with no bank line.</p>}
+      {!isOwner && (
+        <p className="text-[11px] text-slate-500">
+          Mark paid anyway and Reject claim are Owner only: one changes what the customer owes with no bank line, the other ends the pause on reminders.
+        </p>
+      )}
     </div>
   );
 }
