@@ -8,7 +8,7 @@
 
 > SDC Hackathon 2026 (XMUM) · Domain 2: *Orbyte Smart SME Challenge — Less Busywork, Better Business* · sponsored by Alpha Red Solutions
 >
-> **Live demo:** https://kachingg-app.vercel.app · open **Guide** at the top for the 3-minute walk-through. All data is synthetic.
+> **Live demo:** https://kachingg-app.vercel.app · press **Start tour** at the top for a guided walkthrough, or open **Guide** for the 3-minute demo script. All data is synthetic.
 
 Called Kutip during research; the notes in `docs/research/` and `docs/idea/` keep the old name.
 
@@ -271,7 +271,7 @@ AI only reads messages. Every decision (what to chase, whether something is paid
 ### Option 1 — Open the live demo
 
 1. Open https://kachingg-app.vercel.app. Nothing to install.
-2. Open **Guide** in the top bar for the 8-step, 3-minute walk-through.
+2. Press **Start tour** in the top bar for an 11-step spotlight walkthrough, or open **Guide** for the 8-step, 3-minute demo script.
 3. Use the role switcher in the header to act as **Owner** (Lim Siew Lan) or **Clerk** (Nurul). **Reset demo** in the header starts the script again.
 
 ### Option 2 — Run Locally
