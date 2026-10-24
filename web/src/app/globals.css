@@ -1,17 +1,87 @@
 @import "tailwindcss";
 
-/* Kutip demo runs light-only: the simulated Orbyte hub has one theme. */
+/* Kutip design tokens: "Ledger" (shared with the team's Soapay UI).
+   IBM Plex Sans + Mono, navy accent, 2px corners, hairline borders, no shadows,
+   money and IDs in mono with tabular figures. Light only. */
 :root {
-  --background: #f8fafc; /* slate-50 */
-  --foreground: #0f172a; /* slate-900 */
+  --canvas: #f4f5f7;
+  --surface: #ffffff;
+  --line: #d5dae1;
+  --line-strong: #b8c0cb;
+  --hairline: #eef0f3;
+  --ink: #0f1720;
+  --ink2: #4a5563;
+  --ink-disabled: #8a94a3;
+  --accent: #1e3a5f;
+  --accent-hover: #162c49;
+  --accent-soft: #e4eefa;
+  --on-accent-muted: #c9daf0;
   color-scheme: light;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-plex-sans), system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Ledger palette as utilities: bg-navy, text-ink2, border-line, ... */
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-hairline: var(--hairline);
+  --color-ink: var(--ink);
+  --color-ink2: var(--ink2);
+  --color-ink3: var(--ink-disabled);
+  --color-navy: var(--accent);
+  --color-navy-hover: var(--accent-hover);
+  --color-navy-soft: var(--accent-soft);
+  --color-navy-muted: var(--on-accent-muted);
+
+  /* Status registers (Ledger): ready green, warning amber, error red, received blue. */
+  --color-emerald-50: #eef8f1;
+  --color-emerald-100: #e1f3e7;
+  --color-emerald-200: #c4e6cf;
+  --color-emerald-300: #9fd3b0;
+  --color-emerald-400: #5fae7c;
+  --color-emerald-500: #2f8a52;
+  --color-emerald-600: #1e6b3a;
+  --color-emerald-700: #1e6b3a;
+  --color-emerald-800: #17542d;
+  --color-emerald-900: #113f22;
+  --color-amber-50: #fdf6e7;
+  --color-amber-100: #fbedd3;
+  --color-amber-200: #f4dcae;
+  --color-amber-300: #e8c27a;
+  --color-amber-800: #7a4b00;
+  --color-amber-900: #5e3a00;
+  --color-rose-50: #fdf2f2;
+  --color-rose-100: #fbe5e5;
+  --color-rose-200: #f3c9c9;
+  --color-rose-300: #e7a3a3;
+  --color-rose-600: #a32d2d;
+  --color-rose-700: #a32d2d;
+  --color-rose-800: #8a2424;
+  --color-sky-50: #f1f6fc;
+  --color-sky-100: #e4eefa;
+  --color-sky-200: #c9daf0;
+  --color-sky-300: #a9c4e6;
+  --color-sky-600: #1d4f8c;
+  --color-sky-700: #1d4f8c;
+  --color-sky-800: #183f70;
+
+  /* Square corners, flat surfaces. */
+  --radius-xs: 2px;
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 2px;
+  --radius-xl: 2px;
+  --radius-2xl: 2px;
+  --shadow-xs: none;
+  --shadow-sm: none;
+  --shadow: none;
+  --shadow-md: none;
+  --shadow-lg: 0 8px 24px rgba(15, 23, 32, 0.12);
+  --shadow-xl: 0 12px 32px rgba(15, 23, 32, 0.16);
 }
 
 html,
@@ -20,9 +90,32 @@ body {
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-plex-sans), system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Money, IDs and times read as a ledger. */
+.num {
+  font-family: var(--font-plex-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+.eyebrow {
+  font-family: var(--font-plex-mono), ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
 }
 
 /* Native datetime-local picker icon sits on a light field. */
