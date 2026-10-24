@@ -48,7 +48,7 @@ export const TOUR_STEPS: TourStep[] = [
     page: "today",
     target: '[data-tour="cash-available"]',
     title: "Cash available and bills",
-    text: "Salaries on 31 Oct are RM2,000 short. You get 11 days' warning.",
+    text: "Each bill in the next 30 days: covered, or how much short. You see it days ahead, not on payday.",
     ownerOnly: true,
   },
   {
