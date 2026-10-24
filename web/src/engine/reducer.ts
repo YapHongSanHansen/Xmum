@@ -28,6 +28,7 @@ import {
   creditExposure,
   findBankLine,
   forecast,
+  RECENT_REMINDER_REASON,
   inQuietHours,
   linkDeduction,
   needsCreditCheck,
@@ -88,12 +89,9 @@ export const warningOptions = (s: State, outflowId: string): string[] => {
 
 /* ---------- scan (08:00) ---------- */
 
-function runScan(s: State) {
-  const today = dayOf(s.now);
-  if (s.scannedDays.includes(today)) return;
-  s.scannedDays.push(today);
-
-  // S1: reminders approved during quiet hours go out now.
+/** S1: reminders approved during quiet hours go out once quiet hours end. */
+function releaseQueued(s: State) {
+  if (inQuietHours(s.now)) return;
   for (const inv of s.invoices) {
     for (const r of inv.reminders) {
       if (r.status === "queued") {
@@ -102,6 +100,14 @@ function runScan(s: State) {
       }
     }
   }
+}
+
+function runScan(s: State) {
+  const today = dayOf(s.now);
+  if (s.scannedDays.includes(today)) return;
+  s.scannedDays.push(today);
+
+  releaseQueued(s);
 
   const fc = forecast(s);
   const overdue = s.invoices.filter((i) => i.status !== "paid" && daysOverdue(i, s.now) >= 1).length;
@@ -118,7 +124,8 @@ function runScan(s: State) {
 
   const plan = chasePlan(s);
   for (const row of plan) {
-    if (row.state === "skipped" && !row.reason.startsWith("customer messaged")) {
+    // Rows skipped only because a reminder went out in the last 5 days are not logged (noise).
+    if (row.state === "skipped" && !row.reason.startsWith(RECENT_REMINDER_REASON)) {
       log(s, "RULE", "R2", `skipped ${row.invoice.number}: ${row.reason}`, { rule: "R2", refs: [row.invoice.id] });
     }
   }
@@ -153,13 +160,17 @@ function arrivals(s: State, from: string, to: string) {
 
 function advance(s: State, to: string) {
   if (to <= s.now) refuse("The demo clock only moves forward.");
+  const start = s.now;
   let from = s.now;
-  for (let d = addDays(dayOf(s.now), 1); d <= dayOf(to); d = addDays(d, 1)) {
+  // One 08:00 scan per boundary crossed, including today's if "now" is still before 08:00.
+  for (let d = dayOf(start); d <= dayOf(to); d = addDays(d, 1)) {
     const scanAt = `${d}T08:00`;
+    if (scanAt <= start) continue;
     if (scanAt > to) break;
     s.now = scanAt;
     arrivals(s, from, scanAt);
     from = scanAt;
+    releaseQueued(s);
     runScan(s);
   }
   s.now = to;
@@ -186,21 +197,26 @@ function applyExtraction(s: State, a: Extract<Action, { type: "APPLY_EXTRACTION"
 
   // FR-E3 verbatim gate: a text field survives only if its quote is in the message.
   const rejected: string[] = [];
+  const gateFields: string[] = [];
+  const drop = (field: string, quote: string | null) => {
+    rejected.push(`${field} (quote "${quote}")`);
+    gateFields.push(field);
+  };
   if (ex.amount !== null && ex.amount_source === "text" && !quoteIsVerbatim(ex.amount_quote, m.text)) {
-    rejected.push(`amount (quote "${ex.amount_quote}")`);
+    drop("amount", ex.amount_quote);
     ex.amount = null;
   }
   if (ex.invoice_ref !== null && ex.invoice_ref_quote !== null && !quoteIsVerbatim(ex.invoice_ref_quote, m.text)) {
-    rejected.push(`invoice (quote "${ex.invoice_ref_quote}")`);
+    drop("invoice", ex.invoice_ref_quote);
     ex.invoice_ref = null;
   }
   if (ex.deduction_amount !== null && !quoteIsVerbatim(ex.deduction_quote, m.text)) {
-    rejected.push(`deduction (quote "${ex.deduction_quote}")`);
+    drop("deduction", ex.deduction_quote);
     ex.deduction_amount = null;
     ex.deduction_reason = null;
   }
   if (ex.promised_date_candidates.length && !quoteIsVerbatim(ex.promised_date_quote, m.text)) {
-    rejected.push(`promised date (quote "${ex.promised_date_quote}")`);
+    drop("promised date", ex.promised_date_quote);
     ex.promised_date_candidates = [];
   }
   s.extractions[m.id] = { messageId: m.id, extraction: ex, model: a.model, cached: a.cached, at: s.now, rejectedQuotes: rejected };
@@ -244,6 +260,21 @@ function applyExtraction(s: State, a: Extract<Action, { type: "APPLY_EXTRACTION"
   }
   log(s, "AI", "AI", parts.length ? parts.join(", ") : `says paid; ${ex.has_slip ? "slip unreadable" : "no slip"}`, { ...aiMeta, confidence: parts.length ? conf : undefined });
   if (!inv) return handoffUnmatched(s, m.id, null, "Which invoice is this payment for?");
+
+  // M4: a field that failed the verbatim gate or sits below 0.85 confidence goes to a person.
+  const lowConf = [
+    ex.amount !== null && ex.amount_confidence < CONFIDENCE_MIN ? "amount" : null,
+    ex.invoice_ref !== null && ex.invoice_ref_confidence < CONFIDENCE_MIN ? "invoice" : null,
+    ex.deduction_amount !== null && ex.deduction_confidence < CONFIDENCE_MIN ? "deduction" : null,
+  ].filter((f): f is string => f !== null);
+  const payFields = gateFields.filter((f) => f !== "promised date");
+  if (payFields.length || lowConf.length) {
+    const why = [
+      payFields.length ? `the quoted words for the ${payFields.join(" and ")} are not in the message` : null,
+      lowConf.length ? `the ${lowConf.join(" and ")} ${lowConf.length > 1 ? "are" : "is"} below ${CONFIDENCE_MIN} confidence` : null,
+    ].filter(Boolean);
+    handoffUnmatched(s, m.id, inv.id, `Check what ${c.contact} said about ${inv.number}: ${why.join("; ")}.`);
+  }
 
   const amount = ex.amount !== null ? Math.round(ex.amount * 100) : outstanding(inv);
   const line = findBankLine(s, amount, m.receivedAt, c, inv);
@@ -411,7 +442,9 @@ export function apply(prev: State, action: Action): Result {
         const h = s.handoffs.find((x) => x.id === action.handoffId) ?? refuse("Unknown hand-off.");
         if (h.resolved) refuse("Already resolved.");
         if (h.kind === "promise_date") {
-          if (!h.options.includes(action.option)) refuse("Pick one of the offered dates.");
+          // No candidates (e.g. the date failed the verbatim gate): the person types the date.
+          const typedDate = h.options.length === 0 && /^\d{4}-\d{2}-\d{2}$/.test(action.option);
+          if (!h.options.includes(action.option) && !typedDate) refuse("Pick one of the offered dates.");
           h.resolved = action.option;
           h.resolvedBy = me(s);
           log(s, "USER", me(s), `confirmed promise date ${fmtDate(action.option)} for ${invoiceOf(s, h.invoiceId!).number}`, { refs: [h.invoiceId!] });

@@ -40,8 +40,13 @@ export function onTimeRate(c: Customer): { rate: number; n: number } {
 /** Owner-entered balance + receipts approved since (P0 definition of cash). */
 export const cashNow = (s: State) => s.bankBalance.amount + s.approvedReceiptTotal;
 
+/** A claim is VERIFIED once M1 matched it to a bank line, i.e. it produced a receipt. */
+export const hasVerifiedClaim = (s: State, inv: Invoice) =>
+  inv.openClaimMessageId !== null && s.receipts.some((r) => r.invoiceId === inv.id && r.messageId === inv.openClaimMessageId);
+
 export function isExpectedInflow(s: State, inv: Invoice): boolean {
-  if (inv.status === "paid" || inv.openClaimMessageId) return false;
+  // F1: "not PAID and without a VERIFIED claim". An unverified claim leaves the inflow expected.
+  if (inv.status === "paid" || hasVerifiedClaim(s, inv)) return false;
   if (inv.dueDate < dayOf(s.now)) return false;
   const { rate, n } = onTimeRate(customerOf(s, inv.customerId));
   return n >= 3 && rate >= ON_TIME_MIN;
@@ -107,11 +112,13 @@ export interface GapImpact {
 export function gapImpact(s: State, inv: Invoice): GapImpact[] {
   const before = shortfalls(s).slice(0, 2);
   const after = forecast(s, outstanding(inv));
+  const by = payBy(s);
+  // Paid by the pay-by date: an outflow due before that date gets no help from it.
   return before.map((b) => ({
     short: b.short,
     dueDate: b.dueDate,
     before: b.forecast,
-    after: after.find((a) => a.outflowId === b.outflowId)!.forecast,
+    after: b.dueDate < by ? b.forecast : after.find((a) => a.outflowId === b.outflowId)!.forecast,
   }));
 }
 
@@ -137,7 +144,9 @@ function nextTier(inv: Invoice, now: string): { tier: Tier | null; waitReason?: 
   const late = daysOverdue(inv, now);
   const sent = inv.reminders.filter((r) => r.status === "sent");
   if (late < 1) return sent.length === 0 && late >= -3 ? { tier: 0 } : { tier: null, waitReason: "not due yet" };
-  const step = TIER_SEQUENCE[Math.min(sent.length, TIER_SEQUENCE.length - 1)];
+  // The fixed sequence T1, T1, T2, T3 starts after an optional Tier 0 courtesy note.
+  const steps = sent.filter((r) => r.tier > 0).length;
+  const step = TIER_SEQUENCE[Math.min(steps, TIER_SEQUENCE.length - 1)];
   const last = sent[sent.length - 1];
   if (last && !last.answered && daysBetween(last.at, now) < 7) {
     return { tier: null, waitReason: `last reminder ${fmtDate(dayOf(last.at))}, waiting 7 days for a reply` };
@@ -146,16 +155,31 @@ function nextTier(inv: Invoice, now: string): { tier: Tier | null; waitReason?: 
   return { tier: step };
 }
 
+/** R2 reason prefix for "the customer was sent any reminder in the last 5 days". */
+export const RECENT_REMINDER_REASON = "reminder sent";
+
 function suppressReason(s: State, inv: Invoice): string | null {
   const today = dayOf(s.now);
   if (inv.status === "disputed") return "invoice disputed";
-  if (inv.openClaimMessageId) return "customer says paid; waiting for bank check";
+  if (inv.openClaimMessageId) {
+    // M5: an open claim pauses reminders until it is settled.
+    const receipt = s.receipts.find((r) => r.invoiceId === inv.id && r.messageId === inv.openClaimMessageId);
+    if (receipt?.status === "proposed") return "payment verified; receipt awaiting approval";
+    if (receipt?.deduction?.status === "pending") return `${fmtRM(receipt.deduction.amount)} deduction under review`;
+    return "customer says paid; waiting for bank check";
+  }
   if (inv.promise && today <= inv.promise.date) return `promise ${fmtDate(inv.promise.date)} not reached`;
+  const paidRecently = s.bankLines
+    .filter((b) => b.matchedInvoiceId === inv.id && b.at <= s.now && daysBetween(b.at, s.now) < 2)
+    .at(-1);
+  if (paidRecently) return `payment received ${fmtDate(dayOf(paidRecently.at))}, under 2 days ago`;
+  // Any reminder to this customer, on any invoice, including one sent or queued today.
   const recent = s.invoices
     .filter((i) => i.customerId === inv.customerId)
     .flatMap((i) => i.reminders)
-    .filter((r) => r.status === "sent" && daysBetween(r.at, s.now) < 5 && dayOf(r.at) !== today);
-  if (recent.length) return `customer messaged ${fmtDate(dayOf(recent[recent.length - 1].at))}, under 5 days ago`;
+    .filter((r) => daysBetween(r.at, s.now) < 5)
+    .sort((a, b) => a.at.localeCompare(b.at));
+  if (recent.length) return `${RECENT_REMINDER_REASON} ${fmtDate(dayOf(recent[recent.length - 1].at))}, under 5 days ago`;
   return null;
 }
 
@@ -309,6 +333,9 @@ export function payerMatches(desc: string, customer: Customer, inv: Invoice | nu
 }
 
 export const visibleBankLines = (s: State) => s.bankLines.filter((b) => b.at <= s.now);
+
+/** FR-H1: seeded inbound messages appear once the demo clock reaches their time. */
+export const visibleMessages = (s: State) => s.messages.filter((m) => m.receivedAt <= s.now);
 
 /** M1: VERIFIED only with an equal-amount bank line within 3 days and a payer match. */
 export function findBankLine(s: State, amount: number, claimedAt: string, customer: Customer, inv: Invoice | null): BankLine | null {
