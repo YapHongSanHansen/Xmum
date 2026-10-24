@@ -1,5 +1,7 @@
 "use client";
 // Module sidebar (PRD FR-O1): Orbyte's existing modules for context, Kutip as the new one.
+// Light Ledger frame: the active item carries a navy rule. Below the lg breakpoint the
+// same items render as one sideways-scrolling strip under the header.
 import type { ComponentType, ReactNode } from "react";
 import {
   BookOpen,
@@ -20,14 +22,37 @@ import {
 import { cx } from "@/components/ui";
 import { useKutip, type Page } from "@/lib/store";
 import { inboxCount } from "./counts";
-import { Wordmark } from "./wordmark";
 import { approvalsCount } from "@/components/pages/approvals";
 
 type Icon = ComponentType<{ className?: string }>;
 
 const PEOPLE_CHILDREN = ["eLeave", "eClaim", "eOT", "Attendance"];
 
-export function Sidebar() {
+interface NavItem {
+  key: string;
+  label: string;
+  icon?: Icon;
+  active: boolean;
+  onClick: () => void;
+  right?: ReactNode;
+  strong?: boolean;
+}
+
+/** Square mono count, e.g. pending approvals or unread messages. */
+function Count({ n, tone }: { n: number; tone: "navy" | "amber" }) {
+  return (
+    <span
+      className={cx(
+        "inline-flex h-[18px] min-w-[18px] items-center justify-center px-1 font-mono text-[11px] font-medium tabular-nums",
+        tone === "navy" ? "bg-navy text-white" : "bg-amber-100 text-amber-800",
+      )}
+    >
+      {n}
+    </span>
+  );
+}
+
+function useNav() {
   const page = useKutip((s) => s.page);
   const moduleName = useKutip((s) => s.moduleName);
   const go = useKutip((s) => s.go);
@@ -36,135 +61,137 @@ export function Sidebar() {
 
   const isModule = (name: string) => page === "module" && moduleName === name;
   const kutipPages: Page[] = ["today", "bookings", "inbox", "log", "usage"];
-  const inKutip = kutipPages.includes(page);
+  const mod = (name: string, icon?: Icon): NavItem => ({ key: name, label: name, icon, active: isModule(name), onClick: () => go("module", name) });
 
+  return {
+    home: mod("Home", House),
+    people: mod("People", Users),
+    peopleChildren: PEOPLE_CHILDREN.map((name) => mod(name)),
+    rest: [
+      mod("Work", Briefcase),
+      mod("eSign", Signature),
+      mod("Hiring", UserPlus),
+      { key: "connect", label: "Connect", icon: Plug, active: page === "connect", onClick: () => go("connect") },
+      {
+        key: "approvals",
+        label: "Approvals",
+        icon: ClipboardCheck,
+        active: page === "approvals",
+        onClick: () => go("approvals"),
+        right: approvals > 0 ? <Count n={approvals} tone="navy" /> : null,
+      },
+    ] as NavItem[],
+    kutip: {
+      key: "kutip",
+      label: "Kutip",
+      icon: Wallet,
+      active: kutipPages.includes(page),
+      strong: true,
+      onClick: () => go("today"),
+      right: <span className="inline-flex h-[18px] items-center bg-emerald-100 px-1.5 font-mono text-[10px] font-medium text-emerald-700">new</span>,
+    } as NavItem,
+    kutipChildren: [
+      { key: "today", label: "Today", icon: LayoutDashboard, active: page === "today", onClick: () => go("today") },
+      { key: "bookings", label: "Bookings", icon: Truck, active: page === "bookings", onClick: () => go("bookings") },
+      {
+        key: "inbox",
+        label: "Inbox (Bukti)",
+        icon: Inbox,
+        active: page === "inbox",
+        onClick: () => go("inbox"),
+        right: count > 0 ? <Count n={count} tone="amber" /> : null,
+      },
+      { key: "log", label: "Activity log", icon: ScrollText, active: page === "log", onClick: () => go("log") },
+      { key: "usage", label: "Usage & credits", icon: Coins, active: page === "usage", onClick: () => go("usage") },
+    ] as NavItem[],
+    guide: { key: "guide", label: "Demo guide", icon: BookOpen, active: page === "guide", onClick: () => go("guide") } as NavItem,
+  };
+}
+
+export function Sidebar() {
+  const nav = useNav();
   return (
-    <nav className="flex w-60 shrink-0 flex-col bg-slate-900 text-slate-300" aria-label="Orbyte modules">
-      <div className="flex h-12 items-center border-b border-white/5 px-4">
-        <Wordmark dark />
-        <span className="ml-2 rounded bg-white/10 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-slate-400">hub</span>
-      </div>
-
-      <div className="flex-1 overflow-y-auto px-2 py-3">
+    <nav className="hidden w-56 shrink-0 flex-col border-r border-line bg-surface lg:flex" aria-label="Orbyte modules">
+      <div className="flex-1 overflow-y-auto px-2 py-4">
         <GroupLabel>Orbyte modules</GroupLabel>
-        <Item icon={House} label="Home" active={isModule("Home")} onClick={() => go("module", "Home")} />
-        <Item icon={Users} label="People" active={isModule("People")} onClick={() => go("module", "People")} />
-        <div className="mb-1 ml-[22px] border-l border-white/10 pl-2">
-          {PEOPLE_CHILDREN.map((name) => (
-            <SubItem key={name} label={name} active={isModule(name)} onClick={() => go("module", name)} />
+        <Item item={nav.home} />
+        <Item item={nav.people} />
+        <div className="mb-1 ml-[19px] border-l border-line pl-1.5">
+          {nav.peopleChildren.map((it) => (
+            <Item key={it.key} item={it} sub />
           ))}
         </div>
-        <Item icon={Briefcase} label="Work" active={isModule("Work")} onClick={() => go("module", "Work")} />
-        <Item icon={Signature} label="eSign" active={isModule("eSign")} onClick={() => go("module", "eSign")} />
-        <Item icon={UserPlus} label="Hiring" active={isModule("Hiring")} onClick={() => go("module", "Hiring")} />
-        <Item icon={Plug} label="Connect" active={page === "connect"} onClick={() => go("connect")} />
-        <Item
-          icon={ClipboardCheck}
-          label="Approvals"
-          active={page === "approvals"}
-          onClick={() => go("approvals")}
-          right={approvals > 0 ? <span className="min-w-5 rounded-full bg-sky-400 px-1.5 text-center text-[11px] font-semibold leading-5 text-slate-900">{approvals}</span> : null}
-        />
+        {nav.rest.map((it) => (
+          <Item key={it.key} item={it} />
+        ))}
 
         <div className="mt-5">
           <GroupLabel>New module</GroupLabel>
-          <Item
-            icon={Wallet}
-            label="Kutip"
-            active={inKutip}
-            strong
-            onClick={() => go("today")}
-            right={<span className="rounded bg-emerald-400/20 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-300">new</span>}
-          />
-          <div className="ml-[22px] border-l border-emerald-400/30 pl-2">
-            <SubItem icon={LayoutDashboard} label="Today" active={page === "today"} onClick={() => go("today")} />
-            <SubItem icon={Truck} label="Bookings" active={page === "bookings"} onClick={() => go("bookings")} />
-            <SubItem
-              icon={Inbox}
-              label="Inbox (Bukti)"
-              active={page === "inbox"}
-              onClick={() => go("inbox")}
-              right={
-                count > 0 ? (
-                  <span className="min-w-5 rounded-full bg-amber-400 px-1.5 text-center text-[11px] font-semibold leading-5 text-slate-900">{count}</span>
-                ) : null
-              }
-            />
-            <SubItem icon={ScrollText} label="Activity log" active={page === "log"} onClick={() => go("log")} />
-            <SubItem icon={Coins} label="Usage & credits" active={page === "usage"} onClick={() => go("usage")} />
+          <Item item={nav.kutip} />
+          <div className="ml-[19px] border-l border-line pl-1.5">
+            {nav.kutipChildren.map((it) => (
+              <Item key={it.key} item={it} sub />
+            ))}
           </div>
         </div>
       </div>
 
-      <div className="border-t border-white/5 p-2">
-        <Item icon={BookOpen} label="Demo guide" active={page === "guide"} onClick={() => go("guide")} />
-        <p className="px-2.5 pb-1 pt-2 text-[10px] leading-snug text-slate-500">Simulated Orbyte frame, the team&apos;s own design. All data is synthetic.</p>
+      <div className="border-t border-hairline p-2">
+        <Item item={nav.guide} />
+        <p className="px-2.5 pb-1 pt-2 text-[11px] leading-snug text-ink2">Simulated Orbyte frame, the team&apos;s own design. All data is synthetic.</p>
+      </div>
+    </nav>
+  );
+}
+
+/** Phone and tablet: the same modules as one scrolling strip, Kutip first. */
+export function ModuleStrip() {
+  const nav = useNav();
+  const items = [...nav.kutipChildren, nav.guide, ...nav.rest, nav.home, nav.people, ...nav.peopleChildren];
+  return (
+    <nav className="shrink-0 border-b border-line bg-surface lg:hidden" aria-label="Orbyte modules">
+      <div className="flex gap-4 overflow-x-auto px-4 [scrollbar-width:none]">
+        {items.map((it) => (
+          <button
+            key={it.key}
+            type="button"
+            onClick={it.onClick}
+            aria-current={it.active ? "page" : undefined}
+            className={cx(
+              "relative inline-flex h-10 shrink-0 items-center gap-1.5 whitespace-nowrap text-[13px] transition-colors",
+              it.active ? "font-medium text-ink" : "text-ink2 hover:text-ink",
+            )}
+          >
+            {it.label}
+            {it.right}
+            {it.active && <span className="absolute inset-x-0 bottom-0 h-[2px] bg-navy" aria-hidden />}
+          </button>
+        ))}
       </div>
     </nav>
   );
 }
 
 function GroupLabel({ children }: { children: ReactNode }) {
-  return <div className="px-2.5 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">{children}</div>;
+  return <div className="px-2.5 pb-1.5 font-mono text-[11px] text-ink2">{children}</div>;
 }
 
-function Item({
-  icon: IconCmp,
-  label,
-  active,
-  onClick,
-  right,
-  strong,
-}: {
-  icon: Icon;
-  label: string;
-  active: boolean;
-  onClick: () => void;
-  right?: ReactNode;
-  strong?: boolean;
-}) {
+function Item({ item, sub = false }: { item: NavItem; sub?: boolean }) {
+  const { icon: IconCmp, label, active, onClick, right, strong } = item;
   return (
     <button
       type="button"
       onClick={onClick}
       aria-current={active ? "page" : undefined}
       className={cx(
-        "flex w-full items-center gap-2.5 rounded-md px-2.5 py-1.5 text-left text-sm transition-colors",
-        active ? "bg-white/10 text-white" : "hover:bg-white/5 hover:text-white",
-        strong && "font-semibold",
+        "relative flex w-full items-center text-left transition-colors",
+        sub ? "h-7 gap-2 px-2 text-[13px]" : "h-8 gap-2.5 px-2.5 text-[13px]",
+        strong ? "font-semibold text-ink hover:bg-canvas" : active ? "bg-canvas font-medium text-ink" : "text-ink2 hover:bg-canvas hover:text-ink",
       )}
     >
-      <IconCmp className={cx("h-4 w-4 shrink-0", active ? "text-emerald-300" : "text-slate-400")} />
-      <span className="flex-1 truncate">{label}</span>
-      {right}
-    </button>
-  );
-}
-
-function SubItem({
-  icon: IconCmp,
-  label,
-  active,
-  onClick,
-  right,
-}: {
-  icon?: Icon;
-  label: string;
-  active: boolean;
-  onClick: () => void;
-  right?: ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-current={active ? "page" : undefined}
-      className={cx(
-        "flex w-full items-center gap-2 rounded-md px-2 py-1 text-left text-[13px] transition-colors",
-        active ? "bg-emerald-500/15 font-medium text-emerald-200" : "text-slate-400 hover:bg-white/5 hover:text-white",
-      )}
-    >
-      {IconCmp && <IconCmp className="h-3.5 w-3.5 shrink-0" />}
+      {/* Navy active rule (Ledger tab line, turned vertical). The module heading only tints its icon. */}
+      {active && !strong && <span className="absolute inset-y-1 left-0 w-[2px] bg-navy" aria-hidden />}
+      {IconCmp && <IconCmp className={cx("shrink-0", sub ? "h-3.5 w-3.5" : "h-4 w-4", active ? "text-navy" : "text-ink2")} />}
       <span className="flex-1 truncate">{label}</span>
       {right}
     </button>

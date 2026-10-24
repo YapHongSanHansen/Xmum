@@ -19,34 +19,34 @@ export function Header() {
   const needsScan = !state.scannedDays.includes(dayOf(state.now));
 
   return (
-    <header className="shrink-0 border-b border-slate-200 bg-white">
-      <div className="flex h-14 items-center justify-between gap-4 px-5">
-        <div className="flex min-w-0 items-center gap-4">
-          <Wordmark />
-          <span className="h-6 w-px bg-slate-200" aria-hidden />
-          <div className="min-w-0">
-            <div className="text-[11px] font-medium uppercase tracking-wide text-slate-400">Workspace</div>
-            <div className="truncate text-sm font-semibold text-slate-900">{state.business.name}</div>
+    <header className="shrink-0 bg-surface">
+      {/* Ledger top bar: 52px, light, hairline rule. Wraps onto two lines on a phone. */}
+      <div className="flex min-h-[52px] flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-hairline px-4 py-2 lg:px-6">
+        <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-1">
+          <span className="inline-flex items-center gap-2">
+            <Wordmark />
+            <span className="inline-flex h-[18px] items-center border border-line px-1.5 font-mono text-[10px] text-ink2">hub</span>
+          </span>
+          <span className="hidden h-5 w-px bg-line sm:block" aria-hidden />
+          <div className="flex min-w-0 items-baseline gap-2">
+            <span className="font-mono text-[11px] text-ink2">Workspace</span>
+            <span className="truncate text-[13px] font-medium text-ink">{state.business.name}</span>
           </div>
           <Badge tone="amber">Simulated hub · synthetic data</Badge>
         </div>
         <RoleSwitcher role={state.role} onChange={(role) => dispatch({ type: "SET_ROLE", role })} />
       </div>
 
-      <div className="flex h-12 items-center justify-between gap-4 border-t border-slate-100 bg-slate-50/80 px-5">
-        <div className="flex items-center gap-3">
-          <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Demo clock</span>
-          <span className="inline-flex items-center gap-1.5 rounded-md bg-white px-2.5 py-1 font-mono text-sm font-semibold text-slate-900 ring-1 ring-slate-200">
-            <Clock className="h-3.5 w-3.5 text-slate-500" aria-hidden />
+      <div className="flex min-h-10 flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-line bg-canvas px-4 py-1.5 lg:px-6">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <span className="font-mono text-[11px] text-ink2">Demo clock</span>
+          <span className="inline-flex h-7 items-center gap-1.5 border border-line bg-surface px-2.5 font-mono text-[13px] font-medium tabular-nums text-ink">
+            <Clock className="h-3.5 w-3.5 text-ink2" aria-hidden />
             {fmtDateTime(state.now)}
           </span>
           <AdvanceMenu now={state.now} onAdvance={(to) => dispatch({ type: "ADVANCE", to })} />
           {needsScan && (
-            <Button
-              size="sm"
-              className="bg-amber-500 text-white shadow-sm ring-2 ring-amber-200 hover:bg-amber-600"
-              onClick={() => dispatch({ type: "RUN_SCAN" })}
-            >
+            <Button size="sm" onClick={() => dispatch({ type: "RUN_SCAN" })}>
               <Play className="h-3.5 w-3.5" aria-hidden />
               Run 08:00 scan
             </Button>
@@ -61,8 +61,8 @@ export function Header() {
 function RoleSwitcher({ role, onChange }: { role: Role; onChange: (r: Role) => void }) {
   return (
     <div className="flex items-center gap-2">
-      <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Orbyte role</span>
-      <div className="inline-flex rounded-md bg-slate-100 p-0.5 ring-1 ring-slate-200" role="radiogroup" aria-label="Orbyte role">
+      <span className="font-mono text-[11px] text-ink2">Orbyte role</span>
+      <div className="inline-flex border border-line-strong" role="radiogroup" aria-label="Orbyte role">
         {ROLES.map((r) => (
           <button
             key={r.role}
@@ -71,8 +71,8 @@ function RoleSwitcher({ role, onChange }: { role: Role; onChange: (r: Role) => v
             aria-checked={role === r.role}
             onClick={() => role !== r.role && onChange(r.role)}
             className={cx(
-              "rounded px-3 py-1 text-xs font-medium transition-colors",
-              role === r.role ? "bg-white text-slate-900 shadow-sm ring-1 ring-slate-200" : "text-slate-500 hover:text-slate-800",
+              "h-7 px-3 text-xs font-medium transition-colors [&+&]:border-l [&+&]:border-line-strong",
+              role === r.role ? "bg-navy text-white" : "bg-surface text-ink2 hover:bg-canvas hover:text-ink",
             )}
           >
             {r.label}
@@ -112,8 +112,8 @@ function AdvancePanel({ now, onPick }: { now: string; onPick: (to: string) => vo
   const [custom, setCustom] = useState(now);
   const valid = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(custom) && custom > now;
   return (
-    <div className="absolute left-0 top-full z-40 mt-1.5 w-80 rounded-lg border border-slate-200 bg-white p-1.5 shadow-lg">
-      <div className="px-2 pb-1 pt-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-400">Demo script stops</div>
+    <div className="absolute left-0 top-full z-40 mt-1.5 w-80 max-w-[calc(100vw-2rem)] border border-line-strong bg-surface p-1.5">
+      <div className="px-2 pb-1 pt-1.5 font-mono text-[11px] text-ink2">Demo script stops</div>
       {DEMO_STOPS.map((stop) => {
         const passed = stop.at <= now;
         return (
@@ -123,17 +123,17 @@ function AdvancePanel({ now, onPick }: { now: string; onPick: (to: string) => vo
             disabled={passed}
             onClick={() => onPick(stop.at)}
             className={cx(
-              "flex w-full items-center justify-between gap-2 rounded-md px-2 py-1.5 text-left text-sm",
-              passed ? "cursor-not-allowed text-slate-400" : "text-slate-800 hover:bg-emerald-50 hover:text-emerald-900",
+              "flex h-8 w-full items-center justify-between gap-2 px-2 text-left text-[13px]",
+              passed ? "cursor-not-allowed text-ink3" : "text-ink hover:bg-navy-soft",
             )}
           >
             <span>{stop.label}</span>
-            {passed && <span className="text-[11px]">passed</span>}
+            {passed && <span className="font-mono text-[11px]">passed</span>}
           </button>
         );
       })}
-      <div className="mt-1.5 border-t border-slate-100 px-2 pb-1.5 pt-2.5">
-        <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-400" htmlFor="advance-custom">
+      <div className="mt-1.5 border-t border-hairline px-2 pb-1.5 pt-2.5">
+        <label className="mb-1 block font-mono text-[11px] text-ink2" htmlFor="advance-custom">
           Custom time
         </label>
         <div className="flex items-center gap-2">
@@ -143,13 +143,13 @@ function AdvancePanel({ now, onPick }: { now: string; onPick: (to: string) => vo
             value={custom}
             min={now}
             onChange={(e) => setCustom(e.target.value.slice(0, 16))}
-            className="h-8 min-w-0 flex-1 rounded-md border border-slate-300 px-2 font-mono text-xs text-slate-800 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="h-8 min-w-0 flex-1 rounded-[2px] border border-line-strong bg-surface px-2 font-mono text-xs text-ink"
           />
           <Button size="sm" disabled={!valid} onClick={() => onPick(custom)}>
             Advance
           </Button>
         </div>
-        <p className="mt-1.5 text-[11px] text-slate-500">The clock only moves forward. Each 08:00 crossed runs that day&apos;s scan.</p>
+        <p className="mt-1.5 text-[11px] text-ink2">The clock only moves forward. Each 08:00 crossed runs that day&apos;s scan.</p>
       </div>
     </div>
   );
@@ -169,7 +169,7 @@ function ResetButton({ onReset }: { onReset: () => void }) {
     timer.current = setTimeout(() => setArmed(false), 4000);
   };
   return (
-    <Button size="sm" variant={armed ? "danger" : "ghost"} onClick={click} className={armed ? "" : "text-slate-500"}>
+    <Button size="sm" variant={armed ? "danger" : "ghost"} onClick={click} className={armed ? "" : "text-ink2"}>
       <RotateCcw className="h-3.5 w-3.5" aria-hidden />
       {armed ? "Click again to reset" : "Reset demo"}
     </Button>
