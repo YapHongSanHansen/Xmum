@@ -3,7 +3,7 @@
 import { Ban, Check, Clock, Gavel, Phone } from "lucide-react";
 import { useKutip } from "@/lib/store";
 import { Badge, Button, Card, CardHeader, Empty, RuleTag, cx, tbl } from "@/components/ui";
-import { dayOf, fmtDate, fmtRM, outstanding, type State } from "@/engine/model";
+import { dayOf, fmtRM, outstanding, type State } from "@/engine/model";
 import { chasePlan, type PlanRow } from "@/engine/rules";
 import { LANG_SHORT, TierBadge } from "./bits";
 
@@ -20,6 +20,27 @@ function escalationDecision(s: State, row: PlanRow): { decision: string; actor: 
   return entry ? { decision: entry.text.slice(prefix.length), actor: entry.actor } : null;
 }
 
+/**
+ * FR-C4: every row keeps its rule ID and a one-line reason. The table shows a
+ * short form (6 words or fewer); the engine's full reason stays in the cell's
+ * tooltip and in the review drawer. Display only: other reasons pass through.
+ */
+const SHORT_REASONS: [RegExp, string][] = [
+  [/^(\d+)% of past invoices paid within (\d+) days of a Tier \d reminder( · .*)?$/, "$1% paid within $2 days"],
+  [/^reminder sent (\d+ \w+), under 5 days ago$/, "sent $1"],
+  [/^phone call (\d+ \w+) by .+, under 5 days ago$/, "called $1"],
+  [/^payment received (\d+ \w+), under 2 days ago$/, "paid $1"],
+  [/^customer says paid; waiting for bank check$/, "says paid; bank check pending"],
+  [/^last reminder (\d+ \w+), waiting 7 days for a reply$/, "no reply since $1"],
+  [/^30\+ days and unanswered: .*$/, "30+ days, no reply"],
+];
+
+function shortReason(row: PlanRow): string {
+  if (row.state === "remind" && row.closesGap) return "closes the gap";
+  for (const [re, out] of SHORT_REASONS) if (re.test(row.reason)) return row.reason.replace(re, out);
+  return row.reason;
+}
+
 export default function ChasePlan({ selectedId, onReview }: { selectedId: string | null; onReview: (invoiceId: string) => void }) {
   const state = useKutip((s) => s.state);
   const rows = chasePlan(state);
@@ -28,37 +49,28 @@ export default function ChasePlan({ selectedId, onReview }: { selectedId: string
   return (
     <Card>
       <CardHeader
-        kicker="Chase plan"
-        title={
-          remindCount
-            ? `${remindCount} reminder${remindCount === 1 ? "" : "s"} to review, ranked by cash expected before the next bill`
-            : "No reminders to review right now"
-        }
-        right={
-          <div className="flex gap-1">
-            <RuleTag id="R1" />
-            <RuleTag id="R2" />
-            <RuleTag id="R3" />
-          </div>
-        }
+        title="Chase plan"
+        right={<span className="text-[13px] text-ink2">{remindCount ? `${remindCount} to review` : "Nothing to review"}</span>}
       />
       {rows.length === 0 ? (
-        <div className="p-4">
-          <Empty>No overdue invoices. An unpaid invoice joins this plan once it is a day past its due date.</Empty>
+        <div className="p-5">
+          <Empty>No overdue invoices.</Empty>
         </div>
       ) : (
-        <div className={tbl.wrap}>
-          <table className={cx(tbl.table, "min-w-[880px]")}>
+        // `relative` keeps the sr-only header inside the scroll box at 390px.
+        <div className={cx(tbl.wrap, "relative")}>
+          <table className={cx(tbl.table, "min-w-[760px]")}>
             <thead>
               <tr className={tbl.headRow}>
-                <th className={cx(tbl.th, "w-10")}>#</th>
                 <th className={tbl.th}>Customer</th>
                 <th className={tbl.th}>Invoice</th>
-                <th className={cx(tbl.th, "text-right")}>Outstanding</th>
-                <th className={cx(tbl.th, "text-right")}>Days late</th>
+                <th className={cx(tbl.th, "text-right")}>Amount</th>
+                <th className={cx(tbl.th, "text-right")}>Late</th>
                 <th className={tbl.th}>Tier</th>
                 <th className={tbl.th}>Why</th>
-                <th className={cx(tbl.th, "text-right")}>Action</th>
+                <th className={tbl.th}>
+                  <span className="sr-only">Action</span>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -77,40 +89,31 @@ function PlanTableRow({ state, row, selected, onReview }: { state: State; row: P
   const dispatch = useKutip((s) => s.dispatch);
   const muted = row.state === "skipped" || row.state === "waiting";
   const isOwner = state.role === "owner";
+  const queued = row.state === "sent_today" && row.invoice.reminders.some((r) => r.status === "queued" && dayOf(r.at) === dayOf(state.now));
 
   return (
-    <tr
-      className={cx(
-        tbl.row,
-        "align-top transition-colors",
-        muted ? "bg-canvas text-ink2" : "hover:bg-canvas/60",
-        selected && "bg-navy-soft hover:bg-navy-soft",
-      )}
-    >
-      <td className={cx(tbl.td, "num text-xs text-ink2", selected && "shadow-[inset_2px_0_0_var(--accent)]")}>{row.rank ?? "–"}</td>
-      <td className={tbl.td}>
+    <tr className={cx(tbl.row, "transition-colors", muted ? "text-ink2" : "hover:bg-canvas/60", selected && "bg-navy-soft hover:bg-navy-soft")}>
+      <td className={cx(tbl.td, selected && "shadow-[inset_2px_0_0_var(--accent)]")}>
         <div className={cx("font-medium", muted ? "text-ink2" : "text-ink")}>{row.customer.name}</div>
         <div className="text-xs text-ink2">
           {row.customer.contact} · {LANG_SHORT[row.customer.lang]}
         </div>
       </td>
-      <td className={tbl.td}>
-        <div className={cx("num whitespace-nowrap text-xs", muted ? "text-ink2" : "text-ink")}>{row.invoice.number}</div>
-        <div className="whitespace-nowrap text-xs text-ink2">due {fmtDate(row.invoice.dueDate)}</div>
+      <td className={cx(tbl.td, "num whitespace-nowrap text-xs", muted ? "text-ink2" : "text-ink")}>{row.invoice.number}</td>
+      <td className={cx(tbl.td, "num whitespace-nowrap text-right", muted ? "text-ink2" : "text-ink")}>{fmtRM(outstanding(row.invoice))}</td>
+      <td className={cx(tbl.td, "num whitespace-nowrap text-right text-xs")} title={`${row.daysLate} days late`}>
+        {row.daysLate}d
       </td>
-      <td className={cx(tbl.td, "num whitespace-nowrap text-right", muted ? "text-ink2" : "font-medium text-ink")}>{fmtRM(outstanding(row.invoice))}</td>
-      <td className={cx(tbl.td, "num text-right")}>{row.daysLate}</td>
       <td className={tbl.td}>
         <TierBadge tier={row.tier} />
       </td>
-      <td className={cx(tbl.td, "max-w-[22rem]")}>
-        <div className="flex flex-wrap items-center gap-1.5">
+      <td className={tbl.td} title={row.reason}>
+        <div className="flex flex-wrap items-center gap-1.5 text-xs">
           <RuleTag id={row.rule} />
           {row.state === "skipped" && <Badge>skipped</Badge>}
           {row.state === "waiting" && <Badge>waiting</Badge>}
-          {row.closesGap && <Badge tone="emerald">closes the gap</Badge>}
+          <span className={row.state === "remind" && row.closesGap ? "font-medium text-emerald-700" : "text-ink2"}>{shortReason(row)}</span>
         </div>
-        <div className="mt-1 text-xs text-ink2">{row.reason}</div>
       </td>
       <td className={cx(tbl.td, "text-right")}>
         {row.state === "remind" && (
@@ -119,18 +122,17 @@ function PlanTableRow({ state, row, selected, onReview }: { state: State; row: P
           </Button>
         )}
         {row.state === "sent_today" &&
-          (row.invoice.reminders.some((r) => r.status === "queued" && dayOf(r.at) === dayOf(state.now)) ? (
+          (queued ? (
             <span className="inline-flex items-center gap-1 text-xs font-medium text-navy">
               <Clock className="h-3.5 w-3.5" aria-hidden />
-              {row.reason}
+              Queued
             </span>
           ) : (
             <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700">
               <Check className="h-3.5 w-3.5" aria-hidden />
-              {row.reason}
+              {row.rule === "FR-C9" ? "Called" : "Sent"}
             </span>
           ))}
-        {muted && <span className="text-xs text-ink2">{row.state === "skipped" ? "Skipped" : "Waiting"}</span>}
         {row.state === "escalate" && <EscalationActions state={state} row={row} isOwner={isOwner} onDecide={(decision) => dispatch({ type: "ESCALATION_DECISION", invoiceId: row.invoice.id, decision })} />}
       </td>
     </tr>
