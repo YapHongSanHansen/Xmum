@@ -163,7 +163,7 @@ export function Figure({
  */
 export const tbl = {
   /** Wrapper that lets a wide table scroll sideways on a phone. */
-  wrap: "overflow-x-auto",
+  wrap: "relative overflow-x-auto",
   table: "w-full border-collapse text-left text-[13px]",
   headRow: "h-[30px] border-b border-line",
   th: "whitespace-nowrap px-3 align-middle text-xs font-normal text-ink2 first:pl-4 last:pr-4",
