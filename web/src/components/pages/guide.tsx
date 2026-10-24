@@ -82,7 +82,7 @@ const STEPS: Step[] = [
     n: 6,
     title: "Mega Bina pays with a deduction",
     who: ["clerk", "owner"],
-    look: "The 22 and 23 Oct scans run and a second warning (5 Nov diesel) appears. The 14:25 bank line and the slip arrive; a live AI call shows each field with its exact words and confidence, including the RM330 deduction linked to DO-8812. As Clerk, approve the VERIFIED RM2,770 receipt: only then does the 31 Oct meter turn green. As Owner, accept the deduction: INV-2304 is PAID and CN-0057 is drafted.",
+    look: "The 22 and 23 Oct scans run and a second warning (5 Nov diesel) appears. The 14:25 bank line and the slip arrive; Bukti's reading (live AI, or the labelled cached result) shows each field with its exact words and confidence, including the RM330 deduction linked to DO-8812. As Clerk, approve the VERIFIED RM2,770 receipt: only then does the 31 Oct meter turn green. As Owner, accept the deduction: INV-2304 is PAID and CN-0057 is drafted.",
     refs: "FR-H1, E1–E6, E12, B4 · M1, M3",
     page: "inbox",
     stop: DEMO_STOPS[2].at,

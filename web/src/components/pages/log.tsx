@@ -35,9 +35,10 @@ function ActorBadge({ e }: { e: LogEntry }) {
   return <Badge tone={KIND_TONE[e.kind]}>{e.kind === "USER" ? e.actor : e.kind}</Badge>;
 }
 
-function matches(e: LogEntry, q: string): boolean {
+/** `text` is what the viewer sees, so a Clerk's search never matches a redacted figure (FR-B5). */
+function matches(e: LogEntry, text: string, q: string): boolean {
   if (!q) return true;
-  const hay = [e.text, e.actor, e.rule ?? "", ...(e.refs ?? [])].join(" ").toLowerCase();
+  const hay = [text, e.actor, e.rule ?? "", ...(e.refs ?? [])].join(" ").toLowerCase();
   return q
     .toLowerCase()
     .split(/\s+/)
@@ -84,9 +85,10 @@ export default function LogPage() {
   }, [log]);
 
   const rows = useMemo(() => {
-    const filtered = log.filter((e) => (kinds.length === 0 || kinds.includes(e.kind)) && matches(e, query.trim()));
+    const shown = (e: LogEntry) => (role === "clerk" ? redactForClerk(e) : e.text);
+    const filtered = log.filter((e) => (kinds.length === 0 || kinds.includes(e.kind)) && matches(e, shown(e), query.trim()));
     return newestFirst ? [...filtered].reverse() : filtered;
-  }, [log, kinds, query, newestFirst]);
+  }, [log, kinds, query, newestFirst, role]);
 
   const toggleKind = (k: ActorKind) => setKinds((ks) => (ks.includes(k) ? ks.filter((x) => x !== k) : [...ks, k]));
   const canExport = role === "owner";
