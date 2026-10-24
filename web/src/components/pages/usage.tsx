@@ -89,7 +89,16 @@ export default function UsagePage() {
 
   return (
     <div className="min-w-0">
-      <PageTitle title="Usage & credits" subtitle={`Simple, transparent usage. ${monthName} so far.`} right={<Badge tone="amber">Illustrative prices</Badge>} />
+      <PageTitle
+        title="Usage & credits"
+        subtitle={
+          <>
+            Simple, transparent usage. {monthName} so far.
+            <span className="mt-1 block text-xs">Charges would come from Orbyte Wallet credits (simulated). Prices are illustrative.</span>
+          </>
+        }
+        right={<Badge tone="amber">Illustrative prices</Badge>}
+      />
 
       <div className="space-y-6">
         <section className="panel flex flex-wrap items-end justify-between gap-x-10 gap-y-6 p-8">

@@ -100,7 +100,7 @@ export default function LogPage() {
         subtitle={
           <span className="inline-flex items-center gap-1.5" title="Entries cannot be edited or deleted">
             <Lock className="h-3.5 w-3.5" aria-hidden />
-            Append-only
+            Append-only · mirrored to the Orbyte audit trail (simulated)
           </span>
         }
         right={
