@@ -2,9 +2,9 @@
 // FR-D1: record a new booking (Owner or Clerk). A credit booking for a customer
 // 30+ days late goes ON HOLD and raises an Owner credit check (R4).
 import { useState, type FormEvent, type ReactNode } from "react";
-import { Plus, Wand2 } from "lucide-react";
+import { Wand2 } from "lucide-react";
 import { useKutip } from "@/lib/store";
-import { Button, Card, CardHeader, RuleTag } from "@/components/ui";
+import { Button, Card, CardHeader, RuleTag, cx } from "@/components/ui";
 import type { Booking } from "@/engine/model";
 
 type Terms = Booking["terms"];
@@ -21,6 +21,8 @@ const EMPTY = { customerId: "", route: "", amount: "", terms: "credit" as Terms,
 
 const inputCls =
   "h-[34px] w-full rounded-[2px] border border-line-strong bg-surface px-2.5 text-[13px] text-ink placeholder:text-ink3 disabled:bg-canvas disabled:text-ink2";
+
+const NOTE_TONE = { good: "text-emerald-700", warn: "text-amber-800", bad: "text-rose-700" } as const;
 
 export default function BookingForm() {
   const customers = useKutip((s) => s.state.customers);
@@ -42,7 +44,7 @@ export default function BookingForm() {
   const submit = (e: FormEvent) => {
     e.preventDefault();
     if (!valid) {
-      setNote({ tone: "bad", text: "Pick a customer and fill in the route, an amount above zero and the credit days." });
+      setNote({ tone: "bad", text: "Fill in customer, route, amount and credit days." });
       return;
     }
     const ok = dispatch({
@@ -57,8 +59,8 @@ export default function BookingForm() {
     const b = useKutip.getState().state.bookings.at(-1);
     setNote(
       b?.status === "on_hold"
-        ? { tone: "warn", text: "Booking saved and put ON HOLD: a credit check was sent to the Owner (R4)." }
-        : { tone: "good", text: "Booking saved and accepted." },
+        ? { tone: "warn", text: "Saved · on hold for an Owner credit check." }
+        : { tone: "good", text: "Saved · accepted." },
     );
     setForm(EMPTY);
   };
@@ -66,13 +68,12 @@ export default function BookingForm() {
   return (
     <Card>
       <CardHeader
-        kicker="New booking"
-        title="Record an order"
+        title="New booking"
         right={
           <Button
             type="button"
             size="sm"
-            variant="secondary"
+            variant="ghost"
             onClick={() => {
               setForm(DEMO);
               setNote(null);
@@ -83,10 +84,10 @@ export default function BookingForm() {
           </Button>
         }
       />
-      <form onSubmit={submit} className="space-y-3 p-4">
-        <Field label="Customer">
+      <form onSubmit={submit} className="grid grid-cols-2 gap-x-3 gap-y-3.5 p-5">
+        <Field label="Customer" className="col-span-2">
           <select className={inputCls} value={form.customerId} onChange={(e) => set("customerId", e.target.value)}>
-            <option value="">Select a customer…</option>
+            <option value="">Select…</option>
             {customers.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
@@ -94,27 +95,25 @@ export default function BookingForm() {
             ))}
           </select>
         </Field>
-        <Field label="Route">
-          <input className={inputCls} value={form.route} placeholder="e.g. Klang → Ipoh, 1 lorry" onChange={(e) => set("route", e.target.value)} />
+        <Field label="Route" className="col-span-2">
+          <input className={inputCls} value={form.route} placeholder="Klang → Ipoh" onChange={(e) => set("route", e.target.value)} />
         </Field>
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="Amount (RM)">
-            <input
-              className={`${inputCls} text-right tabular-nums`}
-              inputMode="decimal"
-              value={form.amount}
-              placeholder="0"
-              onChange={(e) => set("amount", e.target.value.replace(/[^0-9.]/g, ""))}
-            />
-          </Field>
-          <Field label="Terms">
-            <select className={inputCls} value={form.terms} onChange={(e) => set("terms", e.target.value as Terms)}>
-              <option value="credit">Credit</option>
-              <option value="cod">Cash on delivery</option>
-              <option value="prepaid">Prepaid</option>
-            </select>
-          </Field>
-        </div>
+        <Field label="Amount (RM)">
+          <input
+            className={`${inputCls} text-right tabular-nums`}
+            inputMode="decimal"
+            value={form.amount}
+            placeholder="0"
+            onChange={(e) => set("amount", e.target.value.replace(/[^0-9.]/g, ""))}
+          />
+        </Field>
+        <Field label="Terms">
+          <select className={inputCls} value={form.terms} onChange={(e) => set("terms", e.target.value as Terms)}>
+            <option value="credit">Credit</option>
+            <option value="cod">Cash on delivery</option>
+            <option value="prepaid">Prepaid</option>
+          </select>
+        </Field>
         <Field label="Credit days">
           <input
             className={`${inputCls} text-right tabular-nums`}
@@ -125,26 +124,17 @@ export default function BookingForm() {
             onChange={(e) => set("creditDays", e.target.value.replace(/[^0-9]/g, ""))}
           />
         </Field>
-        <div className="flex items-center justify-between gap-3 pt-1">
-          <div className="flex items-center gap-1.5 text-[11px] text-ink2">
-            <RuleTag id="R4" />
-            <span>Credit orders for customers 30+ days late go on hold. COD and prepaid are not checked.</span>
-          </div>
-          <Button type="submit" disabled={!valid} className="whitespace-nowrap">
-            <Plus className="h-4 w-4" aria-hidden />
+        <div className="flex items-end">
+          <Button type="submit" disabled={!valid} className="w-full">
             Save booking
           </Button>
         </div>
+        <div className="col-span-2 flex items-center gap-1.5 text-xs text-ink2">
+          <RuleTag id="R4" />
+          <span>Credit, 30+ days late: on hold</span>
+        </div>
         {note && (
-          <div
-            className={
-              note.tone === "warn"
-                ? "border-l-[3px] border-l-amber-800 bg-amber-100 px-3 py-2 text-xs text-amber-900"
-                : note.tone === "good"
-                  ? "border-l-[3px] border-l-emerald-700 bg-emerald-100 px-3 py-2 text-xs text-emerald-800"
-                  : "border-l-[3px] border-l-rose-700 bg-rose-100 px-3 py-2 text-xs text-rose-800"
-            }
-          >
+          <div role="status" className={cx("col-span-2 text-xs font-medium", NOTE_TONE[note.tone])}>
             {note.text}
           </div>
         )}
@@ -153,10 +143,10 @@ export default function BookingForm() {
   );
 }
 
-function Field({ label, children }: { label: string; children: ReactNode }) {
+function Field({ label, className, children }: { label: string; className?: string; children: ReactNode }) {
   return (
-    <label className="block">
-      <span className="mb-1 block text-xs font-medium text-ink2">{label}</span>
+    <label className={cx("block min-w-0", className)}>
+      <span className="mb-1 block text-xs text-ink2">{label}</span>
       {children}
     </label>
   );
