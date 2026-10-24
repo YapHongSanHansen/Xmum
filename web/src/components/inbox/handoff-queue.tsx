@@ -3,11 +3,11 @@
 // question; answers go to the engine as RESOLVE_HANDOFF, which checks the role.
 // Below it, "already paid" claims with no bank line that still pause reminders
 // (M5), which only the Owner can reject (REJECT_CLAIM, PRD §22 row 2).
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Ban, HelpCircle, Send } from "lucide-react";
 import { customerOf, fmtDateTime, invoiceOf, timeOf, type Handoff, type Invoice, type State } from "@/engine/model";
 import { useKutip } from "@/lib/store";
-import { Badge, Button, Card, CardHeader, RuleTag, cx } from "@/components/ui";
+import { Badge, Button, Card, RuleTag, cx } from "@/components/ui";
 import { ChatBackdrop, ChatBubble } from "./bubble";
 import { dayLabel } from "./fields";
 import { openHandoffs } from "./status";
@@ -33,31 +33,27 @@ export function HandoffQueue({ state, onOpen }: { state: State; onOpen: (message
   const waiting = waitingClaims(state);
   if (!open.length && !waiting.length) return null;
   return (
-    <>
+    <div className="mb-8 space-y-6">
       {open.length > 0 && <OpenHandoffs state={state} open={open} onOpen={onOpen} />}
       {waiting.length > 0 && <WaitingClaims state={state} invoices={waiting} onOpen={onOpen} />}
-    </>
+    </div>
   );
+}
+
+function SectionTitle({ children }: { children: ReactNode }) {
+  return <h2 className="mb-2 text-[13px] font-semibold text-ink">{children}</h2>;
 }
 
 function OpenHandoffs({ state, open, onOpen }: { state: State; open: Handoff[]; onOpen: (messageId: string) => void }) {
   return (
-    <Card tone="warn" className="mb-5">
-      <CardHeader
-        kicker={
-          <span className="inline-flex items-center gap-1.5">
-            <RuleTag id="M4" /> Hand-off
-          </span>
-        }
-        title={`Needs a human · ${open.length}`}
-        right={<span className="font-mono text-[11px] text-ink2">Bukti never guesses: one question each</span>}
-      />
-      <div className="grid gap-3 p-3 lg:grid-cols-2">
+    <section>
+      <SectionTitle>{`Needs a human · ${open.length}`}</SectionTitle>
+      <div className="grid gap-4 lg:grid-cols-2">
         {open.map((h) => (
           <HandoffCard key={h.id} state={state} h={h} onOpen={() => onOpen(h.messageId)} />
         ))}
       </div>
-    </Card>
+    </section>
   );
 }
 
@@ -69,27 +65,27 @@ export function HandoffCard({ state, h, onOpen }: { state: State; h: Handoff; on
   const resolve = (option: string) => dispatch({ type: "RESOLVE_HANDOFF", handoffId: h.id, option });
 
   return (
-    <div className="border border-amber-200 bg-surface p-3">
+    <Card tone="warn" className="p-5">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-1.5">
+          <div className="flex flex-wrap items-center gap-1.5" title={h.id}>
             <Badge tone="amber">{KIND_LABEL[h.kind]}</Badge>
-            {inv && <Badge className="num">{inv.number}</Badge>}
-            <span className="num text-[11px] text-ink2">{h.id}</span>
+            {inv && <span className="num text-xs font-medium text-ink">{inv.number}</span>}
+            <RuleTag id="M4" />
           </div>
           <div className="mt-1 truncate text-xs text-ink2">
-            {c.name} · {timeOf(msg.receivedAt)}
+            {c.name} · <span className="num">{timeOf(msg.receivedAt)}</span>
           </div>
         </div>
         {onOpen && (
-          <Button variant="ghost" size="sm" onClick={onOpen}>
-            Open message
+          <Button variant="ghost" size="sm" onClick={onOpen} aria-label="Open message">
+            Open
           </Button>
         )}
       </div>
-      <p className="mt-2 border-l-2 border-l-line-strong bg-canvas px-2 py-1 text-xs italic text-ink2">“{msg.text}”</p>
-      <div className="mt-2 flex items-start gap-1.5 text-sm font-semibold text-ink">
-        <HelpCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+      <p className="mt-3 border-l-2 border-l-line-strong pl-2 text-xs italic text-ink2">“{msg.text}”</p>
+      <div className="mt-3 flex items-start gap-1.5 text-sm font-semibold text-ink">
+        <HelpCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" aria-hidden />
         <span>{h.question}</span>
       </div>
       {h.kind === "promise_date" && <PromiseDateForm h={h} onConfirm={resolve} />}
@@ -101,7 +97,7 @@ export function HandoffCard({ state, h, onOpen }: { state: State; h: Handoff; on
           </Button>
         </div>
       )}
-    </div>
+    </Card>
   );
 }
 
@@ -133,13 +129,10 @@ function PromiseDateForm({ h, onConfirm }: { h: Handoff; onConfirm: (option: str
           </label>
         ))}
       </div>
-      <div className="mt-2 flex items-center gap-2">
-        <Button size="sm" disabled={!picked} onClick={() => picked && onConfirm(picked)}>
+      <div className="mt-3">
+        <Button size="sm" disabled={!picked} onClick={() => picked && onConfirm(picked)} title="Pauses reminders until the day after (M5)">
           Confirm
         </Button>
-        <span className="text-[11px] text-ink2">
-          Confirming pauses reminders until the day after (<RuleTag id="M5" />)
-        </span>
       </div>
     </div>
   );
@@ -148,39 +141,39 @@ function PromiseDateForm({ h, onConfirm }: { h: Handoff; onConfirm: (option: str
 function WaitingClaims({ state, invoices, onOpen }: { state: State; invoices: Invoice[]; onOpen: (messageId: string) => void }) {
   const isOwner = state.role === "owner";
   return (
-    <Card className="mb-5">
-      <CardHeader
-        kicker={
-          <span className="inline-flex items-center gap-1.5">
-            <RuleTag id="M5" /> Paused
-          </span>
-        }
-        title={`Says paid, not in the bank · ${invoices.length}`}
-        right={<span className="font-mono text-[11px] text-ink2">Never marked paid without a matching bank line</span>}
-      />
-      <ul className="divide-y divide-hairline">
+    <section>
+      <SectionTitle>{`Says paid, not in the bank · ${invoices.length}`}</SectionTitle>
+      <ul className="divide-y divide-hairline border border-line bg-surface">
         {invoices.map((inv) => {
           const msg = state.messages.find((m) => m.id === inv.openClaimMessageId)!;
           const asked = state.handoffs.find((h) => h.messageId === msg.id && h.kind === "claim_unverified" && h.resolved === "send_reply");
           return (
-            <li key={inv.id} className="flex min-h-[38px] flex-wrap items-center gap-3 px-4 py-3 text-sm">
-              <Badge className="num">{inv.number}</Badge>
+            <li key={inv.id} className="flex min-h-[38px] flex-wrap items-center gap-3 px-5 py-4 text-sm">
               <div className="min-w-0 flex-1">
-                <div className="truncate text-ink">{customerOf(state, inv.customerId).name}</div>
-                <div className="text-xs text-ink2">
-                  Said paid <span className="num">{fmtDateTime(msg.receivedAt)}</span>
-                  {asked ? ` · slip requested by ${asked.resolvedBy}` : ""} · reminders paused until the bank shows it or the Owner rejects the claim
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="num text-xs font-medium text-ink">{inv.number}</span>
+                  <span className="truncate text-ink">{customerOf(state, inv.customerId).name}</span>
+                </div>
+                <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-ink2">
+                  <span>
+                    Said paid <span className="num">{fmtDateTime(msg.receivedAt)}</span>
+                    {asked ? ` · slip requested by ${asked.resolvedBy}` : ""}
+                  </span>
+                  <span className="inline-flex items-center gap-1" title="Reminders stay paused until the bank shows it or the Owner rejects the claim">
+                    <RuleTag id="M5" /> reminders paused
+                  </span>
                 </div>
               </div>
-              <Button variant="ghost" size="sm" onClick={() => onOpen(msg.id)}>
-                Open message
+              <Button variant="ghost" size="sm" onClick={() => onOpen(msg.id)} aria-label="Open message">
+                Open
               </Button>
               <RejectClaimButton isOwner={isOwner} invoiceId={inv.id} />
+              {!isOwner && <span className="w-full text-[11px] text-ink2">Reject claim: Owner only</span>}
             </li>
           );
         })}
       </ul>
-    </Card>
+    </section>
   );
 }
 
@@ -204,9 +197,9 @@ function RejectClaimButton({ isOwner, invoiceId }: { isOwner: boolean; invoiceId
 function ClaimUnverifiedForm({ state, h, onResolve }: { state: State; h: Handoff; onResolve: (option: string) => void }) {
   const isOwner = state.role === "owner";
   return (
-    <div className="mt-3 space-y-2">
-      <div className="text-[11px] text-ink2">
-        <RuleTag id="M1" /> Not marked paid. Draft reply for approval:
+    <div className="mt-3 space-y-3">
+      <div className="flex items-center gap-1.5 text-xs text-ink2">
+        <RuleTag id="M1" /> Not marked paid · draft reply
       </div>
       {h.draftReply && (
         <ChatBackdrop className="p-2">
@@ -230,11 +223,7 @@ function ClaimUnverifiedForm({ state, h, onResolve }: { state: State; h: Handoff
         </Button>
         {h.invoiceId && <RejectClaimButton isOwner={isOwner} invoiceId={h.invoiceId} />}
       </div>
-      {!isOwner && (
-        <p className="text-[11px] text-ink2">
-          Mark paid anyway and Reject claim are Owner only: one changes what the customer owes with no bank line, the other ends the pause on reminders.
-        </p>
-      )}
+      {!isOwner && <p className="text-[11px] text-ink2">Mark paid and Reject: Owner only</p>}
     </div>
   );
 }
