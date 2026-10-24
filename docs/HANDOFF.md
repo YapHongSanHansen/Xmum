@@ -15,8 +15,9 @@ Written 25 Oct 2026, 02:50 MYT; updated 03:40 MYT. For the next agent or teammat
 
 ## 1a. Decisions after 03:40 (user)
 
-- **No Orbyte or other company names in the app.** The UI is Kutip only: no Orbyte wordmark, no other-module sidebar (eLeave, eClaim, …), no "Orbyte Connect / credit wallet / audit trail" wording, no competitor names (the Bukku price line on Usage is gone). The Orbyte fit (brief must-have 5) is argued only in the proposal, pitch and judge Q&A. Do not add Orbyte branding back to the app.
-- **Fewer words.** A simplify pass cut helper sentences, mono eyebrows and nested cards on every page; details sit in tooltips or `<details>`. Rule IDs stay on every decision (NFR-1). After it, the browser walk still passes 36 of 36 locally and on the live URL (`main` at `65d4576`).
+- ~~No Orbyte or other company names in the app.~~ **Reversed by the user at 04:55:** Kutip must integrate Orbyte. Orbyte has no public API, so the integration is built against our own documented API assumptions (`docs/orbyte-integration.md`) with a simulated Orbyte: `web/src/orbyte/` (connector, synthetic workspace), `/api/orbyte-mock/v1/{clients,projects,users,wallet}`, Kutip's own API `/api/kutip/v1/{manifest,events}`, and a "Sync from Orbyte" panel on Connect. Orbyte appears as text labels marked "simulated" (header chip, roles, approvals, audit trail, Wallet); no Orbyte logo and no fake other-module menus. Competitor names stay out of the app.
+- **Fewer words.** A simplify pass cut helper sentences, mono eyebrows and nested cards on every page; details sit in tooltips or `<details>`. Rule IDs stay on every decision (NFR-1). After it, the browser walk still passes 36 of 36 locally and on the live URL.
+- 05:10: the team's redesign (`ecff584`) plus the Orbyte layer pass the walk 36 of 36; 182 tests.
 - The browser walk scripts live outside the repo (the agent's scratchpad); they drive headless Chrome with `playwright-core`. The nav landmark is now `nav[aria-label="Kutip"]`.
 
 ## 2. Builder work (done, merged 25 Oct 03:10–03:30)
