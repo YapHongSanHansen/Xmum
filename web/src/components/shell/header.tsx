@@ -36,7 +36,7 @@ export function Header() {
       </div>
 
       {/* Demo controls: clock, advance, scan, reset. */}
-      <div className="flex min-h-9 flex-wrap items-center gap-x-2 gap-y-1 border-b border-line bg-canvas px-4 py-1 lg:px-6">
+      <div className="relative flex min-h-9 flex-wrap items-center gap-x-2 gap-y-1 border-b border-line bg-canvas px-4 py-1 lg:px-6">
         <span className="mr-1 inline-flex items-center gap-1.5 font-mono text-[13px] font-medium tabular-nums text-ink" title="Demo clock">
           <Clock className="h-3.5 w-3.5 text-ink2" aria-hidden />
           <span className="sr-only">Demo clock: </span>
@@ -84,7 +84,7 @@ function RoleSwitcher({ role, onChange }: { role: Role; onChange: (r: Role) => v
 function AdvanceMenu({ now, onAdvance }: { now: string; onAdvance: (to: string) => boolean }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="relative">
+    <div className="sm:relative">
       <Button size="sm" variant="secondary" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
         <FastForward className="h-3.5 w-3.5" aria-hidden />
         Advance to
@@ -110,7 +110,7 @@ function AdvancePanel({ now, onPick }: { now: string; onPick: (to: string) => vo
   const [custom, setCustom] = useState(now);
   const valid = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(custom) && custom > now;
   return (
-    <div className="absolute left-0 top-full z-40 mt-1.5 w-80 max-w-[calc(100vw-2rem)] border border-line-strong bg-surface p-1.5">
+    <div className="absolute inset-x-4 top-full z-40 mt-1.5 border sm:inset-x-auto sm:left-0 sm:w-80 border-line-strong bg-surface p-1.5">
       <div className="px-2 pb-1 pt-1.5 text-xs text-ink2">Demo stops</div>
       {DEMO_STOPS.map((stop) => {
         const passed = stop.at <= now;
