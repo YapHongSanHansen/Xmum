@@ -8,6 +8,7 @@ import { Badge, Card, CardHeader, PageTitle, cx, tbl } from "@/components/ui";
 import { BalanceEntry } from "@/components/connect/balance-entry";
 import { BankImport } from "@/components/connect/bank-import";
 import { InvoiceImport } from "@/components/connect/invoice-import";
+import { OrbytePanel } from "@/components/connect/orbyte-panel";
 import { fmtDateTime, fmtRM, type Lang } from "@/engine/model";
 import { visibleBankLines } from "@/engine/rules";
 import { DEMO_START } from "@/engine/seed";
@@ -69,6 +70,8 @@ export default function ConnectPage() {
         subtitle="Bring your numbers together. Build a clearer picture."
         right={<Badge tone="sky">Demo connections</Badge>}
       />
+
+      <OrbytePanel />
 
       <section aria-label="Data sources">
         <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
