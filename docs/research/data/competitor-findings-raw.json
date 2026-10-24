@@ -1,0 +1,1313 @@
+{
+ "note": "Raw output of the competitor-scan workflow run on 2026-10-25 (5 searchers). Feature keys F1-F10 are defined in docs/research/02-competitor-scan.md.",
+ "findings_by_searcher": {
+  "payment-proof": {
+   "summary": "Short answer: the payment-proof part of Kutip + Bukti already exists, but in separate pieces. None of the products checked combines all of F1-F10 for Malaysian micro B2B sellers.\n\n(1) Closest overall match: Peakflo (Singapore). Its AI WhatsApp Agent sends due, overdue and escalation reminders and claims 40+ languages. It logs payment promises against invoices and collects dispute and short-payment reasons in chat. Customers can upload payment proof in WhatsApp or the portal. It also does 3-way matching of remittance to invoice to bank statement, and has credit freezes. That covers parts of F1, F2, F5, F6, F7 and F8. Pricing is custom-quoted and the SME packages are Singapore grant packages. Malaysia availability is not stated, and no cash-gap ranking (F3) or tiered reminder approval (F4) appeared on the pages checked.\n\n(2) Thai slip verification is mature and cheap. EasySlip costs from 99 THB for 250 checks and reads slip QR or image. It returns amount, receiver, date and reference, detects duplicate slips, and has a LINE group bot. BigSeller's Slip2GO checks the slip against the order amount and returns Partially Paid, Paid or Overpaid. SlipOK (free tier per a third-party repo only) and RDCW are similar. All of these work only with Thai bank slips, which carry a bank-verifiable mini-QR. No Malaysian DuitNow receipt verifier or fake-receipt checker was found, and the one search on this found only bank terms pages.\n\n(3) Enterprise cash-application tools fully cover allocation, short-pays and deductions (F7): HighRadius, Growfin and Versapay. Growfin also logs promise-to-pay (F8). All three are mid-market or enterprise, quote-priced, show no WhatsApp channel, and Malaysia availability is unclear.\n\n(4) Bookkeeping tools that take documents over WhatsApp handle the supplier (AP) side, not customer collections. Dext takes receipts over WhatsApp at USD 25.21/month. Receiptor AI is on Xero's Malaysia app store and matches receipts to existing Xero records before creating new ones.\n\n(5) Lejar.ai is a Malaysian AI ledger. Its paid plans cost RM39, RM89 and RM169 a month, and there is a free plan. It has DuitNow QR on invoices, an AI inbox for receipts, and PDF/CSV bank reconciliation. No reminders, WhatsApp collections or payment-to-invoice matching were seen.\n\nGaps not found in any product checked:\n- F3 cash-gap ranking against payroll, rent and supplier bills\n- F4 clerk-versus-owner reminder approval\n- F6 parsing of mixed Manglish, BM and Chinese payment replies\n- A Malaysian rule that never marks PAID from a slip alone\n\nAbsence on these pages is not proof the features do not exist.\n\nSearch limits: the shared web-search budget ran out after 10 searches. Indonesian and Philippine verifiers (other than Moota), Malaysian fake-receipt checkers, WhatsApp-native bookkeeping bots, Billtrust, Esker and Bill.com cash application were not fully checked. The Billtrust and Esker pages returned 404, and SlipOK's and G2's sites returned 403. Hubdoc was checked and showed no WhatsApp capture or AR, so it is not in the list.",
+   "products": [
+    {
+     "name": "Peakflo (AR + AI WhatsApp Agent)",
+     "url": "https://peakflo.co/whatsapp-ai-agents",
+     "available_in_malaysia": "unclear",
+     "country_or_market": "Singapore-based; SEA/India customers; no Malaysia page found",
+     "target_size": "SMEs to mid-market; Singapore grant packages up to 1,000 / 5,000 / 10,000 invoices per month",
+     "price_note": "Custom quote via sales call; no public tiers. A third-party listing (FitGap) says it is priced on annual credit sales with a possible setup fee. A TechJockey listing says 'starting at $224' (unverified).",
+     "features": {
+      "F1": "yes: AR module, payment reminder automation, integrations with Xero, NetSuite and QuickBooks; CSV import not confirmed",
+      "F2": "partial: WhatsApp due, overdue and escalation reminders; editable templates per channel; claims 40+ languages with auto-detect; BM and Chinese not named",
+      "F3": "unclear: 'financial forecasting' appears only as an FAQ title; no shortfall-based ranking seen",
+      "F4": "unclear: approval automation listed only for AP; segment-based workflows only",
+      "F5": "yes: automated credit freezes using credit-limit thresholds based on amount and duration",
+      "F6": "partial: WhatsApp agent collects disputes and short-payment reasons in chat; AI extracts remittance from emails, PDFs, CSV, XLS and cheques; extraction from slip images not stated",
+      "F7": "yes: 3-way match of remittance to invoice to bank statement, mismatches flagged; probability-scored partial matching; verifying a slip image itself not stated",
+      "F8": "yes: 'Payment promises captured and logged against the invoice'; reminders can trigger from the promise-to-pay date; reminders pause during disputes",
+      "F9": "unclear: roles and audit log not mentioned on the pages checked",
+      "F10": "unclear: no public price; custom quote, likely not micro-priced"
+     },
+     "evidence_urls": [
+      "https://peakflo.co/whatsapp-ai-agents",
+      "https://peakflo.co/accounts-receivable-and-invoicing/automated-reconciliation-cash-application",
+      "https://peakflo.co/accounts-receivable-and-invoicing/automated-payments-and-reconciliation",
+      "https://peakflo.co/accounts-receivable-and-invoicing/payment-reminder-automation",
+      "https://peakflo.co/accounts-receivable-and-invoicing/customer-portal",
+      "https://peakflo.co/pricing",
+      "https://peakflo.co/productivity-solutions-grant",
+      "https://us.fitgap.com/products/peakflo",
+      "https://www.techjockey.com/detail/peakflo"
+     ],
+     "notes": "Strongest overlap with F6, F7 and F8 plus WhatsApp. The search summary cites G2 reviewers saying WhatsApp Business messages work only after a 24h window and that WhatsApp reminders cannot attach invoices; the G2 page itself returned 403. Malaysia not mentioned on any Peakflo page fetched, and the Ninja Van case study lists the customer as based in Singapore."
+    },
+    {
+     "name": "EasySlip (Thai slip verification API + LINE bot)",
+     "url": "https://easyslip.com/",
+     "available_in_malaysia": "no",
+     "country_or_market": "Thailand only (Thai bank slips with QR, TrueMoney)",
+     "target_size": "Thai online shops and merchants of any size, including micro",
+     "price_note": "10 monthly plans, from 99 THB (Start, 250 checks) to 40,000 THB (Premium-3, 320,000 checks); 30-day plans; 7-day free trial",
+     "features": {
+      "F1": "no: no invoice tracking or reminders",
+      "F2": "no: LINE OA bot, not WhatsApp; no reminders",
+      "F3": "no",
+      "F4": "no",
+      "F5": "no",
+      "F6": "partial: reads slip QR or image and returns amount, receiver account and bank, date, reference; no free-text parsing",
+      "F7": "partial: verifies slip authenticity through the QR lookup and detects duplicate slips; no allocation across invoices",
+      "F8": "no",
+      "F9": "unclear",
+      "F10": "yes: from 99 THB a month, but Thai banks only"
+     },
+     "evidence_urls": [
+      "https://easyslip.com/",
+      "https://github.com/EASYSLIP-CO-LTD/n8n-nodes-easyslip",
+      "https://thai-qr-payment.js.org/guide/slip-verify/"
+     ],
+     "notes": "Works because Thai slips carry a Slip Verify mini-QR that a bank Open API can look up. Similar Thai services: SlipOK ('free for 100 slip per month') and check-slip.com ('free for first 100' slips), both only per the third-party thanakan repo because slipok.com returned 403; RDCW Slip Verify API (POST /v2/inquiry). No Malaysian DuitNow equivalent found."
+    },
+    {
+     "name": "BigSeller Auto-check Payment Certificate (Slip2GO)",
+     "url": "https://help.bigseller.pro/en_US/detailPage/3/1/9328/content",
+     "available_in_malaysia": "no",
+     "country_or_market": "Feature is Thailand only ('Certificate verification currently supports Thailand only')",
+     "target_size": "Online marketplace sellers",
+     "price_note": "Each verification consumes BigCoin; no price on the help page",
+     "features": {
+      "F1": "partial: tracks payment status of offline-transfer orders, not credit invoices",
+      "F2": "no: no WhatsApp reminders described",
+      "F3": "no",
+      "F4": "partial: pending-review list with Unchecked or Confirmed status and batch-mark",
+      "F5": "no",
+      "F6": "partial: reads the uploaded transfer slip",
+      "F7": "partial: checks receiving account, duplicate reference, and amount against the order; sets Partially Paid, Paid or Overpaid; checks the slip, not a bank statement",
+      "F8": "no",
+      "F9": "unclear",
+      "F10": "unclear: pay per check in BigCoin"
+     },
+     "evidence_urls": [
+      "https://help.bigseller.pro/en_US/detailPage/3/1/9328/content"
+     ],
+     "notes": "Closest existing 'slip vs amount owed with partial or overpaid status' logic, but for e-commerce orders in Thailand only."
+    },
+    {
+     "name": "Moota (Indonesian bank mutation aggregator)",
+     "url": "https://moota.co/",
+     "available_in_malaysia": "no",
+     "country_or_market": "Indonesia (20+ banks: BCA, Mandiri, BNI, BRI, CIMB, Permata)",
+     "target_size": "Indonesian online sellers and businesses",
+     "price_note": "Free or basic tier up to paid tiers; no prices on the homepage",
+     "features": {
+      "F1": "unclear: invoices not mentioned on the homepage",
+      "F2": "unclear: WhatsApp not mentioned",
+      "F3": "no",
+      "F4": "no",
+      "F5": "no",
+      "F6": "no: reads bank data, not slips or chat",
+      "F7": "partial: pulls bank mutations on a schedule (not real time); auto-matches and marks payments for gateways with webhooks",
+      "F8": "no",
+      "F9": "unclear",
+      "F10": "partial: a free or basic tier exists"
+     },
+     "evidence_urls": [
+      "https://moota.co/"
+     ],
+     "notes": "Shows that 'verify against the bank statement line, not the slip' is an established pattern in Indonesia. Unique-code matching not confirmed on the page."
+    },
+    {
+     "name": "Growfin",
+     "url": "https://www.growfin.ai/",
+     "available_in_malaysia": "unclear",
+     "country_or_market": "US (HQ Wilmington, DE); Asia expansion per news",
+     "target_size": "Mid-market and enterprise (per ERP Research)",
+     "price_note": "Quote-based; no public tiers",
+     "features": {
+      "F1": "yes: collections automation with ERP integration",
+      "F2": "unclear: email-centric AR inbox; WhatsApp not mentioned",
+      "F3": "unclear",
+      "F4": "unclear: escalation and task-assignment rules; no approval tiers documented",
+      "F5": "unclear: credit management rated 0 of 5 with no public documentation",
+      "F6": "partial: AI reads remittance data; AI-assisted reply drafting; no chat or slip parsing",
+      "F7": "yes: SmartExtract remittance from PDFs, spreadsheets, lockboxes, portals and emails; SmartMatch multi-currency matching; same-day ERP posting",
+      "F8": "yes: promise-to-pay logging and portal self-service promises; workflows pause or resume on payment behaviour",
+      "F9": "unclear",
+      "F10": "no: quote-based, mid-market and enterprise"
+     },
+     "evidence_urls": [
+      "https://www.growfin.ai/",
+      "https://erpresearch.com/erp-add-ons/ar-collections/growfin"
+     ],
+     "notes": "Strong on F7 and F8, but no WhatsApp channel and not priced for micro firms."
+    },
+    {
+     "name": "HighRadius Cash Application (Mid-Market)",
+     "url": "https://www.highradius.com/product/cash-application-automation/mid-market/",
+     "available_in_malaysia": "unclear",
+     "country_or_market": "Global (US-based)",
+     "target_size": "Mid-market and mid-sized organisations",
+     "price_note": "Outcome-based pricing; no figures listed",
+     "features": {
+      "F1": "partial: AR suite exists; collections module not checked",
+      "F2": "no: WhatsApp not mentioned",
+      "F3": "unclear",
+      "F4": "unclear",
+      "F5": "unclear",
+      "F6": "partial: AI remittance capture from emails, PDFs, spreadsheets, scanned attachments, portals, bank files, lockbox and EDI",
+      "F7": "yes: applies payments across multiple invoices and partial payments; short-payment exception workflows; AI-suggested deduction codes",
+      "F8": "unclear",
+      "F9": "unclear",
+      "F10": "no: mid-market, outcome-based pricing"
+     },
+     "evidence_urls": [
+      "https://www.highradius.com/product/cash-application-automation/mid-market/"
+     ],
+     "notes": "Reference design for F7 allocation and deduction handling. Neither small business nor WhatsApp is mentioned."
+    },
+    {
+     "name": "Versapay Cash Application",
+     "url": "https://www.versapay.com/cash-application",
+     "available_in_malaysia": "unclear",
+     "country_or_market": "North America (US and Canada banking partners listed)",
+     "target_size": "Framed for firms where volume makes automation worthwhile (page implies over about 1,000 invoices per month)",
+     "price_note": "Not listed; ROI claims only",
+     "features": {
+      "F1": "unclear: only the cash-application page was checked",
+      "F2": "no: WhatsApp not mentioned",
+      "F3": "unclear",
+      "F4": "unclear",
+      "F5": "unclear",
+      "F6": "partial: OCR remittance advice from emails and web portals",
+      "F7": "yes: AI matching to open receivables; short pays, deductions and discounts handled; lump-sum applied across multiple invoices; lockbox, ACH, wire and EFT",
+      "F8": "unclear",
+      "F9": "unclear",
+      "F10": "no: no public price; aimed above micro volume"
+     },
+     "evidence_urls": [
+      "https://www.versapay.com/cash-application"
+     ],
+     "notes": "Same category as HighRadius; not aimed at micro SMEs."
+    },
+    {
+     "name": "Receiptor AI (Xero app)",
+     "url": "https://apps.xero.com/my/app/receiptor-ai",
+     "available_in_malaysia": "yes",
+     "country_or_market": "Listed on the Xero Malaysia app store",
+     "target_size": "Xero small-business users",
+     "price_note": "Not listed; 14-day free trial",
+     "features": {
+      "F1": "no: AP side (supplier bills and receipts), not customer invoices",
+      "F2": "no",
+      "F3": "no",
+      "F4": "no",
+      "F5": "no",
+      "F6": "partial: extracts receipts and invoices sent over WhatsApp, iMessage or email; English only",
+      "F7": "partial: 'match before create' checks Xero records by amount, currency and date, then reference and supplier; asks when matches are ambiguous; invoice plus payment proof becomes a Bill plus its payment",
+      "F8": "no",
+      "F9": "unclear",
+      "F10": "unclear"
+     },
+     "evidence_urls": [
+      "https://apps.xero.com/my/app/receiptor-ai"
+     ],
+     "notes": "WhatsApp-native document intake already exists for AP. It does not read customers' payment replies or Manglish text."
+    },
+    {
+     "name": "Dext",
+     "url": "https://dext.com/en",
+     "available_in_malaysia": "unclear",
+     "country_or_market": "Global (UK-based); APAC and Rest of World region selectors; Malaysia not named",
+     "target_size": "Accounting firms and small businesses",
+     "price_note": "Business plan USD 25.21/month (USD 302.50/year), 250 documents and 5 users; firm plans per client with a 10-client minimum",
+     "features": {
+      "F1": "no: supplier invoices and receipts, no sales AR",
+      "F2": "no",
+      "F3": "no",
+      "F4": "no",
+      "F5": "no",
+      "F6": "partial: accepts receipts, invoices and statements by WhatsApp, email, mobile or desktop; supplier documents only",
+      "F7": "partial: syncs with bank feeds and lists reconciliation; matching method not described",
+      "F8": "no",
+      "F9": "partial: plan includes 5 users; roles and audit log not described",
+      "F10": "partial: USD 25.21/month is low, but the plan is AP-only"
+     },
+     "evidence_urls": [
+      "https://dext.com/en"
+     ],
+     "notes": "Hubdoc (Xero) was also checked: mobile, email and desktop capture only; no WhatsApp and no AR."
+    },
+    {
+     "name": "Lejar.ai",
+     "url": "https://lejar.ai/",
+     "available_in_malaysia": "yes",
+     "country_or_market": "Malaysia (MPERS chart of accounts, SST-02, MyInvois)",
+     "target_size": "Malaysian SMEs and micro businesses",
+     "price_note": "Free RM0; Starter RM39/month; Business RM89/month; Pro RM169/month; annual billing gives 2 months free",
+     "features": {
+      "F1": "partial: sales invoices with DuitNow QR and aged receivables report; payment reminders not mentioned",
+      "F2": "no: WhatsApp appears only as a sales contact channel",
+      "F3": "no evidence",
+      "F4": "no: AI journal drafts need human approval, but there are no reminder approval tiers",
+      "F5": "unclear",
+      "F6": "partial: AI Inbox reads receipts and bills into line items with confidence scores; customer replies not mentioned",
+      "F7": "partial: PDF or CSV bank statement import and reconciliation against the ledger; automatic payment-to-invoice matching not stated",
+      "F8": "no",
+      "F9": "partial: unlimited team members on the Business plan; roles and audit log not stated",
+      "F10": "yes: RM39 Starter, below Bukku's RM65"
+     },
+     "evidence_urls": [
+      "https://lejar.ai/"
+     ],
+     "notes": "Closest Malaysian AI ledger at micro pricing, but it is a bookkeeping tool with no collections workflow. DuitNow QR on invoices partly avoids the need to check slips."
+    }
+   ]
+  },
+  "adversarial": {
+   "summary": "Verdict: I found no product that does Kutip + Bukti end to end for Malaysian micro B2B sellers. Every feature except F3 does exist in some product, but spread across tools and price bands that miss the target user.\n\nClosest overall is Peakflo (Singapore, sells in SEA). It offers virtual-account collection in Malaysia. It covers:\n- yes: F1 (AR tracking), F5 (credit-limit thresholds flag credit freezes), F8 (promise-to-pay logged from WhatsApp free text and used as a reminder trigger), F9 (custom roles and an immutable audit trail).\n- partly: F2 (automated WhatsApp reminders with templates; the AI agent claims 40+ languages, but BM and Chinese are not named), F6 (the agent collects promises and short-payment reasons, and customers can upload proof of payment, but reading the image is not claimed), F7 (bank sync plus 3-way matching of remittance, invoice and bank statement; partial matching).\n- missing: F3 (no cash forecasting), F4 (no clerk-vs-owner approval on reminders) and F10 (custom pricing; Singapore grant packages start at \"up to 1,000 invoices/month\").\n\nNext closest:\n- Paidnice (NZ; Xero, QBO and Stripe; from USD 69/mo): WhatsApp reminders with pay links, an AI that reads replies and logs promised dates, a person approves every draft, credit stop as an escalation option, and a week-by-week expected-inflow view. No bank-match or slip evidence. Malaysia availability unclear.\n- Seenn \"Shira\" (Israel): a WhatsApp/email/phone AI agent for SMBs on net 30/60/90. It answers replies, books promises and matches payments to invoices. Custom pricing; no Malaysia evidence.\n- Enterprise tools (Tesorio, Kolleno): strong on promise extraction, cash application and forecast-led collections, but email-centric and far above micro pricing.\n- Malaysian incumbents (Bukku, Mishu) and Whautomate (SG/MY): WhatsApp invoice sending at best. Bukku's auto reminders are email-only, from the RM65 Grow plan. Whautomate shows WhatsApp payment reminders on a tool page; Sales plans start at S$199/mo.\n- Regional pieces: BukuWarung (Indonesia, WhatsApp \"Tagih\" with pay link for micro merchants) and EasySlip (Thailand, slip verification via QR on LINE, from 99 baht/month).\n\nGaps no product covered in what I could see:\n- F3: none of the pages reviewed ranks overdue invoices by how much each closes a forecast shortfall against named outflows (payroll, rent, supplier bills). Tesorio \"flags risk and gaps against your targets\" from inflows only. Float forecasts outflows but does no collections.\n- F4: no clerk-gentle / owner-firm tiered approval anywhere; only Paidnice's approve-everything.\n- F6: no evidence of anything parsing mixed Manglish/BM/Chinese replies, or reading payment-slip screenshots, into amount, reference and date.\n- F7: no evidence of a check that stops PAID being set from a slip without a bank line.\n- F10: no product with WhatsApp plus AI collections priced below RM65/month.\n\nAlso seen: an ADA case study of a bespoke WhatsApp collections journey for one Malaysian leasing company (enterprise, not an SME product). CredFlow (India) is listed by third parties as sending WhatsApp reminders; its own site returned 503 and could not be checked.\n\nLimits of this research: the session's web-search budget ran out after 6 searches (the target was 10+). Product Hunt, YC batches, e27, Vulcan Post, Tech in Asia and hackathon winners were not searched, and only one Chinese and one Malay query ran. Everything else comes from about 30 direct fetches of known vendor pages. Statements that a feature is missing are therefore weaker than statements that it exists. A follow-up search pass on those sources is recommended before claiming novelty.",
+   "products": [
+    {
+     "name": "Peakflo (AR automation + WhatsApp AI Agent)",
+     "url": "https://peakflo.co/",
+     "country_or_market": "Singapore HQ; SEA (Indonesia, Malaysia, Vietnam, Philippines, Singapore virtual accounts); India",
+     "target_size": "Mid-market/enterprise finance teams (Ninja Van, Glints, InMobi); SG grant packages up to 1,000-10,000 invoices/month",
+     "available_in_malaysia": "yes",
+     "price_note": "Custom pricing only ('Get a Custom Pricing'); no SME tier published",
+     "features": {
+      "F1": "yes - AR reminder automation, Finance CRM, integrations Xero/QuickBooks/NetSuite/Jurnal/SAP; CSV import unclear",
+      "F2": "partial - automated WhatsApp/email/SMS/LINE/Zalo reminders with customizable templates; AI agent claims '40+ languages', BM/Chinese not named",
+      "F3": "no - no cash forecasting described; prioritisation by aging, payment-behaviour classification and tags",
+      "F4": "partial - custom roles, escalation matrices; no clerk-vs-owner approval of reminders found (approval automation is AP-side)",
+      "F5": "yes - 'credit limit thresholds based on amount and duration to automatically flag accounts for credit freezes'",
+      "F6": "partial - WhatsApp AI agent logs promises from free text, collects short-payment reasons, accepts proof-of-payment uploads; reading slip images not claimed",
+      "F7": "partial - bank sync + 3-way match remittance vs invoice vs bank statement, partial payments, deduction/WHT rules; one payment across many invoices unclear",
+      "F8": "yes - promise-to-pay date/amount logged (also by AI from WhatsApp text) and usable as reminder schedule trigger",
+      "F9": "yes - custom/built-in roles and 'immutable audit trail' per customer timeline",
+      "F10": "no - custom pricing, enterprise-oriented"
+     },
+     "evidence_urls": [
+      "https://blog.peakflo.co/en/learning-center/reach-your-customers-with-automated-whatsapp-messages",
+      "https://peakflo.co/accounts-receivable-and-invoicing/payment-reminder-automation",
+      "https://peakflo.co/accounts-receivable-and-invoicing/collections-task-management",
+      "https://peakflo.co/accounts-receivable-and-invoicing/reconciliation",
+      "https://peakflo.co/accounts-receivable-and-invoicing/automated-reconciliation-cash-application",
+      "https://peakflo.co/whatsapp-ai-agents",
+      "https://peakflo.co/pricing",
+      "https://peakflo.co/productivity-solutions-grant",
+      "https://peakflo.co/case-studies"
+     ],
+     "notes": "Closest single product. Covers most of F1/F2/F5/F6/F7/F8/F9 but targets larger finance teams; lacks cash-gap prioritisation (F3), tiered reminder approval (F4) and micro pricing (F10). Malaysian customers not named on the case-study page."
+    },
+    {
+     "name": "Paidnice",
+     "url": "https://www.paidnice.com/",
+     "country_or_market": "New Zealand; bills in USD/GBP/EUR/AUD/CAD/NZD/ZAR",
+     "target_size": "SMBs on Xero/QuickBooks Online/Stripe",
+     "available_in_malaysia": "unclear",
+     "price_note": "Essentials USD 69/mo (150 invoices, 2 users); Pro from USD 99/mo; no MYR pricing",
+     "features": {
+      "F1": "yes - syncs invoices from Xero/QuickBooks Online/Stripe; CSV import not mentioned",
+      "F2": "partial - 'Payment reminders on WhatsApp, with a link to pay' plus email/SMS; languages not mentioned",
+      "F3": "partial - 'Expected payments, week by week, from your ledger'; no outflows (payroll/rent), no shortfall ranking",
+      "F4": "partial - 'A person approves each draft before it is sent'; accounts assigned to people; no gentle/firm tiering",
+      "F5": "partial - 'credit stop' as manual escalation option; not auto-flagging new orders",
+      "F6": "partial - AI 'answers replies and logs promised dates'; no slip/screenshot reading; languages not stated",
+      "F7": "unclear - payment matching / bank verification not mentioned",
+      "F8": "partial - promised dates logged; pausing reminders until date not stated",
+      "F9": "partial - assign accounts to people or AI, per-action approval; roles/audit log not described",
+      "F10": "no - from USD 69/mo"
+     },
+     "evidence_urls": [
+      "https://www.paidnice.com/",
+      "https://www.paidnice.com/features",
+      "https://www.paidnice.com/pricing"
+     ],
+     "notes": "Closest on WhatsApp + AI reply reading + human approval loop. Works only via Xero/QBO/Stripe; no Malaysia or Asian-language mention."
+    },
+    {
+     "name": "Seenn (AI collections agent 'Shira')",
+     "url": "https://www.seenn.ai/",
+     "country_or_market": "Israel (Hebrew site; Israeli accounting system integrations)",
+     "target_size": "'small and medium businesses that work on net 30, 60, 90+ payment terms'",
+     "available_in_malaysia": "unclear",
+     "price_note": "Custom plans, 14-day free trial; no prices published",
+     "features": {
+      "F1": "yes - pulls overdue invoices from accounting systems (e.g. Hashavshevet); CSV unclear",
+      "F2": "partial - WhatsApp via official Business API with payment link, plus email and phone calls; languages not listed",
+      "F3": "no - not mentioned",
+      "F4": "unclear - transfers to a human 'only when a person is needed'; no approval tiers",
+      "F5": "unclear - not mentioned",
+      "F6": "partial - reads and answers WhatsApp/email replies; slip image reading not stated",
+      "F7": "partial - matches incoming payment to invoice and marks settled; short-payment handling not stated",
+      "F8": "partial - books promise to pay and records against invoice; queue shows who promised",
+      "F9": "unclear - not described",
+      "F10": "unclear - custom pricing"
+     },
+     "evidence_urls": [
+      "https://www.seenn.ai/",
+      "https://www.getapp.com.au/software/2111404/seenn-ai"
+     ],
+     "notes": "Closest in concept (WhatsApp AI agent for credit-term B2B SMBs) but Israel-focused; GetApp page seen only as a search snippet (fetch returned 403)."
+    },
+    {
+     "name": "Tesorio",
+     "url": "https://www.tesorio.com/",
+     "country_or_market": "United States",
+     "target_size": "Enterprise finance teams (Controllers, CFOs)",
+     "available_in_malaysia": "unclear",
+     "price_note": "Not published; contact sales",
+     "features": {
+      "F1": "yes - AR collections with ERP data",
+      "F2": "no - email-based Collections Agent; WhatsApp not mentioned",
+      "F3": "partial - 'Predicts future cash inflows and flags risk and gaps against your targets, so you can drive proactive collections'; no outflows",
+      "F4": "partial - agent 'escalates to humans as needed'",
+      "F5": "no - credit hold not mentioned",
+      "F6": "partial - reads inbound emails and auto-extracts payment promises; no chat/slip images",
+      "F7": "yes - payments matched to open invoices, 95%+ auto-match, partial payments and exceptions flagged",
+      "F8": "yes - 'Promise to Pay' auto-extracted from emails with confidence score",
+      "F9": "unclear - not described",
+      "F10": "no - enterprise"
+     },
+     "evidence_urls": [
+      "https://www.tesorio.com/"
+     ],
+     "notes": "Strong on F6-F8 logic for email; not SME, not WhatsApp, not SEA."
+    },
+    {
+     "name": "Kolleno",
+     "url": "https://www.kolleno.com/",
+     "country_or_market": "United Kingdom",
+     "target_size": "Turnover under GBP1M up to GBP1Bn+; built for CFOs/AR managers",
+     "available_in_malaysia": "unclear",
+     "price_note": "Business Pay USD 545/user/mo (annual); Business Plus USD 995/user/mo",
+     "features": {
+      "F1": "yes - connects ERP (Xero, QuickBooks, Sage, NetSuite)",
+      "F2": "no - SMS/calls/email; WhatsApp not mentioned",
+      "F3": "partial - 'Forecast your future cash position' + 'AI Prioritization'; shortfall-driven ranking not stated",
+      "F4": "partial - configurable agent autonomy and escalation triggers",
+      "F5": "partial - Credit Risk Management 'flags potential credit issues'; no hold on new orders stated",
+      "F6": "unclear - 'AI agent support' from Business Plus; reply parsing not described",
+      "F7": "partial - transaction-matching module; auto reconciliation only in Enterprise tiers",
+      "F8": "unclear - not mentioned",
+      "F9": "partial - team collaboration; roles not detailed",
+      "F10": "no - USD 545+/user/mo"
+     },
+     "evidence_urls": [
+      "https://www.kolleno.com/",
+      "https://www.kolleno.com/pricing"
+     ],
+     "notes": "Enterprise-priced; covers forecasting + matching, not WhatsApp/SEA."
+    },
+    {
+     "name": "Bukku",
+     "url": "https://www.bukku.my/",
+     "country_or_market": "Malaysia",
+     "target_size": "Malaysian SMEs and micro businesses",
+     "available_in_malaysia": "yes",
+     "price_note": "Launch RM0, Seed RM35, Grow RM65 (adds 'Auto invoice reminder'), Prime RM95 (adds advanced permissions), Elite RM135",
+     "features": {
+      "F1": "partial - full invoicing/AR ledger; auto reminders from Grow (RM65)",
+      "F2": "partial - reminders 'automatically via Email' only; WhatsApp only for one-click QuickShare of invoices",
+      "F3": "no - dashboard cashflow charts only",
+      "F4": "partial - module-level advanced permissions (Prime+); no reminder approval tiers",
+      "F5": "unclear - credit limit not mentioned",
+      "F6": "no - not offered",
+      "F7": "partial - SmartRecon reconciles uploaded bank statement PDFs; short-payment flagging not stated",
+      "F8": "no - not offered",
+      "F9": "yes - advanced permissions + 'best-in-class audit trail'",
+      "F10": "benchmark - RM65/mo is the price point to beat"
+     },
+     "evidence_urls": [
+      "https://www.bukku.my/pricing",
+      "https://www.bukku.my/features"
+     ],
+     "notes": "Local incumbent baseline: email-only reminders, no WhatsApp reminders, no AI reply parsing."
+    },
+    {
+     "name": "Whautomate (Sales module)",
+     "url": "https://whautomate.com/",
+     "country_or_market": "Singapore; priced for Singapore, Malaysia and Brunei",
+     "target_size": "SMB WhatsApp CRM users (3-25 users)",
+     "available_in_malaysia": "yes",
+     "price_note": "Engage S$99/mo + CRM S$55 + Sales S$55, or Complete from S$199/mo; Meta WhatsApp fees extra",
+     "features": {
+      "F1": "partial - invoices, payment links and statements in Sales module; no AR import described",
+      "F2": "partial - 'automatic WhatsApp payment reminders before and after the due date until the invoice clears'; languages not mentioned",
+      "F3": "no - not offered",
+      "F4": "unclear - not described",
+      "F5": "no - not offered",
+      "F6": "partial - shared inbox with 'AI reply assist'; no structured extraction",
+      "F7": "partial - marked paid automatically only via connected payment gateway; no bank-statement check",
+      "F8": "unclear - not mentioned",
+      "F9": "partial - multi-user plans; roles/log not described",
+      "F10": "no - from ~S$199/mo for invoicing"
+     },
+     "evidence_urls": [
+      "https://whautomate.com/tools/whatsapp-invoice-generator",
+      "https://whautomate.com/pricing"
+     ],
+     "notes": "Generic WhatsApp CRM with invoice reminders, available in Malaysia; no collections intelligence. Pricing page lists no dedicated payment-reminder feature; that claim comes from the tool page."
+    },
+    {
+     "name": "Mishu",
+     "url": "https://mishu.my/our-services/invoicing-software/",
+     "country_or_market": "Malaysia",
+     "target_size": "Malaysian SMEs",
+     "available_in_malaysia": "yes",
+     "price_note": "Launch RM0, Growth RM59/mo, Premium RM99/mo",
+     "features": {
+      "F1": "partial - invoicing; automated reminders not mentioned",
+      "F2": "partial - send invoices via email and WhatsApp; reminders not mentioned",
+      "F3": "no - not offered",
+      "F4": "unclear - not described",
+      "F5": "unclear - not mentioned",
+      "F6": "no - AI captures data from receipts uploaded via WhatsApp for own bookkeeping, not customer replies",
+      "F7": "unclear - 'SmartRecon' listed but not described",
+      "F8": "no - not offered",
+      "F9": "unclear - not described",
+      "F10": "yes - RM59/mo Growth"
+     },
+     "evidence_urls": [
+      "https://mishu.my/our-services/invoicing-software/"
+     ],
+     "notes": "Local accounting/e-invoice tool with WhatsApp sending; not a collections tool."
+    },
+    {
+     "name": "BukuWarung (Tagih)",
+     "url": "https://bukuwarung.com/",
+     "country_or_market": "Indonesia",
+     "target_size": "Micro merchants (UMKM)",
+     "available_in_malaysia": "no",
+     "price_note": "Free to download; fees not listed",
+     "features": {
+      "F1": "partial - tracks hutang-piutang in bookkeeping",
+      "F2": "partial - 'Tagih' requests payment over WhatsApp with a payment link; automation/templates/languages unclear",
+      "F3": "no - not offered",
+      "F4": "no - not offered",
+      "F5": "no - not offered",
+      "F6": "no - not offered",
+      "F7": "unclear - pay-link payments to merchant account; reconciliation not described",
+      "F8": "no - not offered",
+      "F9": "unclear - not described",
+      "F10": "yes - free app"
+     },
+     "evidence_urls": [
+      "https://bukuwarung.com/"
+     ],
+     "notes": "Shows micro-merchant WhatsApp debt chasing exists in SEA, but B2C/micro-retail and simple."
+    },
+    {
+     "name": "EasySlip (slip verification API)",
+     "url": "https://easyslip.com/",
+     "country_or_market": "Thailand",
+     "target_size": "Thai merchants/developers",
+     "available_in_malaysia": "no",
+     "price_note": "From 99 baht/mo for 250 checks; up to 40,000 baht/mo",
+     "features": {
+      "F1": "no - not offered",
+      "F2": "no - LINE bot only, no WhatsApp",
+      "F3": "no - not offered",
+      "F4": "no - not offered",
+      "F5": "no - not offered",
+      "F6": "partial - reads QR on transfer-slip images (LINE group bot) to return transfer details; no free-text parsing",
+      "F7": "partial - checks slip status/details via QR; whether it queries bank records not stated; no invoice allocation",
+      "F8": "no - not offered",
+      "F9": "no - not offered",
+      "F10": "yes - cheap per-check pricing"
+     },
+     "evidence_urls": [
+      "https://easyslip.com/"
+     ],
+     "notes": "Component-level prior art for the 'Bukti' slip-check step, built on Thai slip QR codes; no Malaysian DuitNow equivalent found in this research."
+    }
+   ]
+  },
+  "global-ar": {
+   "summary": "Verdict from the global AR / collections angle: I found no single product that does all of Kutip + Bukti. Two products overlap heavily, though, and the basic layer (F1+F2: tracking invoices and sending WhatsApp reminders) already exists. Do not pitch that layer as new.\n\nClosest overlaps:\n(1) PAIDNICE. It is on the Xero App Store Malaysia listing and also works with QuickBooks. Its features page says \"Payment reminders on WhatsApp, with a link to pay\". Per the Xero listing and its homepage, its AI reads replies, logs promises and drafts the next step for you to approve. Promises are recorded and reminders are held until the promised date. It also offers a \"credit stop\" escalation, approval of each action, and a weekly cash forecast. It starts at USD 69/month (Essentials, 2 users), which is far above RM65.\n(2) PEAKFLO, described in press as a Singaporean fintech. It sends WhatsApp, SMS, LINE and Zalo reminders from templates. Its AI WhatsApp Agent claims 40+ languages, captures promise-to-pay and collects short-payment reasons in chat. It flags credit freezes by limit and runs cash application with partial matching and WHT/discount rules. Pricing is custom and it targets scale-ups to enterprises; Malaysia is not mentioned.\n\nMid-market and enterprise tools: Upflow, Tesorio and Kolleno now ship AI agents that read replies for promise-to-pay, disputes and remittances. They work over email only; none mention WhatsApp. They start at about USD 545/user/month (Kolleno) or on-request pricing aimed at GBP 10M+ revenue (Upflow).\n\nAccounting tools:\n- Xero's built-in reminders are email-only. Xero staff said on 17 June 2026 that WhatsApp sending is not planned.\n- Zoho Books can send payment notifications over WhatsApp from templates (April 2024 release). It also pauses reminders when someone enters an expected payment date by hand.\n- Third-party WhatsApp layers such as Saysimple already push overdue reminders from Xero and Zoho Books.\n\nCash-flow tools: Float, Agicap and the forecasting in Chaser and Tesorio show liquidity gaps. None of them ranks overdue invoices by how much each closes a specific upcoming shortfall.\n\nGaps not seen in any product checked:\n- F3: ranking overdue invoices against named outflows (\"short RM2,000 for payroll on 31 Oct, chase these 3 first\").\n- F6: reading payment-slip screenshots. Peakflo only says customers can send proof of payment in WhatsApp.\n- F7: checking a slip against the bank-statement line before marking an invoice paid, for micro firms.\n- F4: clerk-gentle / owner-firm approval tiers. Paidnice's approval is per action, not by tone tier.\n- F2/F6: explicit support for Manglish / BM / Chinese free text.\n- F10: pricing under RM65. Only Zoho Books (USD 12/month Standard) and Xero promo plans are near that, and both lack the AI features.\n\nThe defensible part is the combination of F3, F6/F7 and micro-firm pricing, not reminders or promise tracking.\n\nCaveats:\n- The web search budget ran out after 11 searches. Everything after that was checked by fetching vendor pages directly.\n- Pages for Gaviti, Satago, InvoiceSherpa, Fathom, Pulse, Fluidly, FreshBooks and Wave were not checked in depth.\n- CredFlow (India, WhatsApp reminders for SMEs) could not be verified because its site returned 503 or an empty page.\n- Zoho Malaysia pages returned 404, so MYR pricing was not verified.\n- This angle did not cover Malaysian local tools (Bukku, ChatDaddy, etc.).",
+   "products": [
+    {
+     "name": "Paidnice",
+     "url": "https://www.paidnice.com/",
+     "available_in_malaysia": "yes",
+     "country_or_market": "Global (NZ/AU origin); Xero App Store lists Malaysia, Singapore, Indonesia, Philippines, HK, etc.",
+     "target_size": "SMBs on Xero/QuickBooks; priced by invoice volume (150 invoices/mo on Essentials)",
+     "price_note": "Essentials USD 69/mo (2 users, 150 invoices); Pro 300 USD 99/mo; up to Pro 4,000 USD 799/mo; Custom from USD 999. SMS 0.10 USD each. Roughly RM300/mo at entry, well above Bukku RM65.",
+     "features": {
+      "F1": "yes - real-time two-way sync with Xero (invoices, contacts, payments); QuickBooks also supported; automated email/SMS reminders",
+      "F2": "partial - features page: 'Payment reminders on WhatsApp, with a link to pay'; templates yes; no language support stated (BM/Chinese unclear)",
+      "F3": "partial - 'weekly cash forecast' of expected payments from the ledger; no outflow-vs-receipts shortfall ranking described",
+      "F4": "partial - policies in Draft mode require approving each action; 'Assign accounts to people or an AI agent, and approve each action'; no tone-based clerk/owner tiering described",
+      "F5": "partial - escalations include 'credit stop'/credit holds plus per-customer credit score; blocking new credit orders not described",
+      "F6": "partial - AI 'reads each reply, logs the promise or the question and drafts the next step', finds dispute reasons; text replies only, no slip/image reading or Manglish/Chinese mentioned",
+      "F7": "no/unclear - Stripe payments reconciled to Xero; no bank-statement verification of claimed payments or slip check described",
+      "F8": "yes - payment promises recorded in Xero and reminders held until the promised date (Xero listing)",
+      "F9": "partial - 'Roles and approvals' heading; 'see every step'; formal audit log/permissions not described",
+      "F10": "no - entry USD 69/mo"
+     },
+     "evidence_urls": [
+      "https://www.paidnice.com/",
+      "https://www.paidnice.com/features",
+      "https://www.paidnice.com/pricing",
+      "https://apps.xero.com/us/app/paidnice",
+      "https://apps.xero.com/my/app/paidnice"
+     ],
+     "notes": "Closest global match to Kutip+Bukti's collections layer (WhatsApp + AI reply reading + promise holds + credit stop + approvals). Missing: cash-gap ranking against payroll/rent, slip OCR, bank-line verification, multilingual Manglish/Chinese, micro-firm price. Requires Xero or QuickBooks ledger. Pricing page itself flags an inconsistency on which features are Essentials vs Pro."
+    },
+    {
+     "name": "Peakflo (AR + AI WhatsApp Agent)",
+     "url": "https://peakflo.co/accounts-receivable-and-invoicing/payment-reminder-automation",
+     "available_in_malaysia": "unclear",
+     "country_or_market": "Singapore-based (press quote 'Singaporean fintech'); SE Asia focus, virtual accounts in Indonesia/Singapore; India customer case",
+     "target_size": "'Scale-ups to enterprises', 100+ businesses; NetSuite/SAP/Dynamics integrations; also accounting-firm offering",
+     "price_note": "Custom pricing only ('Get a Custom Pricing for Your Agentic Workflow'); demo call required.",
+     "features": {
+      "F1": "yes - payment reminder automation synced with ERP/accounting (Xero, NetSuite, QuickBooks, Dynamics, SAP)",
+      "F2": "partial - automated WhatsApp/SMS/email (plus LINE, Zalo) reminders with editable templates; AI WhatsApp Agent claims '40+ Languages & Dialects' with auto-detection, BM/Chinese not named",
+      "F3": "no - AI payment-behaviour classification to reassign workflows; no cash-gap vs upcoming outflows ranking seen",
+      "F4": "unclear - 'Approval Automation' listed only under Accounts Payable; AI agent escalates to humans, no pre-send approval tiers described",
+      "F5": "yes - credit limit thresholds by amount and duration auto-flag accounts for credit freezes",
+      "F6": "partial - AI WhatsApp agent handles replies ('We'll clear it this Friday'), collects disputes and short-payment reasons; customers can send proof of payment in WhatsApp but slip data extraction not stated",
+      "F7": "partial - cash application with bank sync, probability-scored matching for partial payments, WHT/discount exception rules, remittance extraction from email/PDF; verifying a WhatsApp slip against bank line not described",
+      "F8": "yes - promises 'captured and logged against the invoice'; reminders can be triggered by promise-to-pay date",
+      "F9": "unclear - roles/audit log not described on AR pages",
+      "F10": "no/unclear - custom pricing aimed at scale-ups/enterprise"
+     },
+     "evidence_urls": [
+      "https://peakflo.co/accounts-receivable-and-invoicing/payment-reminder-automation",
+      "https://peakflo.co/whatsapp-ai-agents",
+      "https://peakflo.co/accounting-firm/accounts-receivable",
+      "https://peakflo.co/accounts-receivable-and-invoicing/automated-reconciliation-cash-application",
+      "https://blog.peakflo.co/en/learning-center/reach-your-customers-with-automated-whatsapp-messages",
+      "https://peakflo.co/pricing",
+      "https://peakflo.co/about-us"
+     ],
+     "notes": "Strongest regional overlap on WhatsApp + AI reply handling + promise-to-pay + credit freeze + cash application. A G2 reviewer notes WhatsApp Business messaging is limited to a 24-hour window (G2 page blocked on direct fetch; seen via search). Not aimed at 2-30 staff micro firms; Malaysia not mentioned on pages fetched."
+    },
+    {
+     "name": "Upflow (Collection Agent + Cash App Agent)",
+     "url": "https://docs.upflow.io/en-us/collection-and-collaboration/emails/collection-agents",
+     "available_in_malaysia": "unclear",
+     "country_or_market": "Global (France/UK/US), GBP pricing tiers",
+     "target_size": "Mid-market: Starter up to GBP 10M annual invoiced revenue; agents only from Scale (GBP 25-50M)",
+     "price_note": "All plans priced on request; free 'Discover' dashboard plan; Collections Agent from Scale plan; Upflow Payments platform fee GBP 390/mo.",
+     "features": {
+      "F1": "yes - AR automation with ERP sync, unlimited email, SMS/letters/calls with usage fees",
+      "F2": "no - email, SMS, letters, calls; no WhatsApp in pricing or 2025-2026 changelog; AI writing assistant can translate content (Nov 2025)",
+      "F3": "no - no cash-gap prioritisation seen",
+      "F4": "partial - each agent skill Off / Suggestions-only (human reviews then Send) / Auto-mode; only admins configure agents; no clerk/owner tone tiers",
+      "F5": "unclear - not described",
+      "F6": "partial - Collection agent (beta Jul 2026) skills: Replies, Promise to pay, Disputes, Remittance capture; email replies only, cannot analyse calls/other channels",
+      "F7": "partial - Cash App agent auto-applies clear bank matches, improved Oct 2026 for typo'd refs and single transfers covering several invoices; bank CSV upload",
+      "F8": "partial - AI-suggested promise to pay with quote from customer message; notifies when promise expires unpaid; pausing reminders until date not documented",
+      "F9": "partial - unlimited seats, admin-only agent config; audit log not described",
+      "F10": "no - mid-market pricing on request"
+     },
+     "evidence_urls": [
+      "https://docs.upflow.io/en-us/collection-and-collaboration/emails/collection-agents",
+      "https://docs.upflow.io/en-us/core-entities/invoices/ai-suggested-promise-to-pay",
+      "https://docs.upflow.io/en-us/changelog.md",
+      "https://upflow.io/en-gb/pricing"
+     ],
+     "notes": "Shows the 'AI reads replies -> promise/dispute/remittance' pattern (F6/F8) is shipped in 2025-2026, but email-only and mid-market."
+    },
+    {
+     "name": "Chaser",
+     "url": "https://www.chaserhq.com/",
+     "available_in_malaysia": "unclear",
+     "country_or_market": "UK-based, global (GBP/USD/EUR/AUD/NZD pricing)",
+     "target_size": "Compact plan for <GBP 4M revenue, 4 users",
+     "price_note": "Compact from GBP 199 / USD 259 per month (USD 233/mo yearly); Core USD 779; Complete USD 1,169; Care managed-service add-on from ~GBP 899/mo.",
+     "features": {
+      "F1": "yes - two-way sync with Xero, QuickBooks, Sage, NetSuite, SAP; CSV/API import",
+      "F2": "partial - email, SMS, automated calls, letters natively; WhatsApp only via third-party Saysimple integration; no language support stated",
+      "F3": "partial - cash flow, revenue and receivables forecasts (receivables forecast on Complete+); no shortfall-based chase ranking",
+      "F4": "unclear - approvals not mentioned",
+      "F5": "partial - credit monitoring and reports; credit hold not mentioned",
+      "F6": "no - AI email generator, AI debtor risk insights, payment prediction; reading replies not mentioned",
+      "F7": "unclear - payment portal / Chaser Pay; bank verification not described",
+      "F8": "unclear - not described on pages fetched; payment plans exist",
+      "F9": "unclear - roles/audit trail not on pricing page",
+      "F10": "no - from USD 233-259/mo"
+     },
+     "evidence_urls": [
+      "https://www.chaserhq.com/",
+      "https://www.chaserhq.com/pricing",
+      "https://help.chaserhq.com/chaser-pricing-details",
+      "https://www.saysimple.com/integrations/chaser"
+     ],
+     "notes": "Well-known SMB credit-control tool, but email/SMS-centric and priced far above micro firms."
+    },
+    {
+     "name": "Zoho Books (built-in reminders + WhatsApp)",
+     "url": "https://www.zoho.com/books/help/settings/reminders.html",
+     "available_in_malaysia": "unclear",
+     "country_or_market": "Global accounting software (USD pricing page fetched)",
+     "target_size": "Micro to SMB; Free plan for revenue <USD 50K",
+     "price_note": "Free; Standard USD 12/mo (10 annual, 3 users); Professional USD 24; Premium USD 36; Elite 129; Ultimate 249. MYR pricing not verified (Zoho MY URLs returned 404).",
+     "features": {
+      "F1": "yes - native invoicing; up to three automated reminders before/on/after due date, plus manual 'Send Now'",
+      "F2": "partial - April 2024 release: connect WhatsApp to send payment and sales notifications to customers using customisable templates; reminders help page describes email only; language not stated",
+      "F3": "partial - 'Cashflow forecasting' on Premium and higher; not tied to which invoices to chase",
+      "F4": "partial - sales/purchase approvals on Professional+, not tiered reminder approval",
+      "F5": "unclear - customer credit limit not mentioned on pricing page",
+      "F6": "no - no AI reply reading described",
+      "F7": "unclear - not verified in this check",
+      "F8": "partial - when an expected payment date is sent, 'Don't remind about payment until then' pauses reminders (manual entry, not AI)",
+      "F9": "partial - custom user roles on Professional+; audit trail not mentioned on pricing page",
+      "F10": "partial - Standard USD 12/mo (~RM50) is below RM65, but without AI/cash-gap features"
+     },
+     "evidence_urls": [
+      "https://www.zoho.com/books/help/settings/reminders.html",
+      "https://help.zoho.com/portal/fr/community/topic/whats-new-in-zoho-books-april-2024?page=6",
+      "https://www.zoho.com/books/pricing/",
+      "https://www.saysimple.com/integrations/zoho-books"
+     ],
+     "notes": "Shows cheap WhatsApp + reminders + manual promise-pause already exist in a mainstream ledger. Malaysia availability is widely assumed but not confirmed in this session (Malaysia-specific pages 404)."
+    },
+    {
+     "name": "Xero (built-in invoice reminders) + Saysimple WhatsApp add-on",
+     "url": "https://www.xero.com/my/pricing-plans/",
+     "available_in_malaysia": "yes",
+     "country_or_market": "Global; Malaysia pricing page live with 50% off promo to 31 Dec 2026",
+     "target_size": "Micro to SMB",
+     "price_note": "Malaysia page (USD): Lite 7/mo, Starter 29/mo, Standard 50/mo, Premium 75/mo; 50% off for first 36 months if bought before 31 Dec 2026.",
+     "features": {
+      "F1": "yes - automated invoice reminder emails (e.g. 2 days before, due date, 7/14/30 days after)",
+      "F2": "no (native) - email only; WhatsApp sending idea marked not planned by Xero staff on 17 June 2026; third-party Saysimple sends automated WhatsApp overdue reminders from Xero",
+      "F3": "partial - short-term cash flow forecasting 30/60/180 days by plan; no chase ranking",
+      "F4": "unclear - not described",
+      "F5": "unclear - not described",
+      "F6": "no - not described",
+      "F7": "partial - bank reconciliation all plans, auto-reconcile on Standard+ (or USD 5 add-on); no slip verification",
+      "F8": "unclear - not described",
+      "F9": "unclear - not described on pricing page",
+      "F10": "partial - Starter USD 14.50/mo on promo (~RM60) but no WhatsApp/AI collections"
+     },
+     "evidence_urls": [
+      "https://www.xero.com/my/pricing-plans/",
+      "https://www.trykeep.com/newsroom/how-to-send-invoice-reminders-in-xero",
+      "https://productideas.xero.com/forums/967130-contacts-documents/suggestions/46626529-contacts-send-invoices-and-statements-through-wh",
+      "https://www.saysimple.com/integrations/xero"
+     ],
+     "notes": "Baseline that Malaysian SMEs on Xero already have; confirms native WhatsApp is not on Xero's roadmap as of June 2026, so plug-ins (Paidnice, Saysimple) fill that gap."
+    },
+    {
+     "name": "Tesorio (AI Collections Agent + AR Forecast)",
+     "url": "https://www.tesorio.com/product/ai-agents",
+     "available_in_malaysia": "unclear",
+     "country_or_market": "US, enterprise",
+     "target_size": "Enterprise finance/AR teams (GitLab, Veeva, Smartsheet)",
+     "price_note": "Not published; contact sales.",
+     "features": {
+      "F1": "yes - AR automation integrating NetSuite, Sage Intacct, QuickBooks, etc.",
+      "F2": "no - email only described",
+      "F3": "partial - ML scores open invoices into worklists; separate AR Forecast flags gaps against targets 'so you can drive proactive collections'; not ranked against specific outflows",
+      "F4": "partial - drafts 'ready for one-click send or human review'; accept/reject on promise suggestions; configurable guardrails",
+      "F5": "unclear - not described",
+      "F6": "partial - classifies every incoming AR email (payment confirmations, disputes, questions) and extracts promises/dates; email only",
+      "F7": "partial - separate Cash Application Agent product",
+      "F8": "partial - extracts and tracks payment promises in dashboard; pausing not described",
+      "F9": "partial - audit trails mentioned",
+      "F10": "no - enterprise"
+     },
+     "evidence_urls": [
+      "https://www.tesorio.com/product/ai-agents",
+      "https://www.tesorio.com/"
+     ],
+     "notes": "Closest conceptual link between forecasting and collections priority (F3), but enterprise, email-only."
+    },
+    {
+     "name": "Kolleno",
+     "url": "https://www.kolleno.com/",
+     "available_in_malaysia": "unclear",
+     "country_or_market": "UK-based, global",
+     "target_size": "Business Pay tier for <GBP 1M turnover and <100 invoices; up to GBP 1Bn+",
+     "price_note": "Business Pay USD 545/user/mo (annual) or 650 monthly; Business Plus USD 995/user/mo; Enterprise custom. AI agent support from Business Plus.",
+     "features": {
+      "F1": "yes - centralises receivables from NetSuite, QuickBooks, Xero, Sage, Dynamics; automated follow-ups",
+      "F2": "no - SMS and calls allowances, AI email templates; WhatsApp not mentioned; AI agent language selectable (list not given)",
+      "F3": "partial - predictive 'Accurate Cash Predictions'; no outflow-based ranking",
+      "F4": "partial - AI agent autonomy: insights only / copilot drafts / fully independent",
+      "F5": "partial - credit risk monitoring with real-time alerts; credit hold not described",
+      "F6": "partial - 'AI-driven responses to client queries'; reply parsing to promise/deduction not described",
+      "F7": "partial - AI-powered matching, exception handling, bank connections",
+      "F8": "unclear - not mentioned",
+      "F9": "unclear - not mentioned",
+      "F10": "no - USD 545+/user/mo"
+     },
+     "evidence_urls": [
+      "https://www.kolleno.com/",
+      "https://www.kolleno.com/pricing",
+      "https://www.kolleno.com/collections"
+     ],
+     "notes": "Has 'AI agents' for collections and reconciliation but no WhatsApp and priced far above micro firms."
+    },
+    {
+     "name": "Agicap (Cash flow + Accounts Receivable module)",
+     "url": "https://agicap.com/en/products/account-receivable/",
+     "available_in_malaysia": "unclear",
+     "country_or_market": "France/Europe; clients in 12 countries (not named)",
+     "target_size": "Mid-market, roughly GBP 10M-500M revenue",
+     "price_note": "Not published; demo/free trial.",
+     "features": {
+      "F1": "yes - customisable automated dunning workflows, multi-channel reminders and payment links",
+      "F2": "unclear - channels not named; WhatsApp not mentioned",
+      "F3": "partial - invoices sync into rolling 13-week cash forecast, disputed amounts excluded; no ranking of which overdue invoices close a shortfall",
+      "F4": "no - approval workflows not mentioned",
+      "F5": "partial - credit limits, utilisation tracking, breach alerts",
+      "F6": "no - AI reply reading not mentioned",
+      "F7": "partial - matches customer bank payments to open invoices including 1-to-many and partial",
+      "F8": "no - promise-to-pay not mentioned; dispute tag pauses dunning",
+      "F9": "unclear - not mentioned",
+      "F10": "no - mid-market"
+     },
+     "evidence_urls": [
+      "https://agicap.com/en/products/account-receivable/",
+      "https://agicap.com/en/"
+     ],
+     "notes": "Best example of collections wired into a cash forecast, but no shortfall-driven chase list and not built for micro firms."
+    },
+    {
+     "name": "Float (cash flow forecasting)",
+     "url": "https://floatapp.com/",
+     "available_in_malaysia": "unclear",
+     "country_or_market": "UK-based, global via Xero/QuickBooks",
+     "target_size": "Small Business plan (<GBP 2M revenue) and Growth/Scale",
+     "price_note": "Prices not shown on homepage; 14-day free trial.",
+     "features": {
+      "F1": "no - forecasts invoice timing but does not send reminders or chase customers",
+      "F2": "no",
+      "F3": "partial - 13-week/monthly forecast mapping when invoices get paid and bills come due, shows 'liquidity gaps before they become urgent'; no payroll mention, no chase prioritisation",
+      "F4": "no",
+      "F5": "no",
+      "F6": "no",
+      "F7": "no - no direct bank connection; uses accounting platform data",
+      "F8": "no",
+      "F9": "unclear",
+      "F10": "unclear - prices not shown"
+     },
+     "evidence_urls": [
+      "https://floatapp.com/"
+     ],
+     "notes": "Covers the 'see the gap' half of F3 only; does not turn gaps into a ranked chase list or act on it."
+    }
+   ]
+  },
+  "malaysia-stack": {
+   "products": [
+    {
+     "name": "Bukku (cloud accounting)",
+     "url": "https://www.bukku.my/features",
+     "available_in_malaysia": "yes",
+     "country_or_market": "Malaysia (local vendor)",
+     "target_size": "Micro to established SMEs",
+     "price_note": "Launch RM0, Seed RM35, Grow RM65, Prime RM95, Elite RM135 per month (+8% SST). 'Auto invoice reminder' is listed only from Grow (RM65). 'Advanced user permissions' only from Prime (RM95).",
+     "features": {
+      "F1": "yes - native invoices plus 'Remind your customers of outstanding invoices automatically via Email' (Grow+). CSV import of external invoices not checked.",
+      "F2": "partial - 'send invoices ... via Email or WhatsApp with just one click' is a manual share. Automatic reminders are email only. No language templates found.",
+      "F3": "no - only a dashboard with 'over 10 intuitive charts' covering cashflow. No shortfall-based ranking.",
+      "F4": "no - nothing found for approval tiers on reminders. Permissions work at module or sub-module level.",
+      "F5": "unclear - no credit-limit or credit-hold feature on the features or pricing pages",
+      "F6": "no - OCR covers receipts and bank statements (Digital Shoebox). It does not parse customer chat replies or payment slips.",
+      "F7": "partial - 'SmartRecon' reconciles uploaded PDF bank statements, and bank feeds start at Seed. No slip-vs-bank-line check or short-payment flag was found.",
+      "F8": "no - not found",
+      "F9": "yes - 'Advanced permission system' (Prime+) and a 'best-in-class audit trail'. Not stated whether the log is append-only.",
+      "F10": "partial - Grow at RM65 is the benchmark itself. Seed (RM35) has no auto reminders."
+     },
+     "evidence_urls": [
+      "https://www.bukku.my/features",
+      "https://www.bukku.my/pricing"
+     ],
+     "notes": "This is the incumbent that Kutip + Bukti would be priced against. It already covers reminders, WhatsApp invoice sharing, bank recon, permissions and an audit trail. It lacks cash-gap prioritisation, approval tiers, reply/slip AI and promise-to-pay tracking. Its help center sits behind a login, so per-feature detail is unverified."
+    },
+    {
+     "name": "SQL Account (with SQL eInvoice / Adaptis payment add-on)",
+     "url": "https://www.sql.com.my/accounting-software/features/",
+     "available_in_malaysia": "yes",
+     "country_or_market": "Malaysia (E Stream MSC)",
+     "target_size": "SMEs; very common among Malaysian traders and distributors",
+     "price_note": "SQL Account Cloud: Essential RM79/month, Pro RM109/month, plus RM60 per additional user. The eInvoice/Adaptis add-on is unpriced on public pages.",
+     "features": {
+      "F1": "yes - customer ageing and balance reports. The Adaptis/eInvoice add-on 'Sends payment reminders via email, SMS, WhatsApp, and Messenger'. Whether reminders are automatic or scheduled is not stated.",
+      "F2": "partial - core product sends 'Quotation, Invoice, Statement of account ... via Whatsapp'. WhatsApp reminders need the add-on. No BM/EN/ZH template set found.",
+      "F3": "no - no cash flow forecast on the features page",
+      "F4": "no - 'double layer access control' and document lock exist. No approval tier for reminder tone.",
+      "F5": "yes - credit limit and overdue limit can 'prevent creations of delivery orders & invoices for an overdue customer'",
+      "F6": "unclear - 'AI Easy Scan' OCR turns documents into accounting entries. Customer payment slips and free-text replies are not mentioned.",
+      "F7": "partial - auto bank recon for 20+ Malaysian banks with AI matching, and 'knock off all invoices using FIFO, in 1 simple click'. No slip-vs-bank verification step or deduction flag found.",
+      "F8": "no - not found",
+      "F9": "partial - user access rights and document lock. 'SQL Audit MBRS' appears as an add-on with no detail.",
+      "F10": "no - RM79/month entry plan is above Bukku's RM65"
+     },
+     "evidence_urls": [
+      "https://www.sql.com.my/accounting-software/features/",
+      "https://www.sql.com.my/sqlaccount",
+      "https://www.sql.com.my/adaptis/",
+      "https://www.sql.com.my/pricing/"
+     ],
+     "notes": "Credit hold (F5) and FIFO allocation across invoices (part of F7) already exist here, so neither is novel. WhatsApp reminders exist via an add-on. Cash-gap ranking, approval tiers and promise-to-pay are absent."
+    },
+    {
+     "name": "AutoCount Cloud Accounting / AutoCount Accounting 2.0",
+     "url": "https://www.autocountsoft.com/pro-cloud-acc.html",
+     "available_in_malaysia": "yes",
+     "country_or_market": "Malaysia (local vendor)",
+     "target_size": "Micro to mid SMEs",
+     "price_note": "Cloud Accounting Lite RM70/month monthly, or RM336 for a 12-month plan (RM28/month). Basic RM100, Plus RM140, Pro RM180 per month, excl. SST. Accounting 2.0 (on-premise) prices not listed.",
+     "features": {
+      "F1": "partial - 'Instant Info' shows outstanding and overdue amounts, plus a document status summary. No customer payment reminders mentioned.",
+      "F2": "partial - 'send Quotations, Invoices, Purchase Order using embedded WhatsApp and email'. Manual document send, not reminders.",
+      "F3": "no - not mentioned",
+      "F4": "no - not found for reminders",
+      "F5": "partial - Accounting 2.0 prompts 'requesting your approval to proceed' when a document exceeds the credit limit. Blocking by days overdue is not stated.",
+      "F6": "no - AI SmartScan reads supplier invoices, bills and receipts, not customer replies or slips",
+      "F7": "partial - auto bank reconciliation via Maybank/UOB feeds, or PDF/CSV statement import. No slip verification or short-payment flag.",
+      "F8": "no - not found",
+      "F9": "yes - roles and permissions, and 'every transaction is tracked with a detailed audit trail'",
+      "F10": "partial - RM28/month only on the annual promo, and without reminders"
+     },
+     "evidence_urls": [
+      "https://www.autocountsoft.com/pro-cloud-acc.html",
+      "https://www.autocountsoft.com/pro-accounting2.html",
+      "https://www.autocountsoft.com/"
+     ],
+     "notes": "Strong on recon, roles and audit trail. Has a credit-limit approval prompt, which is close to F4/F5 but applies to sales documents, not reminders. No collections workflow."
+    },
+    {
+     "name": "Xero (Malaysia)",
+     "url": "https://www.xero.com/my/pricing/",
+     "available_in_malaysia": "yes",
+     "country_or_market": "Global, with a Malaysia site and USD pricing",
+     "target_size": "Micro to established SMEs",
+     "price_note": "USD per month: Lite $7, Starter $29, Standard $50, Premium $75. 50% off for 36 months if bought before 31 Dec 2026 (Lite $3.50, Starter $14.50). Xero says prices rise from 1 Nov 2026. Lite has no bank feeds. Auto-reconcile is included from Standard, or a $5 add-on.",
+     "features": {
+      "F1": "yes - 'receivables automation' sends reminder emails, with configurable timing and a log of what was sent",
+      "F2": "partial - an RHB/Xero 2026 fact sheet says 'sending invoices or payment reminders directly through WhatsApp'. Xero's own send-invoices page mentions only email and SMS. Automation and multi-language unclear.",
+      "F3": "partial - 'Cash flow forecasting' horizon of 30 days (Starter), 60 (Standard) or 180 (Premium). Overdue invoices are not ranked by the shortfall they close.",
+      "F4": "unclear - no reminder approval tiers found",
+      "F5": "unclear - not found",
+      "F6": "no - JAX AI chat answers questions and creates invoices. Reading customer replies or slips is not mentioned.",
+      "F7": "partial - bank feeds plus auto-reconcile. Stripe 'feeds the transactions to Xero for you to reconcile'. No slip-vs-bank check.",
+      "F8": "no - not found",
+      "F9": "partial - the JAX page says users see data 'based on their Xero permissions'. Audit log not verified on fetched pages.",
+      "F10": "partial - promo Lite/Starter are cheap for 36 months, but Lite lacks bank feeds and auto-reconcile is extra"
+     },
+     "evidence_urls": [
+      "https://www.xero.com/my/pricing/",
+      "https://www.xero.com/my/accounting-software/send-invoices/",
+      "https://www.xero.com/my/ai-in-accounting/jax/",
+      "https://www.xero.com/my/accounting-software/accept-payments/",
+      "https://rhbfoundation.rhbgroup.com/-/media/Assets/Corporate-Website/Document/Supported-Doc/Xero--Fact-Sheet-(2026).pdf"
+     ],
+     "notes": "Closest incumbent on F3. A generic cash flow forecast exists, but not 'chase these 3 to cover payroll'. The WhatsApp claim comes from a bank partner fact sheet (RHB Reflex Premium Plus bundle), not a Xero feature page. Accept Payments lists Stripe/GoCardless; DuitNow/FPX not mentioned."
+    },
+    {
+     "name": "Zoho Books",
+     "url": "https://www.zoho.com/books/pricing/",
+     "available_in_malaysia": "unclear",
+     "country_or_market": "Global (USD pricing page); no Malaysia-specific Zoho Books page found",
+     "target_size": "Micro to mid SMEs",
+     "price_note": "USD per org per month, billed annually: Free $0, Standard $10, Professional $20, Premium $30, Elite $100, Ultimate $200 (monthly billing $12/$24/$36/$129/$249). 'Automate payment reminders' is listed on the Free plan.",
+     "features": {
+      "F1": "yes - 'Automate payment reminders' from the Free plan",
+      "F2": "partial - WhatsApp can be linked 'to send notifications of payments and sales transactions' with customisable utility templates (April 2024). Whether reminders run automatically over WhatsApp is not stated. Languages unclear.",
+      "F3": "partial - 'Cashflow forecasting' on Premium+ ($30/month). No shortfall-based invoice ranking.",
+      "F4": "partial - 'Setup sales and purchase approvals' and 'Create custom user roles' on Professional+. No tone-tiered reminder approval.",
+      "F5": "unclear - credit limit not listed on the pricing page",
+      "F6": "no - only 'Receipt autoscans'",
+      "F7": "partial - bank feeds (Standard+) and bank reconciliation. No slip verification.",
+      "F8": "no - not found",
+      "F9": "partial - custom roles on Professional+. Audit trail not listed on the pricing page.",
+      "F10": "yes - Free plan includes automated reminders. Standard is $10/month annual. Malaysian e-invoice support unverified."
+     },
+     "evidence_urls": [
+      "https://www.zoho.com/books/pricing/",
+      "https://help.zoho.com/portal/en/community/topic/whats-new-in-zoho-books-april-2024",
+      "https://www.zoho.com/au/books/pricing/"
+     ],
+     "notes": "Covers F1, F4 approvals and F3 forecasting on higher tiers, but nothing ties them together into cash-gap-driven chasing. Every Malaysia-specific Zoho URL tried returned 404, so local availability and pricing are unverified."
+    },
+    {
+     "name": "Biztory",
+     "url": "https://biztory.com.my/full-set-accounting-2/manage-cashflow/",
+     "available_in_malaysia": "yes",
+     "country_or_market": "Malaysia (local vendor)",
+     "target_size": "Micro to small SMEs (2 to 30 users by plan)",
+     "price_note": "Plus RM690/year (2 users), Growth RM1,290/year (10 users), Pro RM2,490/year (30 users), Elite custom",
+     "features": {
+      "F1": "partial - shows 'how many overdue customers you have in a glance'. 'Email reminder with a payment link'. 'top 20 overdue accounts' report.",
+      "F2": "partial - 'Auto-generated invoice URL link' to share via email or WhatsApp (manual). Reminders by email.",
+      "F3": "no - tracks current cash against bills, no forecast",
+      "F4": "unclear - not mentioned",
+      "F5": "unclear - credit limits not mentioned",
+      "F6": "no - not mentioned",
+      "F7": "partial - 'view your bank reconciliation statement anytime', and an iPay88 gateway link. No slip verification.",
+      "F8": "no - not mentioned",
+      "F9": "unclear - user counts per plan only. No roles or audit log described.",
+      "F10": "partial - Plus is about RM57.50/month, but it is unclear whether Plus includes reminders"
+     },
+     "evidence_urls": [
+      "https://www.biztory.com.my/pricing",
+      "https://biztory.com.my/full-set-accounting-2/generate-invoice/",
+      "https://biztory.com.my/full-set-accounting-2/manage-cashflow/"
+     ],
+     "notes": "Its 'top 20 overdue accounts' report is a crude form of prioritisation, ranked by balance and not by the cash gap."
+    },
+    {
+     "name": "HitPay Invoicing (Malaysia)",
+     "url": "https://hitpayapp.com/my/blog/invoicing-malaysia-business",
+     "available_in_malaysia": "yes",
+     "country_or_market": "Malaysia, Singapore, Philippines and others",
+     "target_size": "Micro businesses and freelancers to SMEs",
+     "price_note": "No monthly or setup fee. DuitNow QR 1.2%, FPX 1.8% + RM0.40, domestic cards 1.2% + RM1, plus a 0.2% invoicing fee. Xero integration adds 0.2%.",
+     "features": {
+      "F1": "yes - invoices with automatic reminders, e.g. 3 days before and 2 days after the due date",
+      "F2": "no - reminders are email ('prompt-to-pay email'). WhatsApp is only mentioned as a manual follow-up.",
+      "F3": "no",
+      "F4": "no - not mentioned",
+      "F5": "no - not mentioned",
+      "F6": "no - not mentioned",
+      "F7": "partial - an invoice moves 'from Pending to Paid once payment is made', but only for payments made through HitPay. Has 'partial payment support'. No bank-statement matching for off-platform transfers.",
+      "F8": "no",
+      "F9": "unclear - not covered",
+      "F10": "yes - pay-per-transaction only"
+     },
+     "evidence_urls": [
+      "https://hitpayapp.com/my/blog/invoicing-malaysia-business",
+      "https://hitpayapp.com/my/pricing"
+     ],
+     "notes": "Solves 'was it really paid' by moving payment onto a gateway rail, with DuitNow QR on the invoice. That does not help when B2B customers pay by direct bank transfer and send a slip, which is Kutip + Bukti's F6/F7 case."
+    },
+    {
+     "name": "Curlec (by Razorpay) Payment Links",
+     "url": "https://curlec.com/payment-links/",
+     "available_in_malaysia": "yes",
+     "country_or_market": "Malaysia",
+     "target_size": "SMEs to enterprises",
+     "price_note": "Per transaction: FPX 1.5% or RM1 (whichever is greater), domestic cards 2.5%, international cards 3%, e-wallets 1.5%",
+     "features": {
+      "F1": "partial - payment links 'with free Reminders'. Not an invoice ledger.",
+      "F2": "partial - links shareable 'via SMS, WhatsApp, email'. Whether reminders are automatic, and which languages, unclear.",
+      "F3": "no",
+      "F4": "no - not mentioned",
+      "F5": "no - not mentioned",
+      "F6": "no - not mentioned",
+      "F7": "partial - webhook when a link is paid, instalment/partial payments, 'reconcile payments efficiently through dashboard reporting'. Only covers payments made through Curlec.",
+      "F8": "no",
+      "F9": "unclear",
+      "F10": "yes - per-transaction fees only"
+     },
+     "evidence_urls": [
+      "https://curlec.com/payment-links/"
+     ],
+     "notes": "DuitNow is not listed on the payment links page. Like HitPay, it fixes reconciliation only by changing the payment rail."
+    },
+    {
+     "name": "SleekFlow (WhatsApp Business platform)",
+     "url": "https://sleekflow.io/pricing",
+     "available_in_malaysia": "yes",
+     "country_or_market": "APAC, with Malaysian ringgit pricing and a Malay-language site",
+     "target_size": "SMEs to enterprises (sales/support teams)",
+     "price_note": "Pro RM399/month (3 users), Premium RM1,199/month, Enterprise custom. Plus RM50/month WhatsApp API number hosting. Broadcast and conversation fees billed separately.",
+     "features": {
+      "F1": "partial - no invoice ledger. Could be built from Google Sheets plus the Flow Builder.",
+      "F2": "partial - WhatsApp template broadcasts and flows. Templates and languages are user-built, nothing billing-specific.",
+      "F3": "no",
+      "F4": "unclear - role-based access control on Premium. No approval step for messages found.",
+      "F5": "no",
+      "F6": "unclear - 'AI agents handle customer conversations'. Structured extraction of amounts or promised dates is not stated.",
+      "F7": "no - Stripe payment links only. No bank-statement matching.",
+      "F8": "no",
+      "F9": "partial - RBAC on Premium",
+      "F10": "no - RM399/month minimum"
+     },
+     "evidence_urls": [
+      "https://sleekflow.io/pricing",
+      "https://sleekflow.io/blog/malaysia-whatsapp-pay"
+     ],
+     "notes": "SleekFlow's own Malaysia guide says WhatsApp Pay is not available in Malaysia, so businesses use payment links in chat. A recurring-payment-reminder use case is documented for Hong Kong, not Malaysia."
+    },
+    {
+     "name": "WATI (WhatsApp Business API platform)",
+     "url": "https://www.wati.io/pricing/",
+     "available_in_malaysia": "yes",
+     "country_or_market": "Global, with ringgit pricing shown",
+     "target_size": "SMEs",
+     "price_note": "Growth RM299/month, Pro RM799/month (billed annually), Business custom. Per-message charges extra by rate card. Astra AI Agents are a paid add-on.",
+     "features": {
+      "F1": "partial - no invoice tracking. The footer lists 'Google Sheet sender' for sheet-driven sends.",
+      "F2": "partial - WhatsApp broadcasts with utility templates. Nothing collections-specific.",
+      "F3": "no",
+      "F4": "unclear - not mentioned",
+      "F5": "no",
+      "F6": "unclear - AI agents (add-on). Extraction of payment details is not stated.",
+      "F7": "no",
+      "F8": "no",
+      "F9": "unclear - user seats only",
+      "F10": "no - RM299/month minimum"
+     },
+     "evidence_urls": [
+      "https://www.wati.io/pricing/"
+     ],
+     "notes": "A generic WhatsApp channel. It supplies the F2 pipe but none of the receivables logic."
+    }
+   ],
+   "summary": "Short answer: none of the Malaysian tools I checked does all of Kutip + Bukti. But several of its pieces already exist, so the idea is only new on its harder features. The 'Malaysia stack' I checked covers local accounting apps, payment gateways and WhatsApp tools.\n\nWhat already exists (do not pitch these as new):\n- Invoice tracking with automatic reminders (F1): Bukku Grow at RM65, Xero, Zoho Books (Free plan), HitPay (email, no monthly fee) and Biztory.\n- WhatsApp sending (F2): Bukku, SQL Account, AutoCount and Biztory send invoices or statements over WhatsApp, as a one-click manual share. SQL Account's eInvoice/Adaptis add-on 'sends payment reminders via email, SMS, WhatsApp'. A 2026 RHB/Xero fact sheet says Xero can send 'invoices or payment reminders directly through WhatsApp'.\n- Credit hold (F5): SQL Account already blocks new delivery orders and invoices for overdue customers. AutoCount 2.0 asks for approval when a document exceeds the credit limit.\n- Bank reconciliation and allocation (F7, partly): auto bank recon in SQL Account (20+ Malaysian banks, AI matching), AutoCount (Maybank/UOB), Bukku SmartRecon (PDF statements) and Xero. SQL Account can 'knock off all invoices using FIFO, in 1 click'.\n- Roles and audit trail (F9): Bukku Prime and AutoCount Cloud.\n- Cash flow forecasting (F3, generic only): Xero (30/60/180 days by plan) and Zoho Books Premium.\n\nWhat I found in none of the products checked:\n- F3 as specified: ranking overdue invoices by how much each one closes the next known shortfall ('short RM2,000 for payroll on 31 Oct, chase these 3').\n- F4: approval tiers by reminder tone. Zoho and AutoCount have approvals only for sales or purchase documents.\n- F6: parsing Manglish/BM/Chinese customer replies and payment-slip screenshots. Every AI or OCR feature found reads supplier bills or receipts.\n- F7 as specified: never marking an invoice paid from a slip alone, checking the claimed payment against a bank line, and flagging short-payments or deductions. HitPay and Curlec auto-mark invoices paid only when the money comes through their own rail, not for direct bank transfers.\n- F8: promise-to-pay tracking from free-text replies that pauses reminders.\n- WhatsApp tools (SleekFlow RM399/month, WATI RM299/month) supply only the messaging channel, with no receivables logic, at roughly 5x Bukku's price.\n\nWhat this means: the gap is real but narrow. It is the reply/slip-to-bank verification loop (F6, F7 strict, F8) plus cash-gap-driven prioritisation (F3) and tone approval (F4). The likely pitch is a layer on top of the accounting apps SMEs already use, not a replacement for invoicing or reminders.\n\nLimits of this check:\n1. I ran 11 web searches before the shared session search budget ran out. Everything after that came from fetching vendor pages directly.\n2. Not checked: QuickBooks Malaysia, QNE, Deskera, iPay88, senangPay, toyyibPay, Revenue Monster, Stripe Malaysia, Interakt, and DuitNow Request (the PayNet page returned 403).\n3. Billplz's homepage (free Basic plan, DuitNow supported) does not mention reminders or reconciliation.\n4. Financio (RM50/month Essentials) lists bank reconciliation and 'A.I. Scan' but no reminders or WhatsApp.\n5. respond.io starts at USD 79/month (billed yearly), with WhatsApp fees extra.\n6. Zoho Books' availability and pricing in Malaysia are unverified: every Malaysia-specific Zoho URL I tried returned 404.\n7. Bukku's help centre needs a login, so its features come only from the public features and pricing pages.\n8. 'no' means not found on the public pages fetched. It does not mean the vendor confirmed the feature is absent.\n9. Global receivables-collection tools (e.g. Chaser, Paidnice) showed up in search results but were outside this angle and were not checked. They should be checked separately before the team claims novelty."
+  },
+  "emerging-markets-micro": {
+   "summary": "I found nothing in this angle that matches Kutip + Bukti as a whole. The closest analogues only cover F1/F2-lite: a credit ledger plus a one-tap or automatic WhatsApp/SMS reminder with a payment link, usually free.\n\nEvidence limits: about 17 searches ran, plus direct fetches of product pages. The shared session search budget ran out twice. Philippines, Vietnam, Nigeria and Brazil were only partly covered. Khatabook's own site and the Google Play listings would not render, so those rows rest on search snippets and third-party pages.\n\nMalaysia availability:\n- The big emerging-market ledgers do not operate in Malaysia. Khatabook, OkCredit, Vyapar, myBillBook and CredFlow are India-focused (UPI, GST); Vyapar adds the UAE. BukuWarung, Paper.id and CrediBook are Indonesia-only.\n- BukuKas/Lummo entered voluntary liquidation (DealStreetAsia, 2 Sep 2023).\n- Kippa (Nigeria) advertised automated debt reminders in 2022 press coverage, but kippa.africa did not resolve during this check, so its current status is unclear.\n- Malaysian 'buku hutang' apps are tiny one-developer apps: BakiMate (one-tap WhatsApp reminder; Urdu/English/Malay; free with Pro at about US$1.99/month), Hutang: Buku Hutang (RM1.90, friends and family, no WhatsApp), Buku 555 (2018, individuals) and Bayar Hutang. Bayar Hutang's older Play listing offered casual/polite/firm reminder tones and its newer one mentions attaching payment proof; its country is unclear. None target B2B sellers on 30-90 day terms.\n- WebWMS2U is a Malaysian WhatsApp platform (from RM49/month) that can schedule payment reminders from CSV/Excel. It is generic messaging infrastructure with no ledger and no payment matching.\n\nGaps (no evidence in any product checked):\n- F3: cash-gap prioritisation against payroll/rent. CredFlow shows 'projected cash flows' only.\n- F4: tiered clerk/owner approval.\n- F6: AI parsing of Manglish/BM/Chinese replies or slip screenshots.\n- F8: promise-to-pay tracking that pauses reminders.\n- F7, verifying against the bank statement before marking PAID: no product does this. CredFlow lists 'Bank Reconciliation' and Paper.id names AI 'rekonsiliasi', both without detail.\n- F2 language mix: no product found sends BM/English/Chinese templates. Vyapar claims multi-language editable templates (Indian languages); OkCredit runs in 11 Indian languages.\n\nDesign point for the team: India and Indonesia largely avoid slip-reading. Reminders carry UPI or payment links, and payments are auto-recorded against the customer (OkCredit, BukuWarung, Paper.id). The Malaysian equivalent would be DuitNow/FPX payment links. Kutip + Bukti's F6/F7 value rests on Malaysian B2B buyers paying by bank transfer and sending slips, not through links. Validate that with real sellers.\n\nOther markets: Lista PH sends free SMS/Viber/Messenger reminders (no WhatsApp). Suki PH has WhatsApp reminders for ₱299 one-time. Sổ Bán Hàng (Vietnam) advertises automatic debt reminders without naming the channel. Fiado Zap (Brazil) has automated fiado reminders; its channel is unstated. Fidexa (Brazil) reportedly uses AI on WhatsApp to collect small retail debts via Pix. That is a consumer-retail analogue to F6, seen only in a search snippet and not verified.\n\nVerdict for this angle: the 'ledger + WhatsApp reminder' core is commoditised and free in emerging markets. The F3 + F4 + F6 + F7 + F8 combination for Malaysian B2B credit sellers was not found.",
+   "products": [
+    {
+     "name": "OkCredit",
+     "url": "https://okcredit.in/payment-reminder-app",
+     "country_or_market": "India",
+     "available_in_malaysia": "no",
+     "target_size": "Kirana shops / micro merchants",
+     "price_note": "Reminders in free Basic Plan; Premium adds unlimited SMS, multi-device, GST billing (no price seen)",
+     "features": {
+      "F1": "partial - credit ledger per customer; no invoice CSV/accounting import seen",
+      "F2": "partial - automatic WhatsApp+SMS reminders with UPI link; 11 Indian languages, no BM/Chinese",
+      "F3": "no - nothing on cash-flow or shortfall ranking on pages seen",
+      "F4": "unclear - no approval tiers mentioned",
+      "F5": "unclear - no credit-hold feature mentioned",
+      "F6": "no - no reply/slip parsing mentioned",
+      "F7": "partial - UPI payments via reminder link auto-recorded; no bank-statement matching",
+      "F8": "unclear - not mentioned",
+      "F9": "unclear - Premium 'multi-device access', no roles described",
+      "F10": "yes - free Basic Plan includes reminders"
+     },
+     "evidence_urls": [
+      "https://okcredit.in/payment-reminder-app",
+      "https://okcredit.in/khatabook-alternative"
+     ],
+     "notes": "Best-documented analogue for automatic WhatsApp reminders. Relies on UPI payment links instead of slip verification. Only India is indicated ('Made in India', 2,800+ cities)."
+    },
+    {
+     "name": "Khatabook",
+     "url": "https://khatabook.com/",
+     "country_or_market": "India",
+     "available_in_malaysia": "no",
+     "target_size": "Micro merchants, tier-2/3 Indian cities",
+     "price_note": "Not confirmed; reminders described as free in third-party listings",
+     "features": {
+      "F1": "partial - digital credit ledger; invoice import not seen",
+      "F2": "partial - WhatsApp/SMS reminders with payment links, multiple with one tap (third-party sources)",
+      "F3": "unclear - not seen",
+      "F4": "unclear - not seen",
+      "F5": "unclear - not seen",
+      "F6": "unclear - not seen",
+      "F7": "unclear - payment links only; no bank matching seen",
+      "F8": "unclear - not seen",
+      "F9": "unclear - not seen",
+      "F10": "unclear - pricing not confirmed"
+     },
+     "evidence_urls": [
+      "https://www.similarweb.com/app/google/com.vaibhavkalpe.android.khatabook/kuwait/",
+      "https://miracuves.com/blog/what-is-khatabook-and-how-does-it-work/",
+      "https://craft.co/khatabook",
+      "https://techcrunch.com/2020/05/19/indias-khatabook-raises-60-million-to-help-merchants-digitize-bookkeeping-and-accept-payments-online"
+     ],
+     "notes": "The official site returned empty, so the evidence is third-party and weaker. Company profiles describe an India-only market; no Malaysia mention found."
+    },
+    {
+     "name": "Vyapar",
+     "url": "https://api1.vyaparapp.in/free/invoice-reminder-software",
+     "country_or_market": "India + UAE",
+     "available_in_malaysia": "unclear",
+     "target_size": "Small businesses / retailers",
+     "price_note": "Free app; iOS paid plans about US$34-149 (Gold, Platinum, etc.); free desktop trial",
+     "features": {
+      "F1": "yes - invoicing with receivables, Sale Aging report, due dates",
+      "F2": "partial - WhatsApp from own number plus auto SMS; editable multi-language templates (Indian focus); polite-to-firm tone by editing",
+      "F3": "no - aging reports only, no cash-gap logic seen",
+      "F4": "unclear - no approval roles mentioned",
+      "F5": "partial - iOS listing mentions setting credit limits for customers",
+      "F6": "no - not mentioned",
+      "F7": "partial - UPI/netbanking/card payment links in reminders; no bank-statement verification seen",
+      "F8": "no - promise-to-pay not mentioned",
+      "F9": "unclear - no roles described",
+      "F10": "unclear - plans about US$34-149 (period not clear)"
+     },
+     "evidence_urls": [
+      "https://api1.vyaparapp.in/free/invoice-reminder-software",
+      "https://vyaparapp.in/guides/how-to-send-payment-reminders-in-vyapar",
+      "https://apps.apple.com/us/app/vyapar-billing-accounting/id6478382307"
+     ],
+     "notes": "Closest Indian analogue for scheduled per-party reminder cadence and bulk sending filtered by debt age. The iOS listing says 'India and the UAE'. No SST/Malaysia support found; vyaparapp.in/malaysia returned 404."
+    },
+    {
+     "name": "myBillBook",
+     "url": "https://mybillbook.in/s/features/payment-reminders/",
+     "country_or_market": "India",
+     "available_in_malaysia": "no",
+     "target_size": "SMBs (GST billing)",
+     "price_note": "About Rs199/month basic (GetApp, third-party)",
+     "features": {
+      "F1": "yes - sales invoices with due dates",
+      "F2": "partial - automatic SMS 3 days before or on due date; WhatsApp is manual, web-only, prefilled",
+      "F3": "no - not mentioned",
+      "F4": "unclear - not mentioned",
+      "F5": "unclear - not mentioned",
+      "F6": "no - not mentioned",
+      "F7": "no - 'Payment status changes only after you record the payment'",
+      "F8": "no - not mentioned",
+      "F9": "unclear - not mentioned on reminder page",
+      "F10": "unclear - about Rs199/month third-party figure"
+     },
+     "evidence_urls": [
+      "https://mybillbook.in/s/features/payment-reminders/",
+      "https://knowledge.mybillbook.in/en/help/articles/2643477-how-to-send-whatsapp-payment-reminders-in-one-click",
+      "https://www.getapp.com/finance-accounting-software/a/flobooks/"
+     ],
+     "notes": "WhatsApp reminders are not automated: 'the message is not sent automatically'."
+    },
+    {
+     "name": "BukuWarung",
+     "url": "https://bukuwarung.com/",
+     "country_or_market": "Indonesia",
+     "available_in_malaysia": "no",
+     "target_size": "Warung / micro merchants (7M+ merchants claimed)",
+     "price_note": "Free app",
+     "features": {
+      "F1": "partial - hutang-piutang bookkeeping; no invoice import seen",
+      "F2": "partial - 'Tagih' sends WhatsApp bill with payment link (Twilio WhatsApp API); Indonesian",
+      "F3": "no - not mentioned",
+      "F4": "unclear - not mentioned",
+      "F5": "unclear - not mentioned",
+      "F6": "no - not mentioned",
+      "F7": "partial - digital payment via link; no bank-statement matching seen",
+      "F8": "unclear - not mentioned",
+      "F9": "unclear - not described",
+      "F10": "yes - free"
+     },
+     "evidence_urls": [
+      "https://bukuwarung.com/",
+      "https://customers.twilio.com/en-us/bukuwarung",
+      "https://finansial.bisnis.com/read/20210810/563/1428325/umkm-suka-ngutangin-pembeli-aplikasi-bukuwarung-bisa-bantu-jadi-pengingat-tagihan"
+     ],
+     "notes": "Site cites 750+ locations in Indonesia only. Its rival BukuKas/Lummo entered voluntary liquidation in Sep 2023."
+    },
+    {
+     "name": "Paper.id",
+     "url": "https://www.paper.id/invoice-online/invoice-reminder",
+     "country_or_market": "Indonesia (B2B invoicing)",
+     "available_in_malaysia": "no",
+     "target_size": "B2B SMEs",
+     "price_note": "Paper Free tier; reminders stated free; PaperPlus premium (no price seen)",
+     "features": {
+      "F1": "yes - B2B digital invoices, ERP connection",
+      "F2": "partial - scheduled auto reminders via email/SMS/WhatsApp, free; Indonesian only",
+      "F3": "no - not mentioned",
+      "F4": "unclear - 'Custom Role' listed, no approval flow",
+      "F5": "unclear - not mentioned",
+      "F6": "unclear - 'AI automation' named generically",
+      "F7": "partial - AI 'rekonsiliasi' named, no detail",
+      "F8": "no - not mentioned",
+      "F9": "partial - 'Custom Role' in footer",
+      "F10": "yes - free tier, free reminders"
+     },
+     "evidence_urls": [
+      "https://www.paper.id/invoice-online/invoice-reminder",
+      "https://www.paper.id/"
+     ],
+     "notes": "Closest emerging-market B2B analogue: scheduled WhatsApp invoice reminders plus claimed reconciliation. No Malaysia presence seen."
+    },
+    {
+     "name": "CredFlow",
+     "url": "https://www.credflow.in/",
+     "country_or_market": "India (Tally users)",
+     "available_in_malaysia": "unclear",
+     "target_size": "SMEs on Tally",
+     "price_note": "Starter $11/month, Growth $28/month (SoftwareSuggest, third-party)",
+     "features": {
+      "F1": "yes - official Tally ERP 9 integration, automated collection workflows",
+      "F2": "partial - SMS/email/IVR; WhatsApp claimed by some listings only",
+      "F3": "partial - 'projected cash flows', debtor-wise analysis; no shortfall-based ranking",
+      "F4": "unclear - not described",
+      "F5": "unclear - not described",
+      "F6": "no - not mentioned",
+      "F7": "partial - 'Bank Reconciliation' listed, no detail",
+      "F8": "unclear - not mentioned",
+      "F9": "partial - 'Multi User', 'User Activity' listed",
+      "F10": "partial - about $11-28/month third-party pricing"
+     },
+     "evidence_urls": [
+      "https://www.softwaresuggest.com/credflow",
+      "https://www.techjockey.com/detail/credflow",
+      "https://www.softwaresuggest.com/credflow/pricing"
+     ],
+     "notes": "Official site returned 503. Nearest found to F3 plus reconciliation, but India/Tally-centric."
+    },
+    {
+     "name": "BakiMate",
+     "url": "https://apps.apple.com/app/bakimate/id6768776202",
+     "country_or_market": "Malaysia (buku hutang shops) - inferred",
+     "available_in_malaysia": "unclear",
+     "target_size": "Neighbourhood shops and stalls",
+     "price_note": "Free; Pro listed at US$1.99/month or US$14.99/year, though description says '100% free'",
+     "features": {
+      "F1": "partial - credit-given/received ledger; no invoice import",
+      "F2": "partial - 'One-tap WhatsApp reminder for each customer'; app in Urdu/English/Malay",
+      "F3": "no - not mentioned",
+      "F4": "no - not mentioned",
+      "F5": "no - not mentioned",
+      "F6": "no - not mentioned",
+      "F7": "no - not mentioned",
+      "F8": "no - not mentioned",
+      "F9": "no - multi-user not mentioned",
+      "F10": "yes - free or about US$1.99/month"
+     },
+     "evidence_urls": [
+      "https://apps.apple.com/app/bakimate/id6768776202"
+     ],
+     "notes": "Single-developer iOS app explicitly built for shops running 'buku hutang' on paper. Malay language suggests Malaysia as the target, but the store page did not confirm the country."
+    },
+    {
+     "name": "Bayar Hutang (Debt & Credit: Kasbon Ledger)",
+     "url": "https://play.google.com/store/apps/details?id=com.bayarhutang.app&hl=en",
+     "country_or_market": "Unclear (Malay/Indonesian naming)",
+     "available_in_malaysia": "unclear",
+     "target_size": "Individuals, freelancers, MSMEs",
+     "price_note": "Not seen",
+     "features": {
+      "F1": "partial - two-way debt ledger",
+      "F2": "partial - WhatsApp reminders with casual/polite/firm tone (older listing)",
+      "F3": "no - not mentioned",
+      "F4": "no - tones are user-chosen, no approval",
+      "F5": "no - not mentioned",
+      "F6": "no - not mentioned",
+      "F7": "partial - newer listing allows attaching payment proof (no verification)",
+      "F8": "no - not mentioned",
+      "F9": "no - not mentioned",
+      "F10": "unclear - price not seen"
+     },
+     "evidence_urls": [
+      "https://play.google.com/store/apps/details?id=com.bayarhutang.app&hl=en",
+      "https://play.google.com/store/apps/details?id=com.bayarhutang.app&hl=en_CA"
+     ],
+     "notes": "Play listing would not render via fetch, so the evidence comes from search-result snippets only. The tone feature resembles gentle/firm tiers but has no approval gate."
+    },
+    {
+     "name": "WebWMS2U Cloud",
+     "url": "https://www.webwms2u.com/blog/whatsapp-payment-reminders-malaysia/",
+     "country_or_market": "Malaysia",
+     "available_in_malaysia": "yes",
+     "target_size": "Malaysian businesses generally",
+     "price_note": "Starter RM49/month (annual) up to Enterprise from RM1,499/month; Meta fees extra",
+     "features": {
+      "F1": "partial - scheduled reminders from imported CSV/Excel; no invoice ledger",
+      "F2": "partial - WhatsApp templates with invoice placeholders; site in BM/Chinese, message languages unstated",
+      "F3": "no - not mentioned",
+      "F4": "no - not mentioned",
+      "F5": "no - not mentioned",
+      "F6": "partial - generic AI chatbot for inbound; no payment parsing",
+      "F7": "no - customers asked to send reference; manual check",
+      "F8": "no - not mentioned",
+      "F9": "partial - exportable logs; advises limiting to authorised staff",
+      "F10": "yes - RM49/month starter"
+     },
+     "evidence_urls": [
+      "https://www.webwms2u.com/blog/whatsapp-payment-reminders-malaysia/",
+      "https://www.webwms2u.com/pricing/",
+      "https://www.webwms2u.com/"
+     ],
+     "notes": "Generic WhatsApp automation infrastructure rather than an AR product. Shows Malaysian SMEs can already script payment reminders, but with no ledger, verification or prioritisation."
+    }
+   ]
+  }
+ }
+}
