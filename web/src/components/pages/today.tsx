@@ -11,6 +11,7 @@ import { CollectionSnapshot, NextAction } from "@/components/today/collection-sn
 import EarlyWarnings from "@/components/today/early-warnings";
 import ChasePlan from "@/components/today/chase-plan";
 import ApprovalPanel from "@/components/today/approval-panel";
+import CollectionsTrend from "@/components/today/collections-trend";
 import WelcomePanel from "@/components/welcome/welcome-panel";
 
 export default function TodayPage() {
@@ -57,6 +58,9 @@ export default function TodayPage() {
       <div className="overview-bottom">
         <CollectionSnapshot />
         <NextAction />
+      </div>
+      <div className="mt-6">
+        <CollectionsTrend />
       </div>
       <div className="mt-6">
         <WelcomePanel />
