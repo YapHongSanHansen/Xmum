@@ -1,9 +1,13 @@
 "use client";
 // Orbyte Connect view (PRD FR-O2, FR-O3): the data sources Kutip reads, what
-// each provides, and the Orbyte platform pieces it reuses.
+// each provides, the CSV imports and owner balance entry (FR-A1, FR-A4, FR-A5),
+// and the Orbyte platform pieces it reuses.
 import type { ComponentType, ReactNode } from "react";
 import { ArrowRight, Contact, FileSpreadsheet, Landmark, Lock, MessageCircle, ShieldCheck, Webhook } from "lucide-react";
 import { Badge, Button, Card, CardHeader, PageTitle } from "@/components/ui";
+import { BalanceEntry } from "@/components/connect/balance-entry";
+import { BankImport } from "@/components/connect/bank-import";
+import { InvoiceImport } from "@/components/connect/invoice-import";
 import { fmtDateTime, fmtRM, type Lang } from "@/engine/model";
 import { visibleBankLines } from "@/engine/rules";
 import { DEMO_START } from "@/engine/seed";
@@ -123,6 +127,24 @@ export default function ConnectPage() {
           <Stat label="Languages" value={langs} />
           <Stat label="Used by" value="templates (R5), matching (M1)" />
         </SourceCard>
+      </div>
+
+      <h2 className="mb-3 mt-8 text-sm font-semibold text-slate-900">Import data</h2>
+      <div className="space-y-4">
+        <InvoiceImport />
+        {/* FR-A4 / FR-B5: the Clerk never sees the balance form or its value. */}
+        {owner ? (
+          <div className="grid grid-cols-5 items-start gap-4">
+            <div className="col-span-3">
+              <BankImport />
+            </div>
+            <div className="col-span-2">
+              <BalanceEntry />
+            </div>
+          </div>
+        ) : (
+          <BankImport />
+        )}
       </div>
 
       <h2 className="mb-3 mt-8 text-sm font-semibold text-slate-900">Reused from Orbyte</h2>
