@@ -7,7 +7,7 @@ import { apply, type Action } from "@/engine/reducer";
 import { seedState } from "@/engine/seed";
 import type { State } from "@/engine/model";
 
-export type Page = "today" | "bookings" | "inbox" | "log" | "connect" | "guide" | "module";
+export type Page = "today" | "bookings" | "inbox" | "log" | "connect" | "guide" | "module" | "approvals";
 
 interface Store {
   state: State;
@@ -40,12 +40,12 @@ export const useKutip = create<Store>()(
     }),
     {
       name: "kutip-demo-v1",
-      partialize: (s) => ({ state: s.state, page: s.page }),
+      partialize: (s) => ({ state: s.state, page: s.page, moduleName: s.moduleName }),
       // A stale or corrupt saved state falls back to the seed.
       merge: (persisted, current) => {
         const p = persisted as Partial<Store> | undefined;
         if (!p?.state || p.state.version !== seedState().version) return current;
-        return { ...current, state: p.state, page: p.page ?? current.page };
+        return { ...current, state: p.state, page: p.page ?? current.page, moduleName: p.moduleName ?? null };
       },
     },
   ),

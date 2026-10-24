@@ -82,7 +82,7 @@ function PlanTableRow({ state, row, selected, onReview }: { state: State; row: P
     <tr
       className={cx(
         "border-b border-slate-100 align-top last:border-0",
-        muted && "bg-slate-50/70 text-slate-400",
+        muted && "bg-slate-50/70 text-slate-500",
         selected && "bg-emerald-50/70",
       )}
     >
@@ -111,7 +111,7 @@ function PlanTableRow({ state, row, selected, onReview }: { state: State; row: P
           {row.state === "waiting" && <Badge>waiting</Badge>}
           {row.closesGap && <Badge tone="emerald">closes the gap</Badge>}
         </div>
-        <div className={cx("mt-1 text-xs", muted ? "text-slate-400" : "text-slate-600")}>{row.reason}</div>
+        <div className={cx("mt-1 text-xs", muted ? "text-slate-500" : "text-slate-600")}>{row.reason}</div>
       </td>
       <td className="px-4 py-3 text-right">
         {row.state === "remind" && (
@@ -131,7 +131,7 @@ function PlanTableRow({ state, row, selected, onReview }: { state: State; row: P
               {row.reason}
             </span>
           ))}
-        {muted && <span className="text-xs text-slate-400">{row.state === "skipped" ? "Skipped" : "Waiting"}</span>}
+        {muted && <span className="text-xs text-slate-500">{row.state === "skipped" ? "Skipped" : "Waiting"}</span>}
         {row.state === "escalate" && <EscalationActions state={state} row={row} isOwner={isOwner} onDecide={(decision) => dispatch({ type: "ESCALATION_DECISION", invoiceId: row.invoice.id, decision })} />}
       </td>
     </tr>

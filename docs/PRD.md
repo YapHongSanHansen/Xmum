@@ -556,3 +556,5 @@ Found by the engine test suite and left for P1.
 | 4 | Reset is not written to the activity log | Intentional for the demo, so the log starts at the 08:00 scan |
 | 5 | A reminder released after quiet hours keeps its approval time | Store the release time separately |
 | 6 | The live AI call has not been exercised against the API in this build (no key on the build machine); the cached results are the tested path | Run the three seeded messages live once a key is set, and record the result |
+| 7 | No screens for invoice CSV import (FR-A1), owner bank-balance entry (FR-A4) or bank CSV import (FR-A5): the demo starts from data already imported | Add the three import forms on the Connect page |
+| 8 | Snooze, mark disputed and "I'll call instead" on the approval card (FR-C9) are not built | Add the three actions to the engine and the drawer |

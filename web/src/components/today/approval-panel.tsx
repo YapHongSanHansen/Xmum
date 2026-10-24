@@ -120,10 +120,7 @@ export default function ApprovalPanel({ row, onClose }: { row: PlanRow; onClose:
           <section>
             <SectionTitle right={<RuleTag id="G1" />}>{isOwner ? "Gap impact" : "Next bill"}</SectionTitle>
             {isOwner ? <OwnerGapImpact row={row} /> : (
-              <div className="text-sm text-slate-700">
-                Helps cover the next bill:{" "}
-                <span className={cx("font-semibold", row.closesGap ? "text-emerald-700" : "text-slate-600")}>{row.closesGap ? "yes" : "no"}</span>
-              </div>
+              <ClerkNextBill row={row} />
             )}
           </section>
 
@@ -188,11 +185,27 @@ export default function ApprovalPanel({ row, onClose }: { row: PlanRow; onClose:
           ) : (
             <div className="flex items-start gap-2 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-900">
               <Lock className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-              <span>Firm reminders need the Owner. Switch the Orbyte role in the header.</span>
+              <span className="flex-1">Firm reminders need the Owner.</span>
+              <Button size="sm" variant="secondary" onClick={() => dispatch({ type: "SET_ROLE", role: "owner" })}>
+                Switch to Owner
+              </Button>
             </div>
           )}
         </footer>
       </aside>
+    </div>
+  );
+}
+
+/** Clerk view of G1: whether paying covers the next bill, never the amounts (FR-B5). */
+function ClerkNextBill({ row }: { row: PlanRow }) {
+  const state = useKutip((s) => s.state);
+  const next = gapImpact(state, row.invoice)[0];
+  const answer = !next ? "no bill is short" : next.after >= 0 ? "yes" : next.after > next.before ? "partly" : "no";
+  return (
+    <div className="text-sm text-slate-700">
+      If paid by {fmtDate(payBy(state))}, covers the next bill:{" "}
+      <span className={cx("font-semibold", answer === "yes" ? "text-emerald-700" : "text-slate-600")}>{answer}</span>
     </div>
   );
 }

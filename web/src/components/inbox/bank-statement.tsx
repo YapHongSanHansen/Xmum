@@ -27,7 +27,7 @@ export function BankStatement({ state }: { state: State }) {
                 <tr key={b.id} className="border-t border-slate-100 align-top">
                   <td className="py-1 pr-2 whitespace-nowrap">{fmtDateTime(b.at)}</td>
                   <td className="py-1 text-right whitespace-nowrap">{fmtRM(b.amount, { cents: true })}</td>
-                  <td className="py-1 pl-3 break-all">{b.description}</td>
+                  <td className="py-1 pl-3 break-words [overflow-wrap:anywhere]">{b.description}</td>
                   <td className="py-1 pl-2">
                     {b.matchedInvoiceId ? <Badge tone="emerald">{invoiceOf(state, b.matchedInvoiceId).number}</Badge> : <span className="text-slate-400">—</span>}
                   </td>

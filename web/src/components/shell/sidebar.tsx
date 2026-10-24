@@ -14,11 +14,13 @@ import {
   UserPlus,
   Users,
   Wallet,
+  ClipboardCheck,
 } from "lucide-react";
 import { cx } from "@/components/ui";
 import { useKutip, type Page } from "@/lib/store";
 import { inboxCount } from "./counts";
 import { Wordmark } from "./wordmark";
+import { approvalsCount } from "@/components/pages/approvals";
 
 type Icon = ComponentType<{ className?: string }>;
 
@@ -29,6 +31,7 @@ export function Sidebar() {
   const moduleName = useKutip((s) => s.moduleName);
   const go = useKutip((s) => s.go);
   const count = useKutip((s) => inboxCount(s.state));
+  const approvals = useKutip((s) => approvalsCount(s.state));
 
   const isModule = (name: string) => page === "module" && moduleName === name;
   const kutipPages: Page[] = ["today", "bookings", "inbox", "log"];
@@ -54,6 +57,13 @@ export function Sidebar() {
         <Item icon={Signature} label="eSign" active={isModule("eSign")} onClick={() => go("module", "eSign")} />
         <Item icon={UserPlus} label="Hiring" active={isModule("Hiring")} onClick={() => go("module", "Hiring")} />
         <Item icon={Plug} label="Connect" active={page === "connect"} onClick={() => go("connect")} />
+        <Item
+          icon={ClipboardCheck}
+          label="Approvals"
+          active={page === "approvals"}
+          onClick={() => go("approvals")}
+          right={approvals > 0 ? <span className="min-w-5 rounded-full bg-sky-400 px-1.5 text-center text-[11px] font-semibold leading-5 text-slate-900">{approvals}</span> : null}
+        />
 
         <div className="mt-5">
           <GroupLabel>New module</GroupLabel>

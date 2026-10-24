@@ -12,6 +12,7 @@ import LogPage from "@/components/pages/log";
 import ConnectPage from "@/components/pages/connect";
 import GuidePage from "@/components/pages/guide";
 import ModulePage from "@/components/pages/module";
+import ApprovalsPage from "@/components/pages/approvals";
 import { Header } from "./header";
 import { Sidebar } from "./sidebar";
 
@@ -68,6 +69,8 @@ function CurrentPage() {
       return <GuidePage />;
     case "module":
       return <ModulePage />;
+    case "approvals":
+      return <ApprovalsPage />;
     default:
       return <TodayPage />;
   }

@@ -10,7 +10,7 @@ export default function BookingsPage() {
   const state = useKutip((s) => s.state);
   const me = userOf(state, state.role);
   return (
-    <div className="mx-auto max-w-7xl p-6">
+    <div className="mx-auto max-w-7xl">
       <PageTitle
         title="Bookings"
         subtitle={`${fmtDateTime(state.now)} · signed in as ${me.name} (${state.role === "owner" ? "Owner" : "Clerk"}). Credit checks are decided by the Owner.`}

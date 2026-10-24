@@ -260,7 +260,7 @@ function Stat({ label, value, hint }: { label: string; value: ReactNode; hint?: 
   return (
     <div className="min-w-0">
       <div className="text-[11px] text-slate-500">{label}</div>
-      <div className="truncate text-sm font-semibold text-slate-900" title={typeof value === "string" ? value : undefined}>
+      <div className="text-sm font-semibold break-words text-slate-900" title={typeof value === "string" ? value : undefined}>
         {value}
       </div>
       {hint && <div className="text-[10px] text-slate-400">{hint}</div>}

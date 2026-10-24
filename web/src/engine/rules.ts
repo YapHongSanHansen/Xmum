@@ -268,7 +268,9 @@ const TEMPLATES: Record<Lang, Record<0 | 1 | 2, string>> = {
 export function renderReminder(s: State, inv: Invoice, tier: 0 | 1 | 2, sender: string): string {
   const c = customerOf(s, inv.customerId);
   const zhDate = (d: string) => `${+d.slice(5, 7)}月${+d.slice(8, 10)}日`;
-  const date = (d: string) => (c.lang === "zh" ? zhDate(d) : fmtDate(d));
+  const BM_MONTHS = ["Jan", "Feb", "Mac", "Apr", "Mei", "Jun", "Jul", "Ogo", "Sep", "Okt", "Nov", "Dis"];
+  const bmDate = (d: string) => `${+d.slice(8, 10)} ${BM_MONTHS[+d.slice(5, 7) - 1]}`;
+  const date = (d: string) => (c.lang === "zh" ? zhDate(d) : c.lang === "bm" ? bmDate(d) : fmtDate(d));
   const fields: Record<string, string> = {
     contact: c.contact,
     sender,

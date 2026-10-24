@@ -22,7 +22,7 @@ export default function TodayPage() {
   const selectedRow = selectedId ? chasePlan(state).find((r) => r.invoice.id === selectedId && r.state === "remind") : undefined;
 
   return (
-    <div className="mx-auto max-w-7xl space-y-5 p-6">
+    <div className="mx-auto max-w-7xl space-y-5">
       <PageTitle
         title="Today"
         subtitle={`${fmtDateTime(state.now)} · signed in as ${me.name} (${state.role === "owner" ? "Owner" : "Clerk"})`}

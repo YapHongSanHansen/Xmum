@@ -335,7 +335,7 @@ describe("R5 templates", () => {
 
   it("Tier 1 BM (Kilang) is in Malay", () => {
     const t = renderReminder(s, invoiceOf(s, "INV-2310"), 1, "Nurul");
-    for (const part of ["Salam Encik Razak", "Nurul", "INV-2310", "RM4,200", "12 Oct", "Peringatan mesra"]) expect(t).toContain(part);
+    for (const part of ["Salam Encik Razak", "Nurul", "INV-2310", "RM4,200", "12 Okt", "Peringatan mesra"]) expect(t).toContain(part);
     noBraces(t);
   });
 
