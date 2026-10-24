@@ -36,7 +36,7 @@ Taylor's University
 TODO: number of members
 
 ### live_url
-Not yet deployed; runs locally from the repo (Vercel planned). TODO: add URL
+Hosted on Vercel (confirmed by the team). TODO: add the live deployment URL
 
 ### repo_url
 https://github.com/YapHongSanHansen/Xmum (public)
@@ -90,7 +90,7 @@ One journey, end to end:
 **Data (Phase 1):** synthetic seed in a Zustand store persisted to the browser; money as integer sen. **Phase 2:** hosted database (Convex or Postgres) behind the same engine.
 **Rules engine:** pure TypeScript, deterministic; 97 Vitest tests replay every rule and the full demo script.
 **AI:** Claude Opus 5.5 via the Anthropic API (official SDK); image + text in, JSON out, validated with Zod; cached results as fallback.
-**Messaging:** WhatsApp click-to-chat (wa.me) links; a person presses send. **Hosting:** Vercel (deployment planned; runs locally today). **Code:** public GitHub repo.
+**Messaging:** WhatsApp click-to-chat (wa.me) links; a person presses send. **Hosting:** Vercel (confirmed by the team; live URL to be added). **Code:** public GitHub repo.
 
 **Block diagram**
 - Browser UI (simulated Orbyte hub, Owner/Clerk roles) → Rules engine (forecast, credit check, chase plan, bank match) → Human approval → Outcome + activity log
@@ -177,7 +177,7 @@ The user opens Kutip in a browser: a Next.js 16 / React 19 app shown as a module
 
 Every state change goes through a pure TypeScript rules engine: cash forecast and early warning, credit check, chase-plan ranking, the exact-quote check, bank-line matching and approval rights. Each step is written to an append-only activity log.
 
-When a customer reply arrives, the browser calls the app's server route /api/extract (local today; Vercel is the planned host). The route sends the message text and slip image to the Anthropic API (Claude Opus 5.5) and validates the JSON reply with Zod. On any error or timeout it returns a cached extraction labelled "cached result". The fields go back to the engine, which decides; the AI never changes money state.
+When a customer reply arrives, the browser calls the app's server route /api/extract (Vercel hosting, confirmed by the team). The route sends the message text and slip image to the Anthropic API (Claude Opus 5.5) and validates the JSON reply with Zod. On any error or timeout it returns a cached extraction labelled "cached result". The fields go back to the engine, which decides; the AI never changes money state.
 
 Approved reminders open WhatsApp through wa.me click-to-chat links, so a person presses send. The preliminary build uses no database (a hosted one is planned for Phase 2). The API key exists only as a server environment variable.
 
@@ -195,7 +195,7 @@ WhatsApp click-to-chat links, wa.me (Meta) | Opens WhatsApp with an approved rem
 No other external APIs | Bank data, accounting data and Orbyte Connect are simulated with synthetic CSV data | Not applicable
 
 ### tech.cloud
-Vercel (planned) | Will host the Next.js app and the /api/extract route, with the API key as an environment variable. Not yet deployed | Plan and region not yet selected
+Vercel | Hosts the Next.js app and the /api/extract route, as confirmed by the team; live URL to be added. API key is a server environment variable | Plan and region to be confirmed
 GitHub | Public code repository and commit history | Free
 Anthropic API (cloud inference) | Runs Claude Opus 5.5 for Bukti | Pay-as-you-go; hosted by Anthropic outside Malaysia
 Orbyte (Alpha Red Solutions) | Sponsor workspace: a synthetic Kutip client and project record; no runtime integration | Sponsor account; region not stated
@@ -269,7 +269,7 @@ For a real deployment under Malaysia's PDPA 2010 (as amended in 2024): the SME i
 Our team did not use Replit to develop, host or run Kutip. We declare this rather than add a token integration (SDC Handbook 8.1.3 and 8.4).
 
 - **Development:** code was written locally and shared through the public GitHub repository.
-- **Hosting:** the app runs locally today; Vercel is the planned host for the Next.js app and its server-side AI route.
+- **Hosting:** Vercel, as confirmed by the team, for the Next.js app and its server-side AI route. The live deployment URL still needs to be added.
 - **Secrets:** the only key (ANTHROPIC_API_KEY) is stored as a host environment variable and in a local .env.local file that git ignores. No secrets are in the repository.
 
 If the organisers require Replit use for the final round, the repository can be imported into Replit (Create Repl → Import from GitHub) and run with `pnpm install` and `pnpm dev` in the web folder.

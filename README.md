@@ -24,7 +24,7 @@
 | Resource          | Link                                           |
 | ----------------- | ---------------------------------------------- |
 | GitHub Repository | https://github.com/YapHongSanHansen/Xmum      |
-| Live Demo         | Not yet deployed (Vercel planned); run locally, see [How to Run](#how-to-run) |
+| Live Demo         | Hosted on Vercel (team-confirmed; live URL to be added); local instructions in [How to Run](#how-to-run) |
 | RunPod Endpoint   | Not used (see [How We Use RunPod](#how-we-use-runpod-required)) |
 | Slide Deck        | ⚠️ TODO: slide deck link                        |
 | Demo Video        | ⚠️ TODO: demo video link                        |
@@ -92,7 +92,7 @@ flowchart LR
 | Backend       | Next.js route handler (`/api/extract`) for the AI call; rules engine in pure TypeScript (`web/src/engine`) |
 | Database      | None in the preliminary build: Zustand store persisted to `localStorage`, reset from a synthetic seed (a hosted database is planned for the final round) |
 | AI / Compute  | Claude Opus 5.5 (`claude-opus-5-5`) via the Anthropic API, structured JSON validated with Zod; cached results as fallback |
-| Hosting / Dev | Vercel (planned hosting), GitHub, Vitest |
+| Hosting / Dev | Vercel, GitHub, Vitest |
 
 ---
 
@@ -245,7 +245,7 @@ AI only reads messages. Every decision (what to chase, whether something is paid
 
 ### Option 1 — Open the live demo (once deployed)
 
-1. Open the Live Demo link above (Vercel deployment planned). Nothing to install.
+1. Open the Vercel Live Demo link above once the deployment URL is added. Nothing to install.
 2. Use the role switcher in the header to act as **Owner** (Lim Siew Lan) or **Clerk** (Nurul).
 3. Follow the demo script in [`docs/PRD.md`](docs/PRD.md#13-preliminary-demo-script-about-3-4-minutes). **Reset demo** in the header starts it again.
 
@@ -284,7 +284,7 @@ pnpm test        # rules engine: every seed check and the full demo script
 **We did not use Replit for this project.** We declare this rather than add a token integration (Handbook 8.1.3 and 8.4).
 
 - **Development:** code was written locally and shared through this GitHub repository.
-- **Hosting:** the app runs locally today; Vercel is the planned host, since it runs Next.js route handlers with no extra server setup.
+- **Hosting:** Vercel, as confirmed by the team. The live deployment URL still needs to be added above.
 - **Secrets:** the only key, `ANTHROPIC_API_KEY`, is stored as an environment variable on the host and in a local `.env.local` that git ignores. No secrets are in this repository.
 
 📄 Proof of use: [`submission/SDC2026_Taygood_Replit_POU.pdf`](submission/SDC2026_Taygood_Replit_POU.pdf) (a signed statement that Replit was not used)
