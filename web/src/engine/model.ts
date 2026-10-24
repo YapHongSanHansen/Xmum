@@ -80,7 +80,11 @@ export interface BankLine {
   amount: number;
   description: string;
   matchedInvoiceId: string | null;
+  /** How the line reached Kachingg: a forwarded bank alert, or a transaction CSV export. Absent means CSV. */
+  source?: BankLineSource;
 }
+
+export type BankLineSource = "alert" | "csv";
 
 export interface InboundMessage {
   id: string;
@@ -222,7 +226,7 @@ export interface State {
   outflows: Outflow[];
   /** Credit lines only: the input for matching (M1). Every role sees these. */
   bankLines: BankLine[];
-  /** Debit lines from an imported statement (FR-A5). Owner only, never shown to the Clerk. */
+  /** Debit lines from an imported transaction export (FR-A5). Owner only, never shown to the Clerk. */
   bankDebits: BankLine[];
   messages: InboundMessage[];
   extractions: Record<string, ExtractionRecord>;

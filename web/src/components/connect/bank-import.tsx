@@ -1,5 +1,6 @@
 "use client";
-// FR-A5: bank statement CSV import. Credit lines go to matching (M1); debit
+// FR-A5: bank transactions CSV import (the export from online banking), the
+// manual fallback to bank alerts. Credit lines go to matching (M1); debit
 // lines are kept for the Owner. The Clerk's view is built by the engine's
 // bankPreviewFor(): credit lines only, no debits, no balance (FR-B5), and the
 // raw file is never shown to the Clerk.
@@ -39,18 +40,19 @@ export function BankImport() {
 
   return (
     <Card>
-      <CardHeader title="Bank statement (CSV)" />
+      <CardHeader kicker="Manual fallback" title="Bank transactions (CSV export from online banking)" />
       <div className="space-y-3 px-5 py-4">
         <div className="flex items-center gap-1.5 text-xs text-ink2">
           <span>{owner ? "Credits to matching; debits stay with you" : "Credit lines only; debits are Owner only"}</span>
           <RuleTag id="M1" />
         </div>
         <FormatNote>
-          Columns: <span className="font-mono">date, amount, description</span>; credits positive, debits negative.
+          Export the transactions from online banking for the days the alerts missed. Columns:{" "}
+          <span className="font-mono">date, amount, description</span>; credits positive, debits negative.
           {owner && " A balance column is ignored."}
         </FormatNote>
         <CsvSource
-          label="Bank statement CSV"
+          label="Bank transactions CSV"
           text={text}
           onText={(t) => {
             setText(t);

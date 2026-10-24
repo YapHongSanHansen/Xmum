@@ -153,7 +153,7 @@ const newOpen = past.invoices.filter((i) => i.status !== "paid");
 export function seedState(): State {
   return {
     // Bump when the State shape or the seed data changes, so a stale saved demo falls back to the seed.
-    version: 3,
+    version: 4,
     now: DEMO_START,
     business: { name: "Lori Laju Logistics Sdn Bhd", city: "Klang", staff: 12 },
     users: [
@@ -172,8 +172,8 @@ export function seedState(): State {
     ],
     bankLines: [
       ...structuredClone(past.bankLines),
-      { id: "bl-0919", at: "2026-10-19T16:10", amount: rm(1250), description: "IBG CR TOKO MAJU ENT 0919", matchedInvoiceId: null },
-      { id: "bl-2304", at: "2026-10-23T14:25", amount: rm(2770), description: "DUITNOW CR MEGA BINA HARDW INV2304", matchedInvoiceId: null },
+      { id: "bl-0919", at: "2026-10-19T16:10", amount: rm(1250), description: "IBG CR TOKO MAJU ENT 0919", matchedInvoiceId: null, source: "csv" },
+      { id: "bl-2304", at: "2026-10-23T14:25", amount: rm(2770), description: "DUITNOW CR MEGA BINA HARDW INV2304", matchedInvoiceId: null, source: "alert" },
     ],
     bankDebits: [],
     messages: [

@@ -4,7 +4,7 @@
 
 **Never be surprised on payroll day, and stop giving credit to customers who don't pay.**
 
-Kachingg is a cash-collection assistant for Malaysian micro and small businesses, built for the Orbyte business hub. It warns the owner before cash runs short, stops new credit to customers who already pay late, tells the team who to chase first, and uses AI to check customers' "dah bank in boss" messages against the bank statement.
+Kachingg is a cash-collection assistant for Malaysian micro and small businesses, built for the Orbyte business hub. It warns the owner before cash runs short, stops new credit to customers who already pay late, tells the team who to chase first, and uses AI to check customers' "dah bank in boss" messages against the bank's incoming transactions.
 
 Formerly called Kutip during research; the research notes in `docs/research/` and `docs/idea/` keep the old name.
 
@@ -38,7 +38,7 @@ A customer can always choose not to pay, and no app can change that. So Kachingg
 | 1 | **Early warning** | Every morning it compares cash in the bank plus expected payments with the bills due soon. It warns the owner **10+ days before** a shortfall, while there is still time to act. |
 | 2 | **Credit check** | When a customer who is already 30+ days late orders again on credit, Kachingg holds the order until the owner decides: give credit, ask for a deposit, cash on delivery, or call first. |
 | 3 | **Chase plan** | It ranks overdue invoices by how much each one closes the shortfall, and prepares WhatsApp reminders in the customer's language (BM, English, 中文). A clerk sends gentle ones; firm ones need the owner. |
-| 4 | **Bukti** *(the AI part)* | AI reads customer replies and payment slips. The invoice is marked paid **only if the money is actually in the bank statement**. Anything unclear goes to a person. |
+| 4 | **Bukti** *(the AI part)* | AI reads customer replies and payment slips. The invoice is marked paid **only if the money has actually arrived in the bank**. Anything unclear goes to a person. |
 
 *Kachingg* is the sound of the till when you get paid. *Bukti* means "proof".
 
@@ -56,6 +56,8 @@ flowchart LR
 - **AI is used in one place only**: reading messy replies like *"dah bank in boss"* or *"下礼拜五才过数"* ("can pay next Friday").
 - **AI never decides anything about money.** Nothing is marked paid without a matching bank line.
 - **People approve every consequential action**, and everything goes into an append-only activity log.
+
+**Bank alerts feed the bank check.** Malaysian banks already send an email or app alert for every incoming credit. The owner sets up one email-forwarding rule to a Kachingg address; Kachingg reads each alert with fixed rules (not AI) into a bank line: amount, date and time, payer, reference. Debits are refused and any balance figure in the alert is ignored. Rule M1 then matches the line to a customer's "paid" claim automatically, and a person still approves the receipt. A CSV export of transactions from online banking stays as the manual fallback. In this demo the mailbox is **simulated** (`lorilaju@alerts.kachingg.app` is not a real address): on Connect you paste an alert under "Simulate an incoming alert". A real deployment would accept alerts only from the bank's verified sender (SPF/DKIM), so a forged alert is rejected before it is read.
 
 ## See it in action
 
@@ -168,7 +170,7 @@ Orbyte is a shared business hub for SMEs. Kachingg is designed as a module insid
 |---|---|
 | ✅ | Problem research, competitor scan, idea brief, PRD (v0.2) |
 | ✅ | Rules engine (`web/src/engine`) running the full demo script in tests (158 tests) |
-| ✅ | Web app: Orbyte hub frame, Today, Bookings, Bukti inbox, approvals, activity log, Connect (invoice and bank CSV import, owner bank balance), usage and credits |
+| ✅ | Web app: Orbyte hub frame, Today, Bookings, Bukti inbox, approvals, activity log, Connect (invoice CSV import, bank alerts (simulated) and bank transactions CSV import, owner bank balance), usage and credits |
 | ✅ | Deployed: the 8-step Demo guide passes end to end in a browser as Owner and Clerk |
 | ✅ | Bukti test set: 40 synthetic Manglish, BM, English and Chinese replies with an eval runner (`pnpm eval:bukti`) |
 | ⬜ | Live AI score on the test set: needs an API key; no score is claimed until it has run |

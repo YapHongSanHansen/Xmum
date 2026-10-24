@@ -140,6 +140,10 @@ Events never carry the bank balance, payroll or gap amounts. The only amounts ar
 
 Permissions follow PRD §9.3. The Clerk never sees bank balance, payroll or gap amounts: on Connect the audit preview is redacted for the Clerk exactly as the activity log is, and the approvals preview carries no cash or gap figures.
 
+## Bank alerts (simulated mailbox)
+
+Payment verification (M1) needs the bank's credit lines. Instead of a monthly upload, the owner forwards the bank's credit-alert emails once to a Kachingg address (`lorilaju@alerts.kachingg.app` in the demo). `parseBankAlert()` in `web/src/engine/bank-alerts.ts` reads each alert with fixed rules (DuitNow email, IBG credit email and app push formats; no AI) into a credit line; the engine action `RECEIVE_BANK_ALERT` (Owner or Clerk) adds it with `source: "alert"` and logs `bank alert received (simulated): …`. Debits are refused, alerts without an amount or date are refused, and a balance figure in an alert is dropped before anything is read, so the Clerk never sees it. The CSV export of transactions from online banking (`IMPORT_BANK_STATEMENT`) stays as the manual fallback. Simulated today: there is no mailbox and a person pastes the alert on Connect. A real deployment would accept mail only from the bank's verified sender domain (SPF/DKIM pass), so a forged alert is rejected before parsing; a person still approves every receipt.
+
 ## Simulated today vs a real Orbyte API
 
 | | Today | With a real Orbyte API |

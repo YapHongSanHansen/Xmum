@@ -1,11 +1,13 @@
 "use client";
 // Connect (PRD FR-O2): the data sources Kachingg reads and what each provides,
-// the CSV imports and owner balance entry (FR-A1, FR-A4, FR-A5), Kachingg's
+// bank alerts (simulated), the CSV imports and owner balance entry (FR-A1,
+// FR-A4, FR-A5), Kachingg's
 // illustrative API, and data handling.
 import type { ReactNode } from "react";
 import { ChevronDown, Lock, Landmark, MessageCircle, Users, FileSpreadsheet } from "lucide-react";
 import { Badge, Card, CardHeader, PageTitle, cx, tbl } from "@/components/ui";
 import { BalanceEntry } from "@/components/connect/balance-entry";
+import { BankAlerts } from "@/components/connect/bank-alerts";
 import { BankImport } from "@/components/connect/bank-import";
 import { InvoiceImport } from "@/components/connect/invoice-import";
 import { OrbytePanel } from "@/components/connect/orbyte-panel";
@@ -87,12 +89,13 @@ export default function ConnectPage() {
             }
           />
           <Source
-            name="Bank statement"
-            provides="Credit lines for matching"
+            name="Bank transactions"
+            provides="Credit lines for matching: bank alerts, CSV export"
             last={lastLine ? `Last line ${fmtDateTime(lastLine)}` : "No lines yet"}
             meta={
               <>
                 {plural(lines.length, "line")} · {lines.filter((b) => b.matchedInvoiceId).length} matched ·{" "}
+                {plural(lines.filter((b) => b.source === "alert").length, "alert")} ·{" "}
                 {owner ? `balance entered ${fmtDateTime(s.bankBalance.enteredAt)} by ${s.bankBalance.enteredBy}` : "balance: Owner only"}
               </>
             }
@@ -130,7 +133,8 @@ export default function ConnectPage() {
           {/* FR-A4 / FR-B5: the Clerk never sees the balance form or its value. */}
           {owner ? (
             <div className="grid items-start gap-6 lg:grid-cols-5">
-              <div className="min-w-0 lg:col-span-3">
+              <div className="min-w-0 space-y-6 lg:col-span-3">
+                <BankAlerts />
                 <BankImport />
               </div>
               <div className="min-w-0 lg:col-span-2">
@@ -138,7 +142,10 @@ export default function ConnectPage() {
               </div>
             </div>
           ) : (
-            <BankImport />
+            <>
+              <BankAlerts />
+              <BankImport />
+            </>
           )}
         </div>
       </details>
@@ -199,7 +206,7 @@ export default function ConnectPage() {
 
 function Source({ name, provides, meta, last }: { name: string; provides: string; meta: ReactNode; last: string }) {
   const Icon =
-    name === "Bank statement" ? Landmark : name === "WhatsApp" ? MessageCircle : name === "Customer records" ? Users : FileSpreadsheet;
+    name === "Bank transactions" ? Landmark : name === "WhatsApp" ? MessageCircle : name === "Customer records" ? Users : FileSpreadsheet;
   return (
     <li className="panel flex flex-col p-6">
       <div className="mb-6 flex items-center justify-between">
