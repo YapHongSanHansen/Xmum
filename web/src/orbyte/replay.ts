@@ -41,7 +41,7 @@ export function replayDemo(): State {
     { type: "ENTER_BOOKING", customerId: "c-hupseng", route: "Klang → Johor Bahru", amount: 240000, terms: "credit", creditDays: 60 },
     as("owner"),
   ]);
-  s = step(s, { type: "DECIDE_CREDIT", bookingId: s.bookings[0].id, decision: "deposit_requested", depositPct: 50 });
+  s = step(s, { type: "DECIDE_CREDIT", bookingId: s.bookings.find((b) => b.status === "on_hold")!.id, decision: "deposit_requested", depositPct: 50 });
   s = steps(s, [advance("2026-10-23T14:30"), read("m-megabina")]);
   s = steps(s, [as("clerk"), { type: "APPROVE_RECEIPT", receiptId: s.receipts[0].id }]);
   s = steps(s, [as("owner"), { type: "DECIDE_DEDUCTION", receiptId: s.receipts[0].id, decision: "accepted" }]);

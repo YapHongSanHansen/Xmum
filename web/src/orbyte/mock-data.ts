@@ -15,6 +15,12 @@ const CLIENT_MAP: [orbyteId: string, kachinggCustomerId: string, tags: string[]]
   ["ORB-CL-0004", "c-pelita", ["cold chain", "credit 30d"]],
   ["ORB-CL-0005", "c-sinar", ["electrical", "credit 30d", "pays early"]],
   ["ORB-CL-0006", "c-gudang", ["cold chain", "credit 30d", "pays early"]],
+  ["ORB-CL-0007", "c-tunas", ["packaging", "credit 30d", "pays early"]],
+  ["ORB-CL-0008", "c-bayu", ["beverages", "credit 30d"]],
+  ["ORB-CL-0009", "c-delima", ["plastics", "credit 30d", "pays early"]],
+  ["ORB-CL-0010", "c-cahaya", ["paper", "credit 30d"]],
+  ["ORB-CL-0011", "c-yongfa", ["building materials", "credit 30d", "pays early"]],
+  ["ORB-CL-0012", "c-seri", ["textile", "credit 30d"]],
 ];
 
 function buildClients(): OrbyteClient[] {
@@ -39,10 +45,15 @@ function buildProjects(): OrbyteProject[] {
     value: inv.amount,
     invoiceNumber: inv.number,
   }));
-  // …plus two jobs that are done but not yet invoiced (no Kachingg invoice).
+  // …plus jobs that are done or on the road but not yet invoiced (no Kachingg invoice).
   const extra: Omit<OrbyteProject, "id">[] = [
     { clientId: "ORB-CL-0005", name: "DO-8897 Klang → Kajang", doNumber: "DO-8897", status: "completed", value: rm(2800), invoiceNumber: null },
     { clientId: "ORB-CL-0003", name: "DO-8899 Muar → Port Klang", doNumber: "DO-8899", status: "in_progress", value: rm(4100), invoiceNumber: null },
+    { clientId: "ORB-CL-0007", name: "DO-8901 Port Klang → Senai", doNumber: "DO-8901", status: "completed", value: rm(4650), invoiceNumber: null },
+    { clientId: "ORB-CL-0011", name: "DO-8902 Klang → Seri Kembangan", doNumber: "DO-8902", status: "completed", value: rm(3150), invoiceNumber: null },
+    { clientId: "ORB-CL-0009", name: "DO-8904 Klang → Prai", doNumber: "DO-8904", status: "in_progress", value: rm(5900), invoiceNumber: null },
+    { clientId: "ORB-CL-0008", name: "DO-8905 Shah Alam → Kuantan", doNumber: "DO-8905", status: "in_progress", value: rm(2650), invoiceNumber: null },
+    { clientId: "ORB-CL-0012", name: "DO-8907 Klang → Nilai", doNumber: "DO-8907", status: "in_progress", value: rm(1950), invoiceNumber: null },
   ];
   return [...invoiced, ...extra].map((p, i) => ({ id: `ORB-PJ-${String(i + 1).padStart(4, "0")}`, ...p }));
 }
