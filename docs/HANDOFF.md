@@ -1,22 +1,21 @@
 # Handoff: Kutip (XMUM hackathon, Domain 2)
 
-Written 25 Oct 2026, 02:50 MYT, for the next agent or teammate continuing the build. Read this first, then `README.md`, `docs/domain-2/brief.md` and `docs/PRD.md`.
+Written 25 Oct 2026, 02:50 MYT; updated 03:40 MYT. For the next agent or teammate continuing the build. Read this first, then `README.md`, `docs/domain-2/brief.md` and `docs/PRD.md`.
 
 ## 1. Where things stand
 
 | | |
 |---|---|
 | **Deadline** | Preliminary submission **25 Oct 2026, 07:59 AM MYT** (from sdchack.my). The team must confirm the exact time and the **submission format and length limits** in the team portal or on Discord. Neither has been seen by the author |
-| **Repo** | `github.com/YapHongSanHansen/Xmum` (public). Latest verified commit at writing time: `8d2ddde` |
+| **Repo** | `github.com/YapHongSanHansen/Xmum` (public). `main` is what is deployed |
 | **Product** | Kutip, a cash-collection module inside a **simulated Orbyte hub**. Bukti is its AI reader. Demo business: Lori Laju Logistics (fictional haulage firm). Pitch: *"Never be surprised on payroll day, and stop giving credit to customers who don't pay."* |
 | **App** | `web/`: Next.js 16 + React 19 + TypeScript + Tailwind 4 + Zustand (client store persisted to `localStorage`) + a pure TypeScript rules engine in `web/src/engine` + one server route `/api/extract` (Claude) |
-| **Status at `8d2ddde`** | The full 8-step demo script (PRD §13) passes in a real browser (two independent verification passes: 0 console errors, every PRD number checked). 100 engine tests pass; tsc, eslint and `next build` are clean |
-| **Live AI** | **Never exercised.** No API key on the build machine; every AI read so far used the cached fixtures (`web/src/engine/cached.ts`, labelled "cached (hand-written fixture)") |
-| **Hosting** | Not deployed yet. A Vercel project `kutip` is linked under scope **`ckayzs-projects`** (never use `predictefys-projects`). The user has also imported the repo into **Replit** (Free plan); Replit Agent was porting it. The judges reportedly said Replit must be used, but nobody has confirmed what counts |
+| **Status (03:40)** | Section 2 work is merged, plus Ledger pass 2 and a sweep of the remaining files. 158 tests pass; tsc, eslint and `next build` are clean. A scripted browser walk of the 8-step Demo guide (headless Chrome, Owner and Clerk) passes 36 of 36 checks against the section 4 numbers, locally and on the live URL: no Clerk-visible cash or gap figure on any page, no console errors, no browser dialogs, no page-level sideways scroll at 390px |
+| **Hosting** | Live on Vercel: **https://kutip-virid.vercel.app** (project `kutip`, scope **`ckayzs-projects`**; never use `predictefys-projects`). `web/vercel.json` pins the Next.js framework (the project was created with the 'Other' preset, which served 404). Deploy with `cd web && vercel deploy --prod --scope ckayzs-projects`. Replit: not tested; whether the judges require it is still unconfirmed |
 
-## 2. Work in progress when this was written
+## 2. Builder work (done, merged 25 Oct 03:10–03:30)
 
-Four builder agents were running in the author's local clone (not yet committed). If they did not finish, redo them from this list. Each owns separate files.
+All four items below were rebuilt in a fresh clone and merged into `main`. Builder A's role choices: invoice and bank imports are Owner or Clerk (the Clerk sees credit lines only); bank balance and reject claim are Owner only; snooze, dispute and call follow the approve tier rules. The seed state `version` is now 2.
 
 | Builder | Scope | Files |
 |---|---|---|
@@ -26,7 +25,7 @@ Four builder agents were running in the author's local clone (not yet committed)
 | D · first-time judge view | Dismissible welcome card on Today for a cold visitor; "Usage & credits" page (FR-O4, Orbyte credit wallet, illustrative prices) | `pages/today.tsx`, `shell/**`, `lib/store.ts`, `pages/usage.tsx`, `welcome/**` |
 
 **UI restyle ("Ledger" design, requested by the user):** follow the team's Soapay UI. Pass 1 is done and committed with this handoff: `globals.css` (tokens: IBM Plex Sans/Mono, navy `#1e3a5f`, 2px corners, hairline borders, no shadows, Ledger status colours mapped onto Tailwind `emerald/amber/rose/sky`), `layout.tsx` (Plex fonts), `components/ui.tsx` (Button, Card, Badge as square-dot pill, RuleTag, PageTitle with mono eyebrow, `NavyPanel` / `NavyRow`). **Pass 2 is not started:**
-- light 52px top bar or light sidebar with a navy active rule instead of the dark sidebar;
+- light 52px top bar or light sidebar with a navy active rule instead of the dark sidebar; **(done: pass 2 and the sweep are merged)**
 - Today's cash position as a navy panel with mono rows, and big mono figures for the gap;
 - chase plan, bank feed and log as Ledger tables (30px header row, 38px rows, hairline dividers, mono numbers, right-aligned amounts);
 - remove leftover `bg-emerald-600` primary buttons (primary is navy) and any `rounded-full`, `shadow` or slate-heavy styling.
@@ -35,14 +34,14 @@ Reference on the author's machine: `~/Documents/GitHub/soapay/packages/ui/src/st
 
 ## 3. Next steps, in order
 
-1. **Pull and check.** `git pull`, then in `web/`: `pnpm install && pnpm test && pnpm exec tsc --noEmit && pnpm exec eslint src && pnpm build`. Everything must be green before anything else.
-2. **Finish or redo** any section-2 builder work that is missing (check `git log` and the file list above).
-3. **Ledger pass 2** (section 2).
-4. **Verify in a browser.** Run `pnpm build && pnpm exec next start -p 3210` and walk the in-app **Demo guide** (8 steps) as Owner and Clerk. Check the numbers below. The Clerk must never see a cash or gap figure anywhere (FR-B5), and there must be no browser dialogs.
-5. **Deploy.** Replit is primary if the judges require it; Vercel is the backup: `cd web && vercel deploy --prod --scope ckayzs-projects`. Open the live link and run the guide once.
+1. ✅ **Pull and check.** `git pull`, then in `web/`: `pnpm install && pnpm test && pnpm exec tsc --noEmit && pnpm exec eslint src && pnpm build`. Everything must be green before anything else.
+2. ✅ **Finish or redo** any section-2 builder work that is missing (check `git log` and the file list above).
+3. ✅ **Ledger pass 2** (section 2).
+4. ✅ **Verify in a browser.** Run `pnpm build && pnpm exec next start -p 3210` and walk the in-app **Demo guide** (8 steps) as Owner and Clerk. Check the numbers below. The Clerk must never see a cash or gap figure anywhere (FR-B5), and there must be no browser dialogs.
+5. ✅ (Vercel) **Deploy.** Replit is primary if the judges require it; Vercel is the backup: `cd web && vercel deploy --prod --scope ckayzs-projects`. Open the live link and run the guide once.
 6. **Live AI, once.** Set `ANTHROPIC_API_KEY` (Vercel: `vercel env add ANTHROPIC_API_KEY production --scope ckayzs-projects`; Replit: Secrets), then read the three seeded messages. If the result is not "Live · …", read the reason label. Replit's managed Anthropic integration needs a **paid** Replit plan and lists only up to `claude-opus-5`, so there also set `KUTIP_AI_MODEL=claude-opus-5` and expose `ANTHROPIC_API_KEY` / `ANTHROPIC_BASE_URL`. Never put a key in the repo or in chat.
 7. **Submission.** Fit `docs/submission/proposal.md` to the real length limit; record the 3-minute video from `demo-video-script.md`; fill the links in `docs/submission/README.md`; confirm the GitHub repo matches the demo.
-8. **README screenshots** of the restyled app (optional, if time allows).
+8. ✅ **README screenshots** (`docs/screens/`) of the restyled app (optional, if time allows).
 
 ## 4. Numbers the demo must show (seed, PRD §14)
 
@@ -78,7 +77,7 @@ Reference on the author's machine: `~/Documents/GitHub/soapay/packages/ui/src/st
 | `web/src/engine/seed.ts` | Synthetic seed + `DEMO_STOPS` for the clock |
 | `web/src/engine/rules.ts` | F1 forecast, G1 gap impact, R1–R6, S1, verbatim gate, M1–M3 helpers |
 | `web/src/engine/reducer.ts` | `apply(state, action)`: role checks, state changes, activity log |
-| `web/src/engine/*.test.ts` | 100 tests (rules, reducer, demo script, review fixes) |
+| `web/src/engine/*.test.ts`, `web/eval/*.test.ts` | 158 tests (rules, reducer, demo script, imports, card actions, review fixes, eval scorer) |
 | `web/src/lib/store.ts` | Zustand store (persist key `kutip-demo-v1`) |
 | `web/src/lib/extract-server.ts` | Claude call: `claude-opus-5-5` (override `KUTIP_AI_MODEL`), structured JSON output, effort low, 9 s timeout, cached fallback with a reason |
 | `web/src/components/shell/` | Simulated Orbyte frame (header, demo clock, role switcher, sidebar) |

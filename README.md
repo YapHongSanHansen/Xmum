@@ -5,6 +5,8 @@
 Kutip is a cash-collection assistant for Malaysian micro and small businesses, built for the Orbyte business hub. It warns the owner before cash runs short, stops new credit to customers who already pay late, tells the team who to chase first, and uses AI to check customers' "dah bank in boss" messages against the bank statement.
 
 > XMUM Hackathon · Domain 2: *Orbyte Smart SME Challenge — Less Busywork, Better Business* · sponsored by Alpha Red
+>
+> **Live demo:** https://kutip-virid.vercel.app · open **Demo guide** in the sidebar for the 3-minute walk-through. All data is synthetic.
 
 ---
 
@@ -110,6 +112,14 @@ On Friday, a customer says they've paid, with a deduction. Bukti reads the messa
 └────────────────────────────────────────────────────────────────────┘
 ```
 
+Screens from the running app (synthetic data):
+
+| Owner: cash gaps and chase plan | Clerk: same page, no cash figures |
+|---|---|
+| ![Owner Today](docs/screens/01-owner-today.png) | ![Clerk Today](docs/screens/02-clerk-today.png) |
+| **Owner: firm reminder with gap impact** | **Bukti: exact words, bank check, deduction** |
+| ![Approval card](docs/screens/03-owner-approval-card.png) | ![Bukti bank check](docs/screens/05-bukti-bank-check.png) |
+
 The full script is in [`docs/PRD.md`](docs/PRD.md#13-preliminary-demo-script-about-3-4-minutes), and every expected log line is in section 13a.
 
 ## Why Kutip is different
@@ -153,8 +163,11 @@ Orbyte is a shared business hub for SMEs. Kutip is designed as a module inside i
 | | |
 |---|---|
 | ✅ | Problem research, competitor scan, idea brief, PRD (v0.2) |
-| ✅ | Rules engine (`web/src/engine`) running the full demo script in tests |
-| 🔄 | Web app: Orbyte hub frame, Today, Bookings, Bukti inbox, activity log |
+| ✅ | Rules engine (`web/src/engine`) running the full demo script in tests (158 tests) |
+| ✅ | Web app: Orbyte hub frame, Today, Bookings, Bukti inbox, approvals, activity log, Connect (invoice and bank CSV import, owner bank balance), usage and credits |
+| ✅ | Deployed: the 8-step Demo guide passes end to end in a browser as Owner and Clerk |
+| ✅ | Bukti test set: 40 synthetic Manglish, BM, English and Chinese replies with an eval runner (`pnpm eval:bukti`) |
+| ⬜ | Live AI score on the test set: needs an API key; no score is claimed until it has run |
 | ⬜ | Interviews with 5-10 Malaysian B2B sellers |
 
 ## Run it locally
@@ -164,6 +177,7 @@ cd web
 pnpm install
 pnpm test          # rules engine: every seed check and the demo script
 pnpm dev           # http://localhost:3000
+pnpm eval:bukti    # Bukti accuracy on 40 synthetic replies (needs ANTHROPIC_API_KEY; Node 22.18+)
 ```
 
 Optional: set `ANTHROPIC_API_KEY` in `web/.env.local` to let Bukti read messages live with Claude. Without it, Bukti uses saved results for the three demo messages and labels them "cached result". Use **Reset demo** in the header to start the script again.

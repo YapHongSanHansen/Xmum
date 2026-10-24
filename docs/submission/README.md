@@ -9,8 +9,8 @@ Deadline as last seen on sdchack.my: **25 Oct 2026, 07:59 AM MYT**. Confirm it i
 | 1 | Proposal (about 2 pages; problem → approach → expected outcome) | [`proposal.md`](proposal.md) | Drafted. Fit to the real length limit and export to the required format (PDF?) | `TODO: proposal link or upload confirmation` |
 | 2 | Demo video (3 minutes, plus an optional 30-second cut) | Script: [`demo-video-script.md`](demo-video-script.md) | Script ready. Not recorded | `TODO: video link` |
 | 3 | Slides | Outline and speaker notes: [`pitch-deck.md`](pitch-deck.md) | Outline ready. Slides not built | `TODO: slides link` |
-| 4 | GitHub repository (public, matches the demo) | This repo | Public. Check that the last commit pushed matches the deployed demo | `TODO: https://github.com/YapHongSanHansen/Xmum` (confirm the URL to submit and the commit hash) |
-| 5 | Live demo link | `web/` (Next.js app) | Not deployed yet. Replit is primary if required; Vercel is the backup | `TODO: live demo link` |
+| 4 | GitHub repository (public, matches the demo) | This repo | Public. The deployed demo is built from `main` | https://github.com/YapHongSanHansen/Xmum |
+| 5 | Live demo link | `web/` (Next.js app) | Deployed on Vercel from `main`; the 8-step Demo guide passes end to end on it (Owner and Clerk). Replit still to confirm if the judges require it | https://kutip-virid.vercel.app |
 | — | Judge Q&A prep (internal, not submitted) | [`judge-qa.md`](judge-qa.md) | Ready | — |
 
 ### Before pressing submit
