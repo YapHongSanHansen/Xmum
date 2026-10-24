@@ -62,7 +62,9 @@ export type Action =
   | { type: "IMPORT_BANK_STATEMENT"; csv: string }
   | { type: "SNOOZE_REMINDER"; invoiceId: string; until: string }
   | { type: "MARK_DISPUTED"; invoiceId: string }
-  | { type: "CALL_INSTEAD"; invoiceId: string };
+  | { type: "CALL_INSTEAD"; invoiceId: string }
+  /** Records a read of the (simulated) Orbyte workspace: counts only, logged. See docs/orbyte-integration.md. */
+  | { type: "ORBYTE_SYNC"; clients: number; projects: number; users: number };
 
 export interface Result {
   state: State;
@@ -659,6 +661,21 @@ export function apply(prev: State, action: Action): Result {
         const { tier, inv } = cardRow(s, action.invoiceId);
         inv.calls.push({ at: s.now, by: me(s) });
         log(s, "USER", me(s), `will call instead of sending Tier ${tier} ${inv.number}: phone follow-up recorded`, { refs: [inv.id] });
+        break;
+      }
+
+      case "ORBYTE_SYNC": {
+        requireRole(s, ["owner", "clerk"], "sync from Orbyte");
+        const counts = [action.clients, action.projects, action.users];
+        if (!counts.every((n) => Number.isInteger(n) && n >= 0)) refuse("Sync counts must be whole numbers of zero or more.");
+        // The time is the log entry's `at` (the demo clock); State is unchanged apart from the log.
+        log(
+          s,
+          "USER",
+          me(s),
+          `synced from Orbyte (simulated): ${plural(action.clients, "client")}, ${plural(action.projects, "project")}, ${plural(action.users, "user")}`,
+          { refs: ["orbyte"] },
+        );
         break;
       }
     }
