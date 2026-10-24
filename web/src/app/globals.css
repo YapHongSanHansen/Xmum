@@ -679,6 +679,156 @@ textarea {
   }
 }
 
+/* ---------- motion primitives ----------
+   Shared classes (also used by other widgets): k-rise, k-grow-y, k-grow-x,
+   k-flash, k-shimmer, k-pulse, plus k-pop and the CountUp overlay.
+   Every animation lives under `no-preference`, uses fill-mode `backwards`
+   (the element's own style is the final state) and only moves opacity,
+   transform or background, so text and layout are final from the start.
+   Stagger with `style={{ "--i": n }}`; `--k-step` changes the step. */
+.k-count {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+}
+.k-count[data-animating] > .k-count-final {
+  color: transparent;
+}
+.k-count-live {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.k-count-live::before {
+  content: attr(data-v);
+}
+.k-shimmer {
+  border-radius: 6px;
+  background: #e7e9ee;
+}
+.k-pulse {
+  position: relative;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .k-rise {
+    animation: k-rise 380ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    animation-delay: calc(var(--i, 0) * var(--k-step, 60ms));
+  }
+  .k-grow-y {
+    transform-origin: bottom;
+    animation: k-grow-y 600ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    animation-delay: calc(var(--i, 0) * var(--k-step, 60ms));
+  }
+  .k-grow-x {
+    transform-origin: left;
+    animation: k-grow-x 700ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    animation-delay: calc(var(--i, 0) * var(--k-step, 60ms));
+  }
+  .k-pop {
+    animation: k-pop 320ms cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+    animation-delay: calc(var(--i, 0) * var(--k-step, 60ms));
+  }
+  .k-flash {
+    border-radius: 4px;
+    animation: k-flash 900ms ease-out;
+  }
+  .k-shimmer {
+    background: linear-gradient(90deg, #e7e9ee 0%, #f4f5f8 45%, #e7e9ee 90%) 0 0 / 300% 100%;
+    animation: k-shimmer 1.2s linear infinite;
+  }
+  .k-pulse::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: currentColor;
+    animation: k-pulse 1.8s ease-out infinite;
+  }
+}
+@keyframes k-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes k-grow-y {
+  from {
+    transform: scaleY(0);
+  }
+}
+@keyframes k-grow-x {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes k-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+@keyframes k-flash {
+  0%,
+  25% {
+    background-color: #c4e6cf;
+    box-shadow: 0 0 0 3px #c4e6cf;
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: 0 0 0 3px transparent;
+  }
+}
+@keyframes k-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+@keyframes k-pulse {
+  from {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(2.6);
+  }
+}
+
+/* Overview chart: negative bars grow down from the zero line; hover lifts. */
+.flow-name,
+.flow-value,
+.flow-bar {
+  transition:
+    transform 0.2s ease-out,
+    box-shadow 0.2s ease-out;
+}
+.flow-bar[data-negative="true"] {
+  transform-origin: top;
+}
+.flow-bar:not([data-negative="true"]) {
+  transform-origin: bottom;
+}
+.flow-column:hover .flow-name,
+.flow-column:hover .flow-value {
+  transform: translateY(-2px);
+}
+.flow-column:hover .flow-bar {
+  transform: scaleY(1.04);
+  box-shadow:
+    inset 0 1px 0 #b7d5ff,
+    0 6px 14px -6px #3162f566;
+}
+.flow-column:hover .flow-bar[data-negative="true"] {
+  box-shadow: 0 6px 14px -6px #f0368766;
+}
+.striped-fill {
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 .inbox-layout > * {
   min-width: 0;
 }
