@@ -20,7 +20,7 @@ const DEMO = {
 const EMPTY = { customerId: "", route: "", amount: "", terms: "credit" as Terms, creditDays: "30" };
 
 const inputCls =
-  "h-9 w-full rounded-md border border-slate-300 bg-white px-2.5 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:bg-slate-50 disabled:text-slate-400";
+  "h-[34px] w-full rounded-[2px] border border-line-strong bg-surface px-2.5 text-[13px] text-ink placeholder:text-ink3 disabled:bg-canvas disabled:text-ink2";
 
 export default function BookingForm() {
   const customers = useKutip((s) => s.state.customers);
@@ -126,7 +126,7 @@ export default function BookingForm() {
           />
         </Field>
         <div className="flex items-center justify-between gap-3 pt-1">
-          <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
+          <div className="flex items-center gap-1.5 text-[11px] text-ink2">
             <RuleTag id="R4" />
             <span>Credit orders for customers 30+ days late go on hold. COD and prepaid are not checked.</span>
           </div>
@@ -139,10 +139,10 @@ export default function BookingForm() {
           <div
             className={
               note.tone === "warn"
-                ? "rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-900"
+                ? "border-l-[3px] border-l-amber-800 bg-amber-100 px-3 py-2 text-xs text-amber-900"
                 : note.tone === "good"
-                  ? "rounded-md bg-emerald-50 px-3 py-2 text-xs text-emerald-900"
-                  : "rounded-md bg-rose-50 px-3 py-2 text-xs text-rose-900"
+                  ? "border-l-[3px] border-l-emerald-700 bg-emerald-100 px-3 py-2 text-xs text-emerald-800"
+                  : "border-l-[3px] border-l-rose-700 bg-rose-100 px-3 py-2 text-xs text-rose-800"
             }
           >
             {note.text}
@@ -156,7 +156,7 @@ export default function BookingForm() {
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-1 block text-xs font-medium text-slate-600">{label}</span>
+      <span className="mb-1 block text-xs font-medium text-ink2">{label}</span>
       {children}
     </label>
   );

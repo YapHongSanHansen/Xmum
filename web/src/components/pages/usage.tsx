@@ -4,7 +4,7 @@
 // from the demo state; the business's own cash figures stay off this page, so
 // the Owner and the Clerk see the same view.
 import { Info, Wallet } from "lucide-react";
-import { Badge, Card, CardHeader, NavyPanel, NavyRow, PageTitle, cx } from "@/components/ui";
+import { Badge, Card, CardHeader, NavyPanel, NavyRow, PageTitle, cx, tbl } from "@/components/ui";
 import { fmtDateTime, fmtRM, type State } from "@/engine/model";
 import { useKutip } from "@/lib/store";
 
@@ -103,17 +103,18 @@ export default function UsagePage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-[1fr_320px] items-start gap-5">
+      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
         <Card>
-          <CardHeader kicker="This demo month" title={`Usage in ${monthName}`} right={<Wallet className="h-4 w-4 text-ink3" aria-hidden />} />
-          <table className="w-full text-[13px]">
+          <CardHeader kicker="This demo month" title={`Usage in ${monthName}`} right={<Wallet className="h-4 w-4 text-ink2" aria-hidden />} />
+          <div className={tbl.wrap}>
+          <table className={cx(tbl.table, "min-w-[620px]")}>
             <thead>
-              <tr className="border-b border-line text-left text-[11px] font-medium text-ink2">
-                <th className="px-4 py-2 font-medium">Unit</th>
-                <th className="px-3 py-2 text-right font-medium">Used</th>
-                <th className="px-3 py-2 text-right font-medium">Billable</th>
-                <th className="px-3 py-2 font-medium">Price (illustrative)</th>
-                <th className="px-4 py-2 text-right font-medium">Credits</th>
+              <tr className={tbl.headRow}>
+                <th className={tbl.th}>Unit</th>
+                <th className={cx(tbl.th, "text-right")}>Used</th>
+                <th className={cx(tbl.th, "text-right")}>Billable</th>
+                <th className={tbl.th}>Price (illustrative)</th>
+                <th className={cx(tbl.th, "text-right")}>Credits</th>
               </tr>
             </thead>
             <tbody>
@@ -129,7 +130,7 @@ export default function UsagePage() {
                     <div className="text-ink">{l.credits === 0 ? "included" : <span className="num">{`${credits(l.credits)} (${ringgit(l.credits)})`}</span>}</div>
                     <div className="text-xs text-ink2">{l.priceNote}</div>
                   </td>
-                  <td className={cx("num px-4 py-2.5 text-right", l.total ? "text-ink" : "text-ink3")}>{credits(l.total)}</td>
+                  <td className={cx("num px-4 py-2.5 text-right", l.total ? "text-ink" : "text-ink2")}>{credits(l.total)}</td>
                 </tr>
               ))}
             </tbody>
@@ -145,6 +146,7 @@ export default function UsagePage() {
               </tr>
             </tfoot>
           </table>
+          </div>
         </Card>
 
         <div className="space-y-3">

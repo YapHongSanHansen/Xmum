@@ -30,24 +30,24 @@ function MessageRow({ state, m, active, onSelect }: { state: State; m: InboundMe
       type="button"
       onClick={onSelect}
       className={cx(
-        "w-full rounded-lg border p-2.5 text-left transition-colors",
-        active ? "border-emerald-400 bg-emerald-50/60 ring-1 ring-emerald-300" : "border-slate-200 bg-white hover:bg-slate-50",
+        "w-full border p-2.5 text-left transition-colors",
+        active ? "border-navy bg-navy-soft ring-1 ring-inset ring-navy" : "border-line bg-surface hover:bg-canvas",
       )}
     >
       <div className="flex items-center justify-between gap-2">
         <div className="min-w-0">
-          <div className="truncate text-sm font-semibold text-slate-900">{c.name}</div>
-          <div className="text-[11px] text-slate-500">
-            {c.contact} · {fmtDateTime(m.receivedAt)}
+          <div className="truncate text-[13px] font-semibold text-ink">{c.name}</div>
+          <div className="text-[11px] text-ink2">
+            {c.contact} · <span className="num">{fmtDateTime(m.receivedAt)}</span>
           </div>
         </div>
         <Badge tone={STATUS_TONE[status]}>{STATUS_LABEL[status]}</Badge>
       </div>
       <div className="mt-2 flex items-start gap-2 rounded-md bg-[#efeae2] p-1.5">
-        <div className="min-w-0 flex-1 rounded-md rounded-tl-none bg-white px-2 py-1 text-xs text-slate-800 shadow-sm">
+        <div className="min-w-0 flex-1 bg-white px-2 py-1 text-xs text-ink">
           <p className="line-clamp-2">{m.text}</p>
           {m.image && (
-            <div className="mt-0.5 flex items-center gap-1 text-[10px] text-slate-500">
+            <div className="mt-0.5 flex items-center gap-1 text-[10px] text-ink2">
               <Paperclip className="h-3 w-3" /> slip image
             </div>
           )}

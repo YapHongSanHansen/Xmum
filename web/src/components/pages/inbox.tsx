@@ -63,7 +63,7 @@ export default function InboxPage() {
               onEnlarge={setLightbox}
             />
           ) : (
-            <div className="rounded-lg border border-dashed border-slate-300 px-4 py-10 text-center text-sm text-slate-500">
+            <div className="border border-dashed border-line-strong px-4 py-10 text-center text-[13px] text-ink2">
               Select a message to see Bukti&apos;s reading.
             </div>
           )}
