@@ -2,33 +2,20 @@
 // FR-B1: the 08:00 scan. The seed day starts unscanned, so the demo opens here.
 import { ScanLine } from "lucide-react";
 import { useKutip } from "@/lib/store";
-import { Button, RuleTag } from "@/components/ui";
-import { fmtDateTime } from "@/engine/model";
+import { Button } from "@/components/ui";
 
 export default function ScanBanner() {
-  const now = useKutip((s) => s.state.now);
   const dispatch = useKutip((s) => s.dispatch);
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 border border-line border-l-[3px] border-l-amber-800 bg-amber-50 px-4 py-3">
-      <div className="flex items-start gap-3">
-        <ScanLine className="mt-0.5 h-5 w-5 shrink-0 text-amber-800" aria-hidden />
-        <div>
-          <div className="text-[13px] font-semibold text-amber-900">Today&apos;s 08:00 scan hasn&apos;t run</div>
-          <div className="text-xs text-amber-900">
-            The scan works out the cash gaps, raises early warnings and builds today&apos;s chase plan. Demo clock:{" "}
-            <span className="num">{fmtDateTime(now)}</span>.
-          </div>
-        </div>
+    <div className="flex flex-wrap items-center justify-between gap-3 border border-line border-l-[3px] border-l-amber-800 bg-surface px-5 py-4">
+      <div className="flex items-center gap-2.5 text-[13px] text-ink">
+        <ScanLine className="h-4 w-4 shrink-0 text-amber-800" aria-hidden />
+        Today&apos;s 08:00 scan hasn&apos;t run.
       </div>
-      <div className="flex flex-wrap items-center gap-2">
-        <RuleTag id="F1" />
-        <RuleTag id="R1–R3" />
-        <RuleTag id="R6" />
-        <Button onClick={() => dispatch({ type: "RUN_SCAN" })}>
-          <ScanLine className="h-4 w-4" aria-hidden />
-          Run scan
-        </Button>
-      </div>
+      <Button onClick={() => dispatch({ type: "RUN_SCAN" })}>
+        <ScanLine className="h-4 w-4" aria-hidden />
+        Run scan
+      </Button>
     </div>
   );
 }
