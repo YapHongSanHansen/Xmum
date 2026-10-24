@@ -1,19 +1,19 @@
 "use client";
-// Simulated Orbyte hub frame (PRD §21). The store persists to localStorage, so
-// the shell renders only on the client to avoid a hydration mismatch.
-import { useSyncExternalStore } from "react";
+// Kachingg app frame. The store persists to localStorage, so the shell renders
+// only on the client to avoid a hydration mismatch.
+import { useEffect, useSyncExternalStore } from "react";
 import { X } from "lucide-react";
 import { cx } from "@/components/ui";
-import { useKutip } from "@/lib/store";
+import { useKachingg } from "@/lib/store";
 import TodayPage from "@/components/pages/today";
 import BookingsPage from "@/components/pages/bookings";
 import InboxPage from "@/components/pages/inbox";
 import LogPage from "@/components/pages/log";
 import ConnectPage from "@/components/pages/connect";
 import GuidePage from "@/components/pages/guide";
-import ModulePage from "@/components/pages/module";
+import ApprovalsPage from "@/components/pages/approvals";
+import UsagePage from "@/components/pages/usage";
 import { Header } from "./header";
-import { Sidebar } from "./sidebar";
 
 const noopSubscribe = () => () => {};
 
@@ -28,21 +28,27 @@ function useMounted() {
 
 export default function Shell() {
   const mounted = useMounted();
+  const page = useKachingg((s) => s.page);
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [page]);
   if (!mounted) {
     return (
-      <div className="grid h-screen place-items-center bg-slate-50 text-sm text-slate-400" aria-busy="true">
-        Loading Kutip…
+      <div className="grid h-screen place-items-center bg-canvas font-mono text-xs text-ink2" aria-busy="true">
+        Loading Kachingg…
       </div>
     );
   }
   return (
-    <div className="flex h-screen min-w-[1180px] flex-col bg-slate-50">
+    <div className="app-frame">
+      <a className="skip-link" href="#main-content">
+        Skip to content
+      </a>
       <Header />
-      <div className="flex min-h-0 flex-1">
-        <Sidebar />
-        <main className="min-w-0 flex-1 overflow-y-auto">
+      <div>
+        <main id="main-content" className="min-w-0" tabIndex={-1}>
           <Toast />
-          <div className="mx-auto max-w-6xl px-6 py-6">
+          <div className="app-main">
             <CurrentPage />
           </div>
         </main>
@@ -52,7 +58,7 @@ export default function Shell() {
 }
 
 function CurrentPage() {
-  const page = useKutip((s) => s.page);
+  const page = useKachingg((s) => s.page);
   switch (page) {
     case "today":
       return <TodayPage />;
@@ -62,28 +68,30 @@ function CurrentPage() {
       return <InboxPage />;
     case "log":
       return <LogPage />;
+    case "usage":
+      return <UsagePage />;
     case "connect":
       return <ConnectPage />;
     case "guide":
       return <GuidePage />;
-    case "module":
-      return <ModulePage />;
+    case "approvals":
+      return <ApprovalsPage />;
     default:
       return <TodayPage />;
   }
 }
 
 function Toast() {
-  const toast = useKutip((s) => s.toast);
-  const clearToast = useKutip((s) => s.clearToast);
+  const toast = useKachingg((s) => s.toast);
+  const clearToast = useKachingg((s) => s.clearToast);
   if (!toast) return null;
   const error = toast.kind === "error";
   return (
     <div
       role={error ? "alert" : "status"}
       className={cx(
-        "sticky top-0 z-20 flex items-start justify-between gap-3 border-b px-6 py-2.5 text-sm",
-        error ? "border-rose-200 bg-rose-50 text-rose-900" : "border-sky-200 bg-sky-50 text-sky-900",
+        "sticky top-0 z-20 flex items-start justify-between gap-3 border-b border-l-[3px] px-4 py-2.5 text-[13px] lg:px-8",
+        error ? "border-rose-200 border-l-rose-700 bg-rose-50 text-rose-800" : "border-sky-200 border-l-sky-700 bg-sky-50 text-sky-800",
       )}
     >
       <div>
@@ -94,7 +102,7 @@ function Toast() {
         type="button"
         onClick={clearToast}
         aria-label="Dismiss"
-        className={cx("rounded p-0.5", error ? "text-rose-700 hover:bg-rose-100" : "text-sky-700 hover:bg-sky-100")}
+        className={cx("p-0.5", error ? "text-rose-700 hover:bg-rose-100" : "text-sky-700 hover:bg-sky-100")}
       >
         <X className="h-4 w-4" />
       </button>

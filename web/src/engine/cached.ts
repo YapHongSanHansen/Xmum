@@ -54,4 +54,4 @@ export const CACHED_EXTRACTIONS: Record<string, Extraction> = {
   },
 };
 
-export const CACHED_MODEL = "cached (claude-opus-5-5 run, saved)";
+export const CACHED_MODEL = "cached (hand-written fixture)";

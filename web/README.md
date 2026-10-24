@@ -1,36 +1,28 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Kachingg web app
 
-## Getting Started
-
-First, run the development server:
+The Kachingg cash-collection demo, designed for the Orbyte business hub. See the [repository README](../README.md) for the product, and [`../docs/PRD.md`](../docs/PRD.md) for the spec.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+pnpm test     # rules engine: PRD seed checks, permissions, clock, full demo script
+pnpm dev      # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| Path | What it is |
+|---|---|
+| `src/engine/` | Pure TypeScript rules engine: model, synthetic seed, rules (F1, G1, R1–R6, S1, M1–M5), reducer that checks roles and writes the activity log, tests |
+| `src/lib/store.ts` | Client store; every change goes through the engine |
+| `src/lib/extract-server.ts`, `src/app/api/extract/route.ts` | Bukti's AI step: Claude Opus 5.5 reads a reply and slip into structured fields, with a cached fallback |
+| `src/components/shell/` | Responsive app frame: top navigation, demo clock, role switcher |
+| `src/components/pages/` | Overview, Bookings, Bukti inbox, Approvals, Activity log, Connect, Usage, Demo guide |
+| `public/slips/` | Synthetic payment slip from a fictional bank, watermarked as not real |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Set `ANTHROPIC_API_KEY` in `.env.local` for live AI reading; without it the three demo messages use hand-written fixtures, labelled "cached".
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Frontend design
 
-## Learn More
+The interface uses a soft grey canvas, rounded panels, a dark active navigation tab, and blue, green, and pink data accents. The Overview pairs an interactive 30-day cash outlook with bill coverage, receivables ageing, inbox work, early warnings, and the collection plan. All other screens share the same controls, typography, and responsive layout.
 
-To learn more about Next.js, take a look at the following resources:
+The cash outlook is a read-only projection built in `src/lib/cash-outlook.ts`; it does not run a scan or mutate demo state. Exact values remain available in the selected-event description and accessible labels. Tests check its balances against the rules engine. Cash balances and forecasts render only for the Owner. The Clerk retains invoice and payment workflows with bill-gap indicators.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The app uses system fonts, so builds do not need to download font files. Navigation scrolls horizontally on smaller screens; wide data tables and the forecast scroll inside their own containers. Review drawers and slip dialogs contain keyboard focus, support Escape, and restore focus when closed.

@@ -15,7 +15,7 @@ const TIER_NAME: Record<Tier, string> = { 0: "courtesy", 1: "nudge", 2: "firm", 
 const TIER_TONE = { 0: "sky", 1: "slate", 2: "amber", 3: "rose" } as const;
 
 export function TierBadge({ tier }: { tier: Tier | null }) {
-  if (tier === null) return <span className="text-xs text-slate-400">—</span>;
+  if (tier === null) return <span className="text-xs text-ink2">—</span>;
   return (
     <Badge tone={TIER_TONE[tier]}>
       T{tier} {TIER_NAME[tier]}

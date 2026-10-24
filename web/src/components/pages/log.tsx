@@ -2,9 +2,9 @@
 // Activity log (PRD FR-G1–G4): append-only, read-only view of state.log.
 import { useMemo, useState } from "react";
 import { ArrowDownUp, Download, Lock, Search, X } from "lucide-react";
-import { Badge, Button, Card, Empty, PageTitle, RuleTag, cx } from "@/components/ui";
+import { Badge, Button, Card, Empty, PageTitle, RuleTag, cx, tbl } from "@/components/ui";
 import { fmtDateTime, type ActorKind, type LogEntry } from "@/engine/model";
-import { useKutip } from "@/lib/store";
+import { useKachingg } from "@/lib/store";
 
 const KINDS: ActorKind[] = ["SYSTEM", "RULE", "AI", "USER", "INBOUND", "BANK"];
 
@@ -17,23 +17,28 @@ const KIND_TONE: Record<ActorKind, "slate" | "sky" | "emerald" | "violet" | "amb
   BANK: "amber",
 };
 
+// Pressed filter chips: the kind's status colour, solid, white text (all AA).
 const CHIP_ACTIVE: Record<ActorKind, string> = {
-  SYSTEM: "bg-slate-700 text-white ring-slate-700",
-  RULE: "bg-slate-900 text-white ring-slate-900",
-  AI: "bg-sky-600 text-white ring-sky-600",
-  USER: "bg-emerald-600 text-white ring-emerald-600",
-  INBOUND: "bg-violet-600 text-white ring-violet-600",
-  BANK: "bg-amber-500 text-white ring-amber-500",
+  SYSTEM: "border-ink2 bg-ink2 text-white",
+  RULE: "border-ink bg-ink text-white",
+  AI: "border-sky-700 bg-sky-700 text-white",
+  USER: "border-emerald-700 bg-emerald-700 text-white",
+  INBOUND: "border-navy bg-navy text-white",
+  BANK: "border-amber-800 bg-amber-800 text-white",
 };
+
+const CHIP = "inline-flex h-8 items-center rounded-full border px-3 font-sans text-[11px] font-medium tabular-nums transition-colors";
+const CHIP_OFF = "border-line-strong bg-surface text-ink2 hover:bg-canvas hover:text-ink";
 
 function ActorBadge({ e }: { e: LogEntry }) {
   if (e.kind === "RULE") return <RuleTag id={e.rule ?? e.actor} />;
   return <Badge tone={KIND_TONE[e.kind]}>{e.kind === "USER" ? e.actor : e.kind}</Badge>;
 }
 
-function matches(e: LogEntry, q: string): boolean {
+/** `text` is what the viewer sees, so a Clerk's search never matches a redacted figure (FR-B5). */
+function matches(e: LogEntry, text: string, q: string): boolean {
   if (!q) return true;
-  const hay = [e.text, e.actor, e.rule ?? "", ...(e.refs ?? [])].join(" ").toLowerCase();
+  const hay = [text, e.actor, e.rule ?? "", ...(e.refs ?? [])].join(" ").toLowerCase();
   return q
     .toLowerCase()
     .split(/\s+/)
@@ -54,17 +59,21 @@ function exportCsv(log: LogEntry[], now: string) {
   const url = URL.createObjectURL(new Blob([body], { type: "text/csv;charset=utf-8" }));
   const a = document.createElement("a");
   a.href = url;
-  a.download = `kutip-activity-log-${now.replace(/[:]/g, "")}.csv`;
+  a.download = `kachingg-activity-log-${now.replace(/[:]/g, "")}.csv`;
   document.body.appendChild(a);
   a.click();
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+/** FR-B5: the Clerk never sees cash or gap figures, so scan and R6 lines are redacted for that role. */
+const redactForClerk = (e: LogEntry) =>
+  e.kind === "SYSTEM" || e.rule === "R6" ? e.text.replace(/[−+-]?RM[\d,.]+/g, "RM•••") : e.text;
+
 export default function LogPage() {
-  const log = useKutip((s) => s.state.log);
-  const now = useKutip((s) => s.state.now);
-  const role = useKutip((s) => s.state.role);
+  const log = useKachingg((s) => s.state.log);
+  const now = useKachingg((s) => s.state.now);
+  const role = useKachingg((s) => s.state.role);
   const [query, setQuery] = useState("");
   const [kinds, setKinds] = useState<ActorKind[]>([]);
   const [newestFirst, setNewestFirst] = useState(false);
@@ -76,52 +85,53 @@ export default function LogPage() {
   }, [log]);
 
   const rows = useMemo(() => {
-    const filtered = log.filter((e) => (kinds.length === 0 || kinds.includes(e.kind)) && matches(e, query.trim()));
+    const shown = (e: LogEntry) => (role === "clerk" ? redactForClerk(e) : e.text);
+    const filtered = log.filter((e) => (kinds.length === 0 || kinds.includes(e.kind)) && matches(e, shown(e), query.trim()));
     return newestFirst ? [...filtered].reverse() : filtered;
-  }, [log, kinds, query, newestFirst]);
+  }, [log, kinds, query, newestFirst, role]);
 
   const toggleKind = (k: ActorKind) => setKinds((ks) => (ks.includes(k) ? ks.filter((x) => x !== k) : [...ks, k]));
   const canExport = role === "owner";
 
   return (
-    <div>
+    <div className="min-w-0">
       <PageTitle
         title="Activity log"
         subtitle={
-          <span className="inline-flex items-center gap-1.5">
+          <span className="inline-flex items-center gap-1.5" title="Entries cannot be edited or deleted">
             <Lock className="h-3.5 w-3.5" aria-hidden />
-            Append-only: entries cannot be edited or deleted. Also serves as the Orbyte audit trail.
+            Append-only · mirrored to the Orbyte audit trail (simulated)
           </span>
         }
         right={
-          <div className="flex flex-col items-end gap-1">
+          <div className="flex items-center gap-2">
+            {!canExport && <span className="text-xs text-ink2">Owner only</span>}
             <Button variant="secondary" size="sm" disabled={!canExport || log.length === 0} onClick={() => exportCsv(log, now)}>
               <Download className="h-3.5 w-3.5" aria-hidden />
-              Export CSV ({log.length})
+              Export CSV
             </Button>
-            {!canExport && <span className="text-[11px] text-slate-500">Export: Owner only. Clerk can view.</span>}
           </div>
         }
       />
 
-      <Card className="mb-4 px-4 py-3">
+      <div className="panel k-rise mb-5 p-5">
         <div className="flex flex-wrap items-center gap-3">
-          <div className="relative w-72">
-            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" aria-hidden />
+          <div className="relative w-full sm:w-56">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink2" aria-hidden />
             <input
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search text or refs, e.g. INV-2304"
+              placeholder="Search, e.g. INV-2304"
               aria-label="Search the activity log"
-              className="h-8 w-full rounded-md border border-slate-300 pl-8 pr-7 text-sm text-slate-800 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="h-8 w-full rounded-xl border border-line-strong bg-surface pl-8 pr-7 text-[13px] text-ink placeholder:text-ink3"
             />
             {query && (
               <button
                 type="button"
                 aria-label="Clear search"
                 onClick={() => setQuery("")}
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded p-0.5 text-slate-400 hover:text-slate-700"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 p-0.5 text-ink2 hover:text-ink"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -132,10 +142,7 @@ export default function LogPage() {
               type="button"
               onClick={() => setKinds([])}
               aria-pressed={kinds.length === 0}
-              className={cx(
-                "rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset",
-                kinds.length === 0 ? "bg-slate-800 text-white ring-slate-800" : "bg-white text-slate-600 ring-slate-300 hover:bg-slate-50",
-              )}
+              className={cx(CHIP, kinds.length === 0 ? "border-navy bg-navy text-white" : CHIP_OFF)}
             >
               All · {log.length}
             </button>
@@ -147,10 +154,7 @@ export default function LogPage() {
                   type="button"
                   onClick={() => toggleKind(k)}
                   aria-pressed={on}
-                  className={cx(
-                    "rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset",
-                    on ? CHIP_ACTIVE[k] : "bg-white text-slate-600 ring-slate-300 hover:bg-slate-50",
-                  )}
+                  className={cx(CHIP, on ? CHIP_ACTIVE[k] : CHIP_OFF)}
                 >
                   {k} · {counts[k]}
                 </button>
@@ -162,41 +166,43 @@ export default function LogPage() {
             {newestFirst ? "Newest first" : "Oldest first"}
           </Button>
         </div>
-      </Card>
+      </div>
 
       {log.length === 0 ? (
-        <Empty>No entries yet. Run the 08:00 scan to start the day.</Empty>
+        <Empty>No entries yet. Run the 08:00 scan.</Empty>
       ) : rows.length === 0 ? (
-        <Empty>No entries match this filter.</Empty>
+        <Empty>No entries match.</Empty>
       ) : (
-        <Card className="overflow-hidden">
-          <table className="w-full table-fixed text-left text-sm">
+        <Card className={tbl.wrap} rise={1}>
+          <table className={cx(tbl.table, "min-w-[760px] table-fixed")}>
             <colgroup>
-              <col className="w-12" />
+              <col className="w-14" />
               <col className="w-36" />
               <col className="w-36" />
               <col />
               <col className="w-52" />
             </colgroup>
-            <thead className="border-b border-slate-200 bg-slate-50 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-              <tr>
-                <th className="px-3 py-2">#</th>
-                <th className="px-3 py-2">Demo time</th>
-                <th className="px-3 py-2">Actor</th>
-                <th className="px-3 py-2">Action</th>
-                <th className="px-3 py-2">Refs · AI</th>
+            <thead>
+              <tr className={tbl.headRow}>
+                <th className={cx(tbl.th, "text-right")}>#</th>
+                <th className={tbl.th} title="Demo clock, Asia/Kuala_Lumpur">
+                  Time
+                </th>
+                <th className={tbl.th}>Actor</th>
+                <th className={tbl.th}>Action</th>
+                <th className={tbl.th}>Refs</th>
               </tr>
             </thead>
             <tbody>
               {rows.map((e) => (
-                <tr key={e.seq} className="border-b border-slate-100 align-top last:border-0 hover:bg-slate-50/60">
-                  <td className="px-3 py-2 font-mono text-xs text-slate-400">{e.seq}</td>
-                  <td className="whitespace-nowrap px-3 py-2 font-mono text-xs text-slate-600">{fmtDateTime(e.at)}</td>
-                  <td className="px-3 py-2">
+                <tr key={e.seq} className={cx(tbl.row, "align-top transition-colors hover:bg-canvas/60")}>
+                  <td className={cx(tbl.td, "num text-right text-xs text-ink2")}>{e.seq}</td>
+                  <td className={cx(tbl.td, "num whitespace-nowrap text-xs text-ink")}>{fmtDateTime(e.at)}</td>
+                  <td className={tbl.td}>
                     <ActorBadge e={e} />
                   </td>
-                  <td className="break-words px-3 py-2 text-[13px] text-slate-800">{e.text}</td>
-                  <td className="px-3 py-2">
+                  <td className={cx(tbl.td, "break-words text-ink")}>{role === "clerk" ? redactForClerk(e) : e.text}</td>
+                  <td className={tbl.td}>
                     <div className="flex flex-wrap gap-1">
                       {(e.refs ?? []).map((r) => (
                         <button
@@ -204,7 +210,7 @@ export default function LogPage() {
                           type="button"
                           title={`Filter by ${r}`}
                           onClick={() => setQuery(r)}
-                          className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] text-slate-600 hover:bg-slate-200"
+                          className="inline-flex h-[18px] items-center border border-line px-1.5 font-mono text-[10px] text-ink2 hover:border-navy hover:text-navy"
                         >
                           {r}
                         </button>
@@ -223,8 +229,8 @@ export default function LogPage() {
           </table>
         </Card>
       )}
-      <p className="mt-3 text-[11px] text-slate-500">
-        Showing {rows.length} of {log.length} entries. Times are the frozen demo clock (Asia/Kuala_Lumpur).
+      <p className="mt-3 text-xs text-ink2">
+        <span className="num">{rows.length}</span> of <span className="num">{log.length}</span> entries
       </p>
     </div>
   );

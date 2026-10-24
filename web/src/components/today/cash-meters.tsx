@@ -1,94 +1,121 @@
 "use client";
-// FR-B4 / FR-B5: one meter per upcoming outflow. The Owner sees amounts; the
-// Clerk sees only "Gap: yes/no" and the due date (no balance, bill or gap figure).
-import { Landmark } from "lucide-react";
-import { useKutip } from "@/lib/store";
-import { Badge, Card, CardHeader, Empty, RuleTag, cx } from "@/components/ui";
-import { fmtDate, fmtDateTime, fmtRM, fmtWeekday } from "@/engine/model";
-import { HORIZON_DAYS, cashNow, forecast, type OutflowForecast } from "@/engine/rules";
-import { daysAwayText } from "./bits";
+import { Wallet } from "lucide-react";
+import { useKachingg } from "@/lib/store";
+import { Badge, Card, CardHeader, Figure, cx, stagger } from "@/components/ui";
+import { CountUp } from "@/components/motion";
+import { useFlashOnChange } from "@/lib/motion";
+import { fmtDate, fmtDateTime, fmtRM } from "@/engine/model";
+import { cashNow, forecast, type OutflowForecast } from "@/engine/rules";
+
+const rm = (sen: number) => fmtRM(Math.round(sen));
 
 export default function CashMeters() {
-  const state = useKutip((s) => s.state);
-  const isOwner = state.role === "owner";
+  const state = useKachingg((s) => s.state);
+  const owner = state.role === "owner";
   const rows = forecast(state);
-
   return (
-    <Card>
+    <Card className="flex flex-col" rise={1}>
       <CardHeader
-        kicker="Cash gap meters"
-        title={`Bills due in the next ${HORIZON_DAYS} days`}
-        right={<RuleTag id="F1" />}
+        title={owner ? "Cash available" : "Upcoming bills"}
+        right={
+          <span className="icon-button h-9! w-9!" aria-hidden>
+            <Wallet className="h-4 w-4" />
+          </span>
+        }
       />
-      <div className="space-y-3 p-4">
-        {isOwner ? (
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-md bg-slate-50 px-3 py-2 text-xs text-slate-600">
-            <Landmark className="h-3.5 w-3.5 text-slate-500" aria-hidden />
-            <span>
-              Cash: bank <span className="font-medium tabular-nums text-slate-900">{fmtRM(state.bankBalance.amount)}</span> (entered{" "}
-              {fmtDateTime(state.bankBalance.enteredAt)} by {state.bankBalance.enteredBy}) + approved receipts{" "}
-              <span className="font-medium tabular-nums text-slate-900">{fmtRM(state.approvedReceiptTotal)}</span> ={" "}
-              <span className="font-semibold tabular-nums text-slate-900">{fmtRM(cashNow(state))}</span>
-            </span>
-            <span className="text-slate-400">· plus invoices from on-time payers due before each bill; promises are not counted</span>
+      {owner && (
+        <div className="px-6 pb-5">
+          <Figure>
+            <CountUp value={cashNow(state)} format={rm} />
+          </Figure>
+          <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-xs text-ink2">
+            <span>Bank {fmtRM(state.bankBalance.amount)}</span>
+            <span className="text-emerald-700">+{fmtRM(state.approvedReceiptTotal)} approved</span>
           </div>
-        ) : (
-          <div className="rounded-md bg-slate-50 px-3 py-2 text-xs text-slate-600">
-            Amounts are visible to the Owner only. You see whether each bill has a gap.
-          </div>
-        )}
-        {rows.length === 0 ? (
-          <Empty>No bills due in the next {HORIZON_DAYS} days.</Empty>
-        ) : (
-          <div className="grid gap-3 md:grid-cols-2">
-            {rows.map((f) => (isOwner ? <OwnerMeter key={f.outflowId} f={f} /> : <ClerkMeter key={f.outflowId} f={f} />))}
-          </div>
-        )}
+        </div>
+      )}
+      <div className="mx-6 border-t border-line pt-5">
+        <div className="mb-4 flex items-center justify-between text-xs text-ink2">
+          <span>Upcoming bill coverage</span>
+          <span>Next 30 days</span>
+        </div>
+        <div className="space-y-5">
+          {rows.length === 0 ? (
+            <p className="pb-5 text-sm text-ink2">No bills due in the next 30 days.</p>
+          ) : (
+            rows.map((f, i) => {
+              const covered = f.amount > 0 ? Math.max(0, Math.min(1, (f.forecast + f.amount) / f.amount)) : 1;
+              const pct = Math.round(covered * 100);
+              return (
+                <div key={f.outflowId}>
+                  <div className="mb-2 flex items-center justify-between gap-3">
+                    <span className="text-sm capitalize">
+                      {owner ? f.short : "Bill"}
+                      <span className="ml-2 text-[11px] text-ink2">{fmtDate(f.dueDate)}</span>
+                    </span>
+                    {owner ? (
+                      <span className="text-sm tabular-nums">{fmtRM(f.amount)}</span>
+                    ) : (
+                      <GapBadge f={f} role={state.role} />
+                    )}
+                  </div>
+                  {owner && (
+                    <>
+                      <div
+                        className="striped-meter"
+                        role="meter"
+                        aria-label={`${f.short} covered`}
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-valuenow={pct}
+                      >
+                        <div
+                          className="striped-fill k-grow-x"
+                          data-color={i % 2 === 0 ? "blue" : "pink"}
+                          style={{ ...stagger(i + 1, "90ms"), width: `${pct}%` }}
+                        />
+                      </div>
+                      <div className="mt-1.5 flex justify-between text-[11px] text-ink2">
+                        <span>{pct}% covered</span>
+                        <CoverageLine f={f} />
+                      </div>
+                    </>
+                  )}
+                </div>
+              );
+            })
+          )}
+        </div>
       </div>
+      <details className="mx-6 mb-5 mt-auto pt-5 text-[11px] text-ink2">
+        <summary className="w-fit">How this is calculated</summary>
+        <p className="mt-2 leading-relaxed">
+          Coverage includes expected payments from reliable customers, after earlier bills. Promises are not counted.
+          {owner && ` Bank balance entered ${fmtDateTime(state.bankBalance.enteredAt)} by ${state.bankBalance.enteredBy}.`}
+        </p>
+      </details>
     </Card>
   );
 }
 
-const dueLine = (f: OutflowForecast) => `Due ${fmtWeekday(f.dueDate)} ${fmtDate(f.dueDate)} · ${daysAwayText(f.daysAway)}`;
+/** Flash once when a bill flips from short to covered, even if that happened on another page. */
+const flipsToCovered = (prev: string, next: string) => prev === "short" && next === "covered";
 
-function OwnerMeter({ f }: { f: OutflowForecast }) {
-  const short = f.forecast < 0;
-  // Share of this bill covered by the money forecast to be there just before it.
-  const before = f.forecast + f.amount;
-  const covered = f.amount > 0 ? Math.max(0, Math.min(1, before / f.amount)) : 1;
+function CoverageLine({ f }: { f: OutflowForecast }) {
+  const flash = useFlashOnChange(f.gap > 0 ? "short" : "covered", { memory: `owner:${f.outflowId}`, when: flipsToCovered });
   return (
-    <div className={cx("rounded-md border p-3", short ? "border-rose-200 bg-rose-50/50" : "border-emerald-200 bg-emerald-50/50")}>
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <div className="text-[11px] font-medium uppercase tracking-wide text-slate-500">{dueLine(f)}</div>
-          <div className="text-sm font-semibold text-slate-900">{f.label}</div>
-        </div>
-        <div className="text-right text-sm font-semibold tabular-nums text-slate-900">{fmtRM(f.amount)}</div>
-      </div>
-      <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-200" role="meter" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(covered * 100)} aria-label={`${f.short} covered`}>
-        <div className={cx("h-full rounded-full", short ? "bg-rose-500" : "bg-emerald-500")} style={{ width: `${covered * 100}%` }} />
-      </div>
-      <div className="mt-2 flex items-center justify-between gap-2 text-xs">
-        <span className="text-slate-500 tabular-nums">{Math.round(covered * 100)}% of this bill covered</span>
-        {short ? (
-          <span className="font-semibold tabular-nums text-rose-700">Short {fmtRM(f.gap)}</span>
-        ) : (
-          <span className="font-semibold tabular-nums text-emerald-700">Covered {fmtRM(f.forecast, { sign: true })}</span>
-        )}
-      </div>
-    </div>
+    <span key={flash.key} className={cx(f.gap > 0 ? "text-rose-700" : "text-emerald-700", flash.className)}>
+      {/* Covered: show the surplus left after this bill (F1 forecast, ≥ 0 here). */}
+      {f.gap > 0 ? `${fmtRM(f.gap)} short` : `Covered ${fmtRM(f.forecast, { sign: true })}`}
+    </span>
   );
 }
 
-function ClerkMeter({ f }: { f: OutflowForecast }) {
-  const short = f.forecast < 0;
+function GapBadge({ f, role }: { f: OutflowForecast; role: string }) {
+  const flash = useFlashOnChange(f.gap > 0 ? "short" : "covered", { memory: `${role}:${f.outflowId}`, when: flipsToCovered });
   return (
-    <div className={cx("flex items-center justify-between gap-3 rounded-md border p-3", short ? "border-rose-200 bg-rose-50/50" : "border-emerald-200 bg-emerald-50/50")}>
-      <div>
-        <div className="text-[11px] font-medium uppercase tracking-wide text-slate-500">{dueLine(f)}</div>
-        <div className="text-sm font-semibold text-slate-900">Bill due {fmtDate(f.dueDate)}</div>
-      </div>
-      <Badge tone={short ? "rose" : "emerald"}>Gap: {short ? "yes" : "no"}</Badge>
-    </div>
+    <span key={flash.key} className={cx("rounded-full", flash.className)}>
+      <Badge tone={f.gap > 0 ? "rose" : "emerald"}>Gap: {f.gap > 0 ? "yes" : "no"}</Badge>
+    </span>
   );
 }

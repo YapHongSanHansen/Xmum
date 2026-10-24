@@ -1,5 +1,6 @@
 // Synthetic demo data for Lori Laju Logistics (PRD §14). Every name, number,
 // bank and message here is fictional.
+import { buildHistory } from "./history";
 import { addDays, rm, type Customer, type Invoice, type PastInvoice, type State, type Tier } from "./model";
 
 export const DEMO_START = "2026-10-20T08:00";
@@ -94,6 +95,8 @@ function inv(
     reminders: [],
     promise: null,
     openClaimMessageId: null,
+    snooze: null,
+    calls: [],
     ...extra,
   };
 }
@@ -141,9 +144,16 @@ const invoices: Invoice[] = [
     { doNumber: "DO-8895", date: "2026-10-20", route: "Klang → Seremban", destination: "Seremban" }),
 ];
 
+// Months of paid work, new healthy customers, older read messages and past
+// bookings (engine/history.ts). Built once; invisible to F1/R1-R4/M1-M5.
+const past = buildHistory(customers, invoices);
+const pastPaid = past.invoices.filter((i) => i.status === "paid");
+const newOpen = past.invoices.filter((i) => i.status !== "paid");
+
 export function seedState(): State {
   return {
-    version: 1,
+    // Bump when the State shape or the seed data changes, so a stale saved demo falls back to the seed.
+    version: 4,
     now: DEMO_START,
     business: { name: "Lori Laju Logistics Sdn Bhd", city: "Klang", staff: 12 },
     users: [
@@ -154,17 +164,20 @@ export function seedState(): State {
     scannedDays: [],
     bankBalance: { amount: rm(9800), enteredAt: "2026-10-20T07:45", enteredBy: "Lim Siew Lan" },
     approvedReceiptTotal: 0,
-    customers: structuredClone(customers),
-    invoices: structuredClone(invoices),
+    customers: structuredClone([...customers, ...past.customers]),
+    invoices: structuredClone([...pastPaid, ...invoices, ...newOpen]),
     outflows: [
       { id: "o-salaries", label: "Salaries (drivers + staff)", short: "salaries", amount: rm(24500), dueDate: "2026-10-31" },
       { id: "o-diesel", label: "Diesel fleet card", short: "diesel", amount: rm(11200), dueDate: "2026-11-05" },
     ],
     bankLines: [
-      { id: "bl-0919", at: "2026-10-19T16:10", amount: rm(1250), description: "IBG CR TOKO MAJU ENT 0919", matchedInvoiceId: null },
-      { id: "bl-2304", at: "2026-10-23T14:25", amount: rm(2770), description: "DUITNOW CR MEGA BINA HARDW INV2304", matchedInvoiceId: null },
+      ...structuredClone(past.bankLines),
+      { id: "bl-0919", at: "2026-10-19T16:10", amount: rm(1250), description: "IBG CR TOKO MAJU ENT 0919", matchedInvoiceId: null, source: "csv" },
+      { id: "bl-2304", at: "2026-10-23T14:25", amount: rm(2770), description: "DUITNOW CR MEGA BINA HARDW INV2304", matchedInvoiceId: null, source: "alert" },
     ],
+    bankDebits: [],
     messages: [
+      ...structuredClone(past.messages),
       {
         id: "m-hupseng",
         customerId: "c-hupseng",
@@ -187,11 +200,11 @@ export function seedState(): State {
         image: null,
       },
     ],
-    extractions: {},
+    extractions: structuredClone(past.extractions),
     receipts: [],
     handoffs: [],
     warnings: [],
-    bookings: [],
+    bookings: structuredClone(past.bookings),
     creditNotes: [],
     log: [],
     counters: { CN: 56 },

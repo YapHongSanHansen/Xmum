@@ -1,8 +1,8 @@
-# Kutip — Product Requirements Document
+# Kachingg — Product Requirements Document
 
 | | |
 |---|---|
-| Product | **Kutip** (working name; "collect" in Malay), with **Bukti** ("proof") as its AI reader |
+| Product | **Kachingg** (the sound of the till when you get paid; formerly Kutip), with **Bukti** ("proof") as its AI reader |
 | Hackathon | XMUM, Domain 2: Orbyte Smart SME Challenge — Less Busywork, Better Business |
 | Version | 0.2, 25 Oct 2026: demo business switched to a haulage firm (section 14); tech stack decided (section 20) |
 | Status | Draft, reviewed once by a builder. Section 18 lists open decisions the team must make; section 18a lists calls made during review, for the team to check |
@@ -12,11 +12,11 @@
 
 ## 1. Summary
 
-Malaysian micro and small B2B sellers deliver goods on credit, get paid 60-90 days late, and still have to pay salary, rent and suppliers on fixed dates. A customer can always choose not to pay, so Kutip does not promise to make customers pay. It promises what the owner controls:
+Malaysian micro and small B2B sellers deliver goods on credit, get paid 60-90 days late, and still have to pay salary, rent and suppliers on fixed dates. A customer can always choose not to pay, so Kachingg does not promise to make customers pay. It promises what the owner controls:
 
 > **Never be surprised on payroll day, and stop giving credit to customers who don't pay.**
 
-Kutip does four jobs:
+Kachingg does four jobs:
 
 1. **Early warning.** Every morning it compares cash in the bank plus expected receipts with the bills due soon, and warns the owner at least 10 days before a shortfall.
 2. **Credit check.** When a customer who is already 30+ days late orders again on credit, the owner decides before the goods leave.
@@ -47,7 +47,7 @@ The evidence is real but thin: no source measures owner chasing time, and no sou
 
 ### 2.3 What the owner can and cannot control
 
-| Cannot control | Can control | Kutip module |
+| Cannot control | Can control | Kachingg module |
 |---|---|---|
 | Whether a customer pays | Whether to keep giving that customer credit | Credit check |
 | When a customer's accounts team pays | Knowing early, with time to act | Early warning |
@@ -73,8 +73,8 @@ The evidence is real but thin: no source measures owner chasing time, and no sou
 - Processing payments of any kind. Pay links, if shown, are simulated.
 - Submitting statutory filings (e.g. e-invoices to MyInvois, tax returns).
 - Legal or financial advice: no letters of demand, no legal wording, no lender or financing recommendations.
-- Replacing the business's accounting software. Kutip is a layer that reads from it.
-- HR, payroll processing, leave or claims (Orbyte already has these). Kutip only reads a payroll *date and total* as an outflow.
+- Replacing the business's accounting software. Kachingg is a layer that reads from it.
+- HR, payroll processing, leave or claims (Orbyte already has these). Kachingg only reads a payroll *date and total* as an outflow.
 - Reading WhatsApp group chats, or integrating the official WhatsApp Business Platform in the preliminary round.
 
 ### Anti-goals (failure even if it technically works)
@@ -337,7 +337,7 @@ Illustrative API: `POST /receivables/invoices`, `GET /receivables/chase-plan?dat
 
 ## 12. Privacy and compliance (real deployment)
 
-- The SME is the data user under PDPA 2010 (as amended in 2024); Kutip/Orbyte is its processor.
+- The SME is the data user under PDPA 2010 (as amended in 2024); Kachingg/Orbyte is its processor.
 - Purpose limitation: contact data is used only to follow up invoices the customer has received; a notice line goes on invoices.
 - Role-based access as in section 9.3; clerk and sales never see cash figures.
 - Opt-out per contact is honoured.
@@ -502,7 +502,7 @@ A builder read this PRD cold and found places where rules, demo steps and tests 
 
 | Term | Meaning |
 |---|---|
-| Kutip | The product; Malay for "collect" |
+| Kachingg | The product; named for the sound of the till when you get paid (formerly Kutip) |
 | Bukti | The AI reader of replies and slips; Malay for "proof" |
 | On credit | Goods delivered now, paid later (e.g. 30-day terms) |
 | Overdue / D+n | n days after the invoice due date |
@@ -535,12 +535,12 @@ Chosen for a working demo inside the preliminary deadline, a link judges can ope
 
 ## 21. Orbyte hub frame (simulated)
 
-Kutip is demoed as a module inside a simulated Orbyte hub, to show "fit the hub" (brief section 6) and "Orbyte fit and reuse" (must-have 5). The frame is the team's own design, not a copy of Orbyte's screens (the brief allows this), and is labelled as a simulation.
+Kachingg is demoed as a module inside a simulated Orbyte hub, to show "fit the hub" (brief section 6) and "Orbyte fit and reuse" (must-have 5). The frame is the team's own design, not a copy of Orbyte's screens (the brief allows this), and is labelled as a simulation.
 
 | ID | Requirement | Priority | Acceptance criteria |
 |---|---|---|---|
-| FR-O1 | Hub shell: workspace header (company name, signed-in user and role), a module sidebar listing Orbyte's existing modules (People: eLeave, eClaim, eOT, Attendance; Work; eSign; Hiring; Connect) as present but not part of this demo, and **Kutip** as the new module | P0 | Kutip is the active module; other modules show a "part of Orbyte, not in this demo" state; the frame says "simulated" |
-| FR-O2 | Connect page: the data sources Kutip uses, each with status and what it provides: accounting partner (invoices, payroll total; simulated by CSV), bank statement (credits; CSV), WhatsApp (wa.me click-to-send; simulated inbox), clients records (shared Orbyte data) | P0 | Each source shows "simulated" and the last import time on the demo clock |
+| FR-O1 | Hub shell: workspace header (company name, signed-in user and role), a module sidebar listing Orbyte's existing modules (People: eLeave, eClaim, eOT, Attendance; Work; eSign; Hiring; Connect) as present but not part of this demo, and **Kachingg** as the new module | P0 | Kachingg is the active module; other modules show a "part of Orbyte, not in this demo" state; the frame says "simulated" |
+| FR-O2 | Connect page: the data sources Kachingg uses, each with status and what it provides: accounting partner (invoices, payroll total; simulated by CSV), bank statement (credits; CSV), WhatsApp (wa.me click-to-send; simulated inbox), clients records (shared Orbyte data) | P0 | Each source shows "simulated" and the last import time on the demo clock |
 | FR-O3 | Shared platform pieces are visibly reused: roles from Orbyte's org structure, approvals in an approvals inbox, and the activity log as Orbyte's audit trail | P0 | The role switcher is labelled as Orbyte roles; approvals show in one inbox |
 | FR-O4 | Billing preview: per-use credits in Orbyte's credit-wallet model (invoice chased, slip read), with illustrative prices only | P1 | Shows a month's illustrative usage; no real payment |
 
@@ -551,8 +551,10 @@ Found by the engine test suite and left for P1.
 | # | Limitation | Plan |
 |---|---|---|
 | 1 | Tier 0 courtesy reminders (D-3) are not proposed; the chase plan lists overdue invoices only | Add Tier 0 rows outside the R3 ranking (they are already F1 inflows) |
-| 2 | An unverified "already paid" claim pauses reminders until the Owner marks it paid; there is no expiry | Add a claim expiry or a "reject claim" action |
+| 2 | ~~An unverified "already paid" claim pauses reminders until the Owner marks it paid; there is no expiry~~ | **Done:** the Owner can "Reject claim" (`REJECT_CLAIM`, Owner only, logged) on the hand-off card or, after the slip request is sent, in the Inbox's "Says paid, not in the bank" list; reminders resume. No automatic expiry yet |
 | 3 | A verified but unapproved receipt on a not-yet-due invoice counts as neither cash nor inflow, so the forecast dips until it is approved | Count verified receipts as pending inflows |
 | 4 | Reset is not written to the activity log | Intentional for the demo, so the log starts at the 08:00 scan |
 | 5 | A reminder released after quiet hours keeps its approval time | Store the release time separately |
-| 6 | The live AI call has not been exercised against the API in this build (no key on the build machine); the cached results are the tested path | Run the three seeded messages live once a key is set, and record the result |
+| 6 | ~~The live AI call has not been exercised against the API in this build~~ **Done 25 Oct:** live through Grafilab (ILMU Mini v3.3): the three seeded messages read correctly, and the 40-message set scores amount 100% exact (`web/eval/results/`) | Keep the cached fallback for outages |
+| 7 | ~~No screens for invoice CSV import (FR-A1), owner bank-balance entry (FR-A4) or bank CSV import (FR-A5)~~ | **Done** on the Connect page: invoice and bank CSV imports with a preview and invalid rows listed with line and reason (Owner and Clerk; the Clerk's bank preview shows credit lines only), and the Owner-only balance entry, all logged. The demo still starts from the seed. Bank debits are stored but do not move cash: P0 cash is the entered balance (F1) |
+| 8 | ~~Snooze, mark disputed and "I'll call instead" on the approval card (FR-C9) are not built~~ | **Done:** all three are in the drawer and the engine, with the approve tier rules (Tier 2 Owner only) and logged with the actor. Snooze skips the row until the date; a call counts as contact for 5 days (R2). Un-disputing an invoice is not built yet |

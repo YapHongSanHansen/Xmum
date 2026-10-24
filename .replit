@@ -1,0 +1,14 @@
+# Replit config for the Kachingg demo (Next.js app in web/).
+# Not yet tested on Replit: if the Run button fails, ask Replit Agent to
+# "run and publish the Next.js app in the web folder with pnpm".
+modules = ["nodejs-22"]
+run = "cd web && npx -y pnpm@10.30.0 install && npx -y pnpm@10.30.0 exec next dev -H 0.0.0.0 -p 3000"
+
+[deployment]
+deploymentTarget = "autoscale"
+build = ["sh", "-c", "cd web && npx -y pnpm@10.30.0 install --frozen-lockfile && npx -y pnpm@10.30.0 run build"]
+run = ["sh", "-c", "cd web && npx -y pnpm@10.30.0 exec next start -H 0.0.0.0 -p 3000"]
+
+[[ports]]
+localPort = 3000
+externalPort = 80

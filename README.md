@@ -1,10 +1,16 @@
-# Kutip
+<img src="docs/brand/kachingg-mark.svg" alt="Kachingg logo" width="64">
+
+# Kachingg
 
 > A cash-collection assistant for Malaysian micro and small B2B sellers, built as a module for the Orbyte business hub: it warns the owner before payroll day runs short, holds new credit for customers who already pay late, and only marks an invoice paid when the money is in the bank.
 
 **Never be surprised on payroll day, and stop giving credit to customers who don't pay.**
 
 > SDC Hackathon 2026 (XMUM) · Domain 2: *Orbyte Smart SME Challenge — Less Busywork, Better Business* · sponsored by Alpha Red Solutions
+>
+> **Live demo:** https://kachingg-app.vercel.app · open **Guide** at the top for the 3-minute walk-through. All data is synthetic.
+
+Called Kutip during research; the notes in `docs/research/` and `docs/idea/` keep the old name.
 
 ---
 
@@ -24,9 +30,9 @@
 | Resource          | Link                                           |
 | ----------------- | ---------------------------------------------- |
 | GitHub Repository | https://github.com/YapHongSanHansen/Xmum      |
-| Live Demo         | Hosted on Vercel (team-confirmed; live URL to be added); local instructions in [How to Run](#how-to-run) |
+| Live Demo         | https://kachingg-app.vercel.app (Vercel)      |
 | RunPod Endpoint   | Not used (see [How We Use RunPod](#how-we-use-runpod-required)) |
-| Slide Deck        | ⚠️ TODO: slide deck link                        |
+| Slide Deck        | [Google Drive folder](https://drive.google.com/drive/folders/1XHFuOC91ZWzTOTwDsceH2fLoAxz0lrAE?usp=sharing) |
 | Demo Video        | ⚠️ TODO: demo video link                        |
 
 ---
@@ -50,16 +56,16 @@ SME payment delays in Malaysia average **64 days**, and **76 days** in transport
 
 ### Solution
 
-A customer can always choose not to pay, and no app can change that. So Kutip focuses on what the owner **can** control:
+A customer can always choose not to pay, and no app can change that. So Kachingg focuses on what the owner **can** control:
 
 | | Feature | What it does |
 |---|---|---|
 | 1 | **Early warning** | Every morning it compares cash in the bank plus expected payments with the bills due soon. It warns the owner **10+ days before** a shortfall, while there is still time to act. |
-| 2 | **Credit check** | When a customer who is already 30+ days late orders again on credit, Kutip holds the order until the owner decides: give credit, ask for a deposit, cash on delivery, or call first. |
+| 2 | **Credit check** | When a customer who is already 30+ days late orders again on credit, Kachingg holds the order until the owner decides: give credit, ask for a deposit, cash on delivery, or call first. |
 | 3 | **Chase plan** | It ranks overdue invoices by how much each one closes the shortfall, and prepares WhatsApp reminders in the customer's language (BM, English, 中文). A clerk sends gentle ones; firm ones need the owner. |
 | 4 | **Bukti** *(the AI part)* | AI reads customer replies and payment slips. The invoice is marked paid **only if the money is actually in the bank statement**. Anything unclear goes to a person. |
 
-*Kutip* means "collect" in Malay. *Bukti* means "proof".
+*Kachingg* is the sound of the till when you get paid. *Bukti* means "proof".
 
 #### How it works
 
@@ -81,7 +87,8 @@ flowchart LR
 - **Early warning** — every morning it compares cash plus expected receipts with the bills due soon and warns the owner 10+ days before a shortfall, with a neutral checklist of the owner's own options.
 - **Credit check** — a new credit order from a customer already 30+ days late is put on hold until the owner chooses: credit, deposit, cash on delivery, or call first.
 - **Chase plan** — overdue invoices ranked by how much each one closes the next cash gap, each with its rule ID and reason, and fixed BM / English / 中文 WhatsApp templates that a person approves and sends.
-- **Bukti (AI)** — Claude reads Manglish / BM / Chinese replies and payment slips into fields with the exact source words; a verbatim gate drops anything not quoted, and nothing is marked paid without a matching bank line.
+- **Bukti (AI)** — ILMU Mini v3.3, a Malaysian model hosted in Malaysia (through Grafilab), reads Manglish / BM / Chinese replies and payment slips into fields with the exact source words; a verbatim gate drops anything not quoted, and nothing is marked paid without a matching bank line.
+- **Orbyte module** — a connector to a simulated Orbyte API syncs clients and invoices, and Kachingg exposes its own module API (`/api/kachingg/v1`) for other Orbyte modules.
 - **People in control** — Owner and Clerk roles with different views and approval rights, a "Needs a human" hand-off queue, and an append-only activity log.
 
 ### Tech Stack
@@ -89,9 +96,9 @@ flowchart LR
 | Layer         | Technology                   |
 | ------------- | ---------------------------- |
 | Frontend      | Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4, lucide-react |
-| Backend       | Next.js route handler (`/api/extract`) for the AI call; rules engine in pure TypeScript (`web/src/engine`) |
+| Backend       | Next.js route handlers: `/api/extract` (AI call), `/api/kachingg/v1` (module API), `/api/orbyte-mock` (simulated Orbyte API); rules engine in pure TypeScript (`web/src/engine`) |
 | Database      | None in the preliminary build: Zustand store persisted to `localStorage`, reset from a synthetic seed (a hosted database is planned for the final round) |
-| AI / Compute  | Claude Opus 5.5 (`claude-opus-5-5`) via the Anthropic API, structured JSON validated with Zod; cached results as fallback |
+| AI / Compute  | ILMU Mini v3.3 via Grafilab's OpenAI-compatible Models API (hosted in Malaysia); Claude Opus 5.5 (Anthropic API) as the alternative provider; output validated with Zod; cached results as fallback |
 | Hosting / Dev | Vercel, GitHub, Vitest |
 
 ---
@@ -100,7 +107,15 @@ flowchart LR
 
 *All names and numbers are fictional.* The demo company is **Lori Laju Logistics**, a 12-person haulage firm in Klang with 6 lorries. Transport has the longest SME payment delays in Malaysia (76 days on average), and per-trip invoices mean many payment slips.
 
-On Tuesday at 08:00, Kutip spots a salary shortfall 11 days ahead:
+Screens from the running app (synthetic data):
+
+| Owner: cash gaps and chase plan | Clerk: same page, no cash figures |
+|---|---|
+| ![Owner Today](docs/screens/01-owner-today.png) | ![Clerk Today](docs/screens/02-clerk-today.png) |
+| **Owner: firm reminder with gap impact** | **Bukti: exact words, bank check, deduction** |
+| ![Approval card](docs/screens/03-owner-approval-card.png) | ![Bukti bank check](docs/screens/05-bukti-bank-check.png) |
+
+On Tuesday at 08:00, Kachingg spots a salary shortfall 11 days ahead:
 
 ```text
 ┌────────────────────────────────────────────────────────────────────┐
@@ -114,7 +129,7 @@ On Tuesday at 08:00, Kutip spots a salary shortfall 11 days ahead:
 │ [ ] Hold new credit for customers 30+ days late                    │
 │ [ ] Talk to my bank myself (note only)                             │
 ├────────────────────────────────────────────────────────────────────┤
-│ Kutip lists options only. It does not recommend a lender.          │
+│ Kachingg lists options only. It does not recommend a lender.       │
 └────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -157,11 +172,11 @@ On Friday, a customer says they've paid, with a deduction. Bukti reads the messa
 
 The full script is in [`docs/PRD.md`](docs/PRD.md#13-preliminary-demo-script-about-3-4-minutes), and every expected log line is in section 13a.
 
-## Why Kutip is different
+## Why Kachingg is different
 
 Payment-reminder tools already exist: [Paidnice](https://www.paidnice.com/features) and [Peakflo](https://peakflo.co/whatsapp-ai-agents) abroad, and Bukku, SQL Account and AutoCount locally. They are built around *chasing*, and are aimed at bigger firms or users of particular accounting software.
 
-| | Typical reminder tools | Kutip |
+| | Typical reminder tools | Kachingg |
 |---|---|---|
 | Promise | "Chase customers automatically" | "No surprises on payroll day" |
 | Ranks who to chase by the next cash shortfall | Not found | ✓ |
@@ -174,13 +189,15 @@ Details and sources are in [`docs/research/02-competitor-scan.md`](docs/research
 
 ## Built for Orbyte
 
-Orbyte is a shared business hub for SMEs. Kutip is designed as a module inside it, not a standalone app:
+Orbyte is a shared business hub for SMEs. Kachingg is designed as a module inside it, not a standalone app:
 
-- **Data in** through Orbyte Connect, from accounting partners (or a CSV).
+- **Data in** through Orbyte Connect, from accounting partners (or a CSV). In the demo, **Sync from Orbyte** pulls clients and invoices from a simulated Orbyte API.
 - **Reuses Orbyte's platform**: client records, roles, review-and-approval flows and the audit trail.
-- **Adds something new.** Orbyte covers HR and admin (leave, claims, overtime, attendance, hiring); Kutip adds finance and sales.
+- **Adds something new.** Orbyte covers HR and admin (leave, claims, overtime, attendance, hiring); Kachingg adds finance and sales.
 - **Fits Orbyte's credit wallet**, paying per invoice chased and per slip read.
 - **Reusable across many businesses**, with packs for printing, catering supply, wholesale and transport.
+
+What Kachingg reads from and writes to Orbyte, with JSON examples, is in [`docs/orbyte-integration.md`](docs/orbyte-integration.md).
 
 ## People stay in control
 
@@ -191,7 +208,7 @@ Orbyte is a shared business hub for SMEs. Kutip is designed as a module inside i
 | **Sales** *(planned)* | Sees whether a customer is on hold |
 | **Accountant** *(planned)* | Read-only export of the aging report and activity log |
 
-**Out of scope, by design:** Kutip does not process payments, submit e-invoices or tax filings, or give legal or financial advice. It never recommends a lender. The demo uses synthetic data only, and PDPA handling for a real deployment is described in the docs.
+**Out of scope, by design:** Kachingg does not process payments, submit e-invoices or tax filings, or give legal or financial advice. It never recommends a lender. The demo uses synthetic data only, and PDPA handling for a real deployment is described in the docs.
 
 ---
 
@@ -201,6 +218,9 @@ Orbyte is a shared business hub for SMEs. Kutip is designed as a module inside i
 .
 ├── docs/
 │   ├── PRD.md                   # Build spec: requirements, rules, demo script, expected log
+│   ├── orbyte-integration.md    # Orbyte module: data in/out, API assumptions, events
+│   ├── brand/                   # Kachingg logo
+│   ├── screens/                 # Screenshots of the running app
 │   ├── idea/kutip-bukti.md      # The full idea and example screens
 │   ├── domain-2/                # Hackathon brief (PDF + text)
 │   └── research/                # Pain research, competitor scan, raw data
@@ -212,11 +232,13 @@ Orbyte is a shared business hub for SMEs. Kutip is designed as a module inside i
 │   ├── answers.md               # Source text of every answer (edit here, then rebuild)
 │   ├── build_pdfs.py            # Writes answers.md into the official templates
 │   └── templates/               # Blank official templates (input to build_pdfs.py)
-├── web/                         # The Kutip app (Next.js)
-│   ├── src/app/                 # Page and the /api/extract route (AI call)
-│   ├── src/components/          # Orbyte hub shell, Today, Bookings, Bukti inbox, log
+├── web/                         # The Kachingg app (Next.js)
+│   ├── src/app/                 # Pages and API routes (extract, kachingg/v1, orbyte-mock)
+│   ├── src/components/          # Orbyte hub shell, Today, Bookings, Bukti inbox, Connect, log
 │   ├── src/engine/              # Rules engine, synthetic seed, tests (Vitest)
+│   ├── src/orbyte/              # Orbyte connector and simulated Orbyte API
 │   ├── src/lib/                 # Store and AI client/server helpers
+│   ├── eval/                    # Bukti test set (40 synthetic replies) and eval runner
 │   └── .env.example             # Example environment variables
 ├── LICENSE
 └── README.md
@@ -230,8 +252,11 @@ Browser ── Next.js app (Orbyte hub frame, Owner/Clerk views)
    │          ├─► Rules engine (TypeScript): cash forecast, credit check, chase plan,
    │          │   verbatim gate, bank match, approvals ─► append-only activity log
    │          │
-   │          └─► POST /api/extract (Next.js server route) ──► Anthropic API (Claude Opus 5.5)
+   │          ├─► OrbyteConnector ──► simulated Orbyte API (clients, invoices)
+   │          │
+   │          └─► POST /api/extract (Next.js server route) ──► Grafilab Models API (ILMU Mini v3.3)
    │                     │   reads one reply + slip → Zod-validated fields with quotes
+   │                     ├── alternative provider: Anthropic API (Claude Opus 5.5)
    │                     └── on error or timeout: cached extraction ("cached result")
    │
    └── Synthetic data only: seed invoices, bank CSV lines, messages, slips
@@ -243,11 +268,11 @@ AI only reads messages. Every decision (what to chase, whether something is paid
 
 ## How to Run
 
-### Option 1 — Open the live demo (once deployed)
+### Option 1 — Open the live demo
 
-1. Open the Vercel Live Demo link above once the deployment URL is added. Nothing to install.
-2. Use the role switcher in the header to act as **Owner** (Lim Siew Lan) or **Clerk** (Nurul).
-3. Follow the demo script in [`docs/PRD.md`](docs/PRD.md#13-preliminary-demo-script-about-3-4-minutes). **Reset demo** in the header starts it again.
+1. Open https://kachingg-app.vercel.app. Nothing to install.
+2. Open **Guide** in the top bar for the 8-step, 3-minute walk-through.
+3. Use the role switcher in the header to act as **Owner** (Lim Siew Lan) or **Clerk** (Nurul). **Reset demo** in the header starts the script again.
 
 ### Option 2 — Run Locally
 
@@ -262,19 +287,20 @@ cd Xmum/web
 pnpm install
 
 # 3. (Optional) Configure the AI key
-cp .env.example .env.local      # then set ANTHROPIC_API_KEY
+cp .env.example .env.local      # then set GRAFILAB_API_KEY (or ANTHROPIC_API_KEY)
 
 # 4. Run the app
 pnpm dev                        # http://localhost:3000
 ```
 
-Without `ANTHROPIC_API_KEY`, Bukti uses saved results for the three demo messages and labels them "cached result". Everything else runs locally with no network.
+With `GRAFILAB_API_KEY`, Bukti reads messages live with ILMU Mini v3.3 (override the model with `GRAFILAB_MODEL`); with `ANTHROPIC_API_KEY`, it uses Claude. Without either, Bukti uses saved results for the three demo messages and labels them "cached result". Everything else runs locally with no network.
 
 ### Run Tests
 
 ```bash
 cd web
-pnpm test        # rules engine: every seed check and the full demo script
+pnpm test          # rules engine, Orbyte connector and AI route: 186 tests, including the full demo script
+pnpm eval:bukti    # Bukti accuracy on 40 synthetic replies (needs GRAFILAB_API_KEY or ANTHROPIC_API_KEY; Node 22.18+)
 ```
 
 ---
@@ -284,8 +310,10 @@ pnpm test        # rules engine: every seed check and the full demo script
 **We did not use Replit for this project.** We declare this rather than add a token integration (Handbook 8.1.3 and 8.4).
 
 - **Development:** code was written locally and shared through this GitHub repository.
-- **Hosting:** Vercel, as confirmed by the team. The live deployment URL still needs to be added above.
-- **Secrets:** the only key, `ANTHROPIC_API_KEY`, is stored as an environment variable on the host and in a local `.env.local` that git ignores. No secrets are in this repository.
+- **Hosting:** Vercel, at https://kachingg-app.vercel.app.
+- **Secrets:** the AI keys (`GRAFILAB_API_KEY`, optionally `ANTHROPIC_API_KEY`) are stored as environment variables on the host and in a local `.env.local` that git ignores. No secrets are in this repository.
+
+A `.replit` file is included so the repository can be imported into Replit if the organisers ask for it; it has not been tested there.
 
 📄 Proof of use: [`submission/SDC2026_Taygood_Replit_POU.pdf`](submission/SDC2026_Taygood_Replit_POU.pdf) (a signed statement that Replit was not used)
 
@@ -293,9 +321,9 @@ pnpm test        # rules engine: every seed check and the full demo script
 
 **We did not use RunPod for this project.**
 
-- **Workload:** Kutip's only AI step reads one short message and one slip image per customer reply. It calls a hosted model (Claude Opus 5.5 through the Anthropic API) rather than running a GPU model.
-- **Why not self-host:** the step is small and infrequent, and a hosted API gave us vision input and structured output on day one. The rules engine needs no GPU.
-- **Where it would fit:** in a real deployment, Malaysian data-residency preferences (PDPA cross-border transfer) could justify an open-weight vision model on a GPU endpoint such as RunPod Serverless. The `/api/extract` route is the single place that would change.
+- **Workload:** Kachingg's only AI step reads one short message and one slip image per customer reply. It calls a hosted model (ILMU Mini v3.3 through Grafilab's Models API) rather than running a GPU model.
+- **Why not self-host:** the step is small and infrequent, and a hosted API gave us image input and structured output on day one. The rules engine needs no GPU.
+- **Where it would fit:** at larger scale, an open-weight vision model on a GPU endpoint such as RunPod Serverless could replace the hosted API. The `/api/extract` route is the single place that would change.
 
 📄 Proof of use: [`submission/SDC2026_Taygood_Runpod_POU.pdf`](submission/SDC2026_Taygood_Runpod_POU.pdf) (a signed statement that RunPod was not used)
 
@@ -309,7 +337,7 @@ Declared under handbook section 8.4.
 |---|---|
 | App | Next.js 16, React 19, TypeScript, Tailwind CSS 4, Zustand, Zod, lucide-react |
 | Tests | Vitest |
-| AI inside the product | Claude Opus 5.5 (Anthropic API) reads customer replies and payment slips (Bukti). Rules, not AI, make every decision |
+| AI inside the product | ILMU Mini v3.3, a Malaysian model hosted in Malaysia, through Grafilab's Models API (OpenAI-compatible) reads customer replies and payment slips (Bukti); Claude Opus 5.5 (Anthropic API) is the alternative provider. Rules, not AI, make every decision |
 | Hosting | Vercel |
 | AI tools used to build | Claude Code (Anthropic) for research, documentation and code generation, reviewed and adapted by the team |
 | Data | Synthetic only: every business, person, bank, slip and message is fictional. No pre-existing project code is used |
@@ -321,8 +349,10 @@ Full declaration: [`submission/SDC2026_Taygood_TechDeclaration.pdf`](submission/
 | | |
 |---|---|
 | ✅ | Problem research, competitor scan, idea brief, PRD (v0.2) |
-| ✅ | Rules engine (`web/src/engine`) running the full demo script in tests |
-| 🔄 | Web app: Orbyte hub frame, Today, Bookings, Bukti inbox, activity log |
+| ✅ | Rules engine (`web/src/engine`) running the full demo script in tests (186 tests) |
+| ✅ | Web app: Orbyte hub frame, Today, Bookings, Bukti inbox, approvals, activity log, Connect (Orbyte sync, invoice and bank CSV import, bank alerts, owner bank balance), usage and credits |
+| ✅ | Deployed at https://kachingg-app.vercel.app: the 8-step Demo guide passes end to end in a browser as Owner and Clerk |
+| ✅ | Bukti test set: 40 synthetic Manglish, BM, English and Chinese replies with an eval runner. Live run with ILMU Mini v3.3: amounts 100% exact, intent 90%, promised dates 84% (date misses go to a person) |
 | ⬜ | Interviews with 5-10 Malaysian B2B sellers |
 
 ## Challenges & Learnings
@@ -331,6 +361,7 @@ Full declaration: [`submission/SDC2026_Taygood_TechDeclaration.pdf`](submission/
 - **A promise we can keep.** No app can make a customer pay. We reframed the product around what the owner controls (early warning, the credit decision, who to chase, correct records), so its value doesn't depend on customers changing their behaviour.
 - **A demo that can be repeated.** A frozen demo clock, a synthetic seed and an expected activity log (PRD section 13a) let the full journey run the same way every time, and the test suite replays the whole script.
 - **Mixed-language replies.** Messages like "下礼拜五才过数" ("pay next Friday") are ambiguous about the date. We learned to hand such cases to a person with one specific question instead of guessing.
+- **Keeping data in Malaysia.** We moved Bukti from a model hosted abroad to ILMU Mini v3.3 on Grafilab, hosted in Malaysia, behind the same server route, so the provider can be swapped without touching the rules.
 - **What we learned:** rules with visible IDs make the product easier to trust and to explain than an AI answer, and a small, clear AI step is easier to make reliable than a chatbot.
 
 ## Future Improvements
@@ -338,8 +369,8 @@ Full declaration: [`submission/SDC2026_Taygood_TechDeclaration.pdf`](submission/
 - [ ] Interview 5-10 Malaysian B2B sellers to validate slip usage, chasing time and the credit-check habit
 - [ ] Hosted database and server-side rules engine (Convex or Postgres), replacing the browser store
 - [ ] Multi-invoice payment allocation, Sales and Accountant roles, CSV export of the aging report and log
-- [ ] Accuracy report on a 30-50 message Manglish / BM / Chinese test set (target ≥ 95% exact amount)
-- [ ] Orbyte Connect adapter for accounting partners; official WhatsApp Business Platform; bank feeds
+- [ ] Raise promised-date accuracy on the mixed-language test set (amounts already 100% exact) and grow the set beyond 40 messages
+- [ ] Real Orbyte Connect adapter for accounting partners; official WhatsApp Business Platform; live bank feeds
 - [ ] Sector packs (transport, printing, wholesale, catering supply) and a BM user interface
 
 ## Team
@@ -355,6 +386,7 @@ Full declaration: [`submission/SDC2026_Taygood_TechDeclaration.pdf`](submission/
 | Read this | For |
 |---|---|
 | [`docs/PRD.md`](docs/PRD.md) | **What to build:** goals, user stories, functional requirements with acceptance criteria, business rules, data model, permissions, demo script and expected log, synthetic data spec, Domain 2 traceability |
+| [`docs/orbyte-integration.md`](docs/orbyte-integration.md) | **Orbyte module (simulated):** what Kachingg reads from and writes to Orbyte, our API assumptions with JSON examples, events, role mapping, mock vs real API |
 | [`docs/idea/kutip-bukti.md`](docs/idea/kutip-bukti.md) | The full idea: example screens, rules, roles, requirement mapping, risks, demo scope |
 | [`docs/domain-2/brief.md`](docs/domain-2/brief.md) | The hackathon brief as text (source of truth: [`Domain-2-brief.pdf`](docs/domain-2/Domain-2-brief.pdf)) |
 | [`docs/research/01-pain-research-shortlist.md`](docs/research/01-pain-research-shortlist.md) | How the idea was chosen: researched pains, evidence, shortlist, judge scores |
@@ -368,12 +400,12 @@ Full declaration: [`submission/SDC2026_Taygood_TechDeclaration.pdf`](submission/
 ## Submission Checklist
 
 - [x] Team name, domain (Domain 1 / Domain 2) and SDG track filled in
-- [ ] Slide deck link added
+- [x] Slide deck link added
 - [ ] Demo video link added
 - [x] Replit use declared (not used), with a statement in `submission/`
 - [x] RunPod use declared (not used), with a statement in `submission/`
-- [ ] Preliminary submission completed (`SDC2026_Taygood_Preliminary.pdf`) *(drafted; phone, member count, workshops, IP-conflict answer and signature TODO)*
-- [ ] Technology declaration completed (`SDC2026_Taygood_TechDeclaration.pdf`) *(drafted; phone, live URL and signature TODO)*
+- [ ] Preliminary submission completed (`SDC2026_Taygood_Preliminary.pdf`) *(drafted; phone, member count, workshops and signature TODO)*
+- [ ] Technology declaration completed (`SDC2026_Taygood_TechDeclaration.pdf`) *(drafted; phone and signature TODO)*
 - [x] Submission files renamed with your team name (replace `TeamName`)
 - [x] "How to Run" steps verified
 - [x] No API keys or secrets committed to the repository

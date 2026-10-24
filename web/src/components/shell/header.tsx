@@ -1,58 +1,91 @@
 "use client";
-// Hub header (PRD FR-O1) plus the demo controls (FR-H1, FR-A7, FR-F1).
+// Top bar: Kachingg, the workspace, the demo disclosure and the role switch;
+// below it the demo controls (FR-H1, FR-A7, FR-F1).
 import { useRef, useState } from "react";
-import { ChevronDown, Clock, FastForward, Play, RotateCcw } from "lucide-react";
-import { Badge, Button, cx } from "@/components/ui";
+import { Bell, BookOpen, Building2, ChevronDown, Clock, FastForward, Play, RotateCcw } from "lucide-react";
+import { Button, cx } from "@/components/ui";
 import { dayOf, fmtDateTime, type Role } from "@/engine/model";
 import { DEMO_STOPS } from "@/engine/seed";
-import { useKutip } from "@/lib/store";
+import { useKachingg } from "@/lib/store";
+import { useFlashOnChange } from "@/lib/motion";
 import { Wordmark } from "./wordmark";
+import { Navigation } from "./navigation";
+import { approvalsCount } from "@/components/pages/approvals";
 
-const ROLES: { role: Role; label: string }[] = [
-  { role: "owner", label: "Lim Siew Lan · Owner" },
-  { role: "clerk", label: "Nurul · Clerk" },
+// `label` is the accessible name; `short` is what the switch shows.
+const ROLES: { role: Role; label: string; short: string }[] = [
+  { role: "owner", label: "Lim Siew Lan · Owner", short: "Owner" },
+  { role: "clerk", label: "Nurul · Clerk", short: "Clerk" },
 ];
 
 export function Header() {
-  const state = useKutip((s) => s.state);
-  const dispatch = useKutip((s) => s.dispatch);
+  const state = useKachingg((s) => s.state);
+  const dispatch = useKachingg((s) => s.dispatch);
+  const go = useKachingg((s) => s.go);
   const needsScan = !state.scannedDays.includes(dayOf(state.now));
-
+  const pending = approvalsCount(state);
+  // The approvals dot pops briefly whenever the pending count changes.
+  const pop = useFlashOnChange(pending, { className: "k-pop" });
   return (
-    <header className="shrink-0 border-b border-slate-200 bg-white">
-      <div className="flex h-14 items-center justify-between gap-4 px-5">
-        <div className="flex min-w-0 items-center gap-4">
+    <header className="app-header">
+      <div className="header-main">
+        <button type="button" onClick={() => go("today")} aria-label="Kachingg overview">
           <Wordmark />
-          <span className="h-6 w-px bg-slate-200" aria-hidden />
-          <div className="min-w-0">
-            <div className="text-[11px] font-medium uppercase tracking-wide text-slate-400">Workspace</div>
-            <div className="truncate text-sm font-semibold text-slate-900">{state.business.name}</div>
+        </button>
+        <Navigation />
+        <div className="header-profile flex shrink-0 items-center gap-2.5">
+          <button
+            type="button"
+            className="icon-button relative"
+            onClick={() => go("approvals")}
+            aria-label={`Approvals, ${pending} pending`}
+          >
+            <Bell className="h-[18px] w-[18px]" />
+            {pending > 0 && (
+              <span
+                key={pop.key}
+                className={cx("absolute right-2 top-2 h-2 w-2 rounded-full border-2 border-canvas bg-[#f2783c]", pop.className)}
+              />
+            )}
+          </button>
+          <div
+            className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br from-[#fed987] via-[#c9d7ef] to-[#6885c1] p-[2px]"
+            aria-hidden
+          >
+            <span className="grid h-full w-full place-items-center rounded-full border-2 border-white bg-[#e9e8e5] text-xs font-medium">
+              {state.role === "owner" ? "SL" : "NU"}
+            </span>
           </div>
-          <Badge tone="amber">Simulated hub · synthetic data</Badge>
         </div>
-        <RoleSwitcher role={state.role} onChange={(role) => dispatch({ type: "SET_ROLE", role })} />
       </div>
-
-      <div className="flex h-12 items-center justify-between gap-4 border-t border-slate-100 bg-slate-50/80 px-5">
-        <div className="flex items-center gap-3">
-          <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Demo clock</span>
-          <span className="inline-flex items-center gap-1.5 rounded-md bg-white px-2.5 py-1 font-mono text-sm font-semibold text-slate-900 ring-1 ring-slate-200">
-            <Clock className="h-3.5 w-3.5 text-slate-500" aria-hidden />
+      <div className="header-context">
+        <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2">
+          <span className="flex items-center gap-1.5">
+            <Building2 className="h-3.5 w-3.5" aria-hidden />
+            {state.business.name}
+          </span>
+          <span className="rounded-full bg-white px-2 py-1 text-[10px]">Orbyte module · simulated · synthetic data</span>
+          <RoleSwitcher role={state.role} onChange={(role) => dispatch({ type: "SET_ROLE", role })} />
+        </div>
+        <div className="demo-tools">
+          <span className="mr-1 inline-flex items-center gap-1.5 tabular-nums" title="Demo clock">
+            <Clock className="h-3.5 w-3.5" aria-hidden />
+            <span className="sr-only">Demo clock: </span>
             {fmtDateTime(state.now)}
           </span>
           <AdvanceMenu now={state.now} onAdvance={(to) => dispatch({ type: "ADVANCE", to })} />
           {needsScan && (
-            <Button
-              size="sm"
-              className="bg-amber-500 text-white shadow-sm ring-2 ring-amber-200 hover:bg-amber-600"
-              onClick={() => dispatch({ type: "RUN_SCAN" })}
-            >
-              <Play className="h-3.5 w-3.5" aria-hidden />
-              Run 08:00 scan
+            <Button size="sm" variant="ghost" onClick={() => dispatch({ type: "RUN_SCAN" })}>
+              <Play className="h-3 w-3" aria-hidden />
+              Scan
             </Button>
           )}
+          <button type="button" onClick={() => go("guide")} className="btn btn-ghost btn-sm" aria-label="Demo guide">
+            <BookOpen className="h-3.5 w-3.5" aria-hidden />
+            <span className="hidden sm:inline">Guide</span>
+          </button>
+          <ResetButton onReset={() => dispatch({ type: "RESET" })} />
         </div>
-        <ResetButton onReset={() => dispatch({ type: "RESET" })} />
       </div>
     </header>
   );
@@ -60,33 +93,42 @@ export function Header() {
 
 function RoleSwitcher({ role, onChange }: { role: Role; onChange: (r: Role) => void }) {
   return (
-    <div className="flex items-center gap-2">
-      <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Orbyte role</span>
-      <div className="inline-flex rounded-md bg-slate-100 p-0.5 ring-1 ring-slate-200" role="radiogroup" aria-label="Orbyte role">
+    <span className="inline-flex items-center gap-1.5">
+      {/* Visible caption only; the group's accessible name says the same. */}
+      <span className="text-[10px]" aria-hidden>
+        Orbyte role
+      </span>
+      <div className="inline-flex gap-0.5 rounded-lg bg-[#e6e7eb] p-0.5" role="group" aria-label="Orbyte role">
         {ROLES.map((r) => (
           <button
             key={r.role}
             type="button"
-            role="radio"
-            aria-checked={role === r.role}
+            aria-pressed={role === r.role}
+            aria-label={r.label}
+            title={r.label}
             onClick={() => role !== r.role && onChange(r.role)}
             className={cx(
-              "rounded px-3 py-1 text-xs font-medium transition-colors",
-              role === r.role ? "bg-white text-slate-900 shadow-sm ring-1 ring-slate-200" : "text-slate-500 hover:text-slate-800",
+              "rounded-md px-2.5 py-1 text-[11px] transition-colors",
+              role === r.role ? "bg-white text-ink shadow-sm" : "text-ink2 hover:text-ink",
             )}
           >
-            {r.label}
+            {r.short}
           </button>
         ))}
       </div>
-    </div>
+    </span>
   );
 }
 
 function AdvanceMenu({ now, onAdvance }: { now: string; onAdvance: (to: string) => boolean }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="relative">
+    <div
+      className="advance-menu relative"
+      onKeyDown={(event) => {
+        if (event.key === "Escape") setOpen(false);
+      }}
+    >
       <Button size="sm" variant="secondary" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
         <FastForward className="h-3.5 w-3.5" aria-hidden />
         Advance to
@@ -112,8 +154,8 @@ function AdvancePanel({ now, onPick }: { now: string; onPick: (to: string) => vo
   const [custom, setCustom] = useState(now);
   const valid = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(custom) && custom > now;
   return (
-    <div className="absolute left-0 top-full z-40 mt-1.5 w-80 rounded-lg border border-slate-200 bg-white p-1.5 shadow-lg">
-      <div className="px-2 pb-1 pt-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-400">Demo script stops</div>
+    <div className="advance-panel absolute right-0 top-full z-40 mt-2 w-[min(320px,85vw)] rounded-2xl border border-line bg-surface p-2 shadow-xl">
+      <div className="px-2 pb-1 pt-1.5 text-xs text-ink2">Demo stops</div>
       {DEMO_STOPS.map((stop) => {
         const passed = stop.at <= now;
         return (
@@ -123,17 +165,17 @@ function AdvancePanel({ now, onPick }: { now: string; onPick: (to: string) => vo
             disabled={passed}
             onClick={() => onPick(stop.at)}
             className={cx(
-              "flex w-full items-center justify-between gap-2 rounded-md px-2 py-1.5 text-left text-sm",
-              passed ? "cursor-not-allowed text-slate-400" : "text-slate-800 hover:bg-emerald-50 hover:text-emerald-900",
+              "flex min-h-10 w-full items-center justify-between gap-2 rounded-lg px-2 py-2 text-left text-xs",
+              passed ? "cursor-not-allowed text-ink3" : "text-ink hover:bg-navy-soft",
             )}
           >
             <span>{stop.label}</span>
-            {passed && <span className="text-[11px]">passed</span>}
+            {passed && <span className="font-mono text-[11px]">passed</span>}
           </button>
         );
       })}
-      <div className="mt-1.5 border-t border-slate-100 px-2 pb-1.5 pt-2.5">
-        <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-400" htmlFor="advance-custom">
+      <div className="mt-1.5 border-t border-hairline px-2 pb-1.5 pt-2.5">
+        <label className="mb-1 block text-xs text-ink2" htmlFor="advance-custom">
           Custom time
         </label>
         <div className="flex items-center gap-2">
@@ -143,13 +185,13 @@ function AdvancePanel({ now, onPick }: { now: string; onPick: (to: string) => vo
             value={custom}
             min={now}
             onChange={(e) => setCustom(e.target.value.slice(0, 16))}
-            className="h-8 min-w-0 flex-1 rounded-md border border-slate-300 px-2 font-mono text-xs text-slate-800 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="h-8 min-w-0 flex-1 rounded-xl border border-line-strong bg-surface px-2 font-mono text-xs text-ink"
           />
           <Button size="sm" disabled={!valid} onClick={() => onPick(custom)}>
             Advance
           </Button>
         </div>
-        <p className="mt-1.5 text-[11px] text-slate-500">The clock only moves forward. Each 08:00 crossed runs that day&apos;s scan.</p>
+        <p className="mt-1.5 text-[11px] text-ink2">Forward only. Each 08:00 passed runs its scan.</p>
       </div>
     </div>
   );
@@ -169,9 +211,10 @@ function ResetButton({ onReset }: { onReset: () => void }) {
     timer.current = setTimeout(() => setArmed(false), 4000);
   };
   return (
-    <Button size="sm" variant={armed ? "danger" : "ghost"} onClick={click} className={armed ? "" : "text-slate-500"}>
+    <Button size="sm" variant={armed ? "danger" : "ghost"} onClick={click} className={armed ? "" : "text-ink2 hover:bg-hairline"}>
       <RotateCcw className="h-3.5 w-3.5" aria-hidden />
-      {armed ? "Click again to reset" : "Reset demo"}
+      {/* On a phone the idle button is icon-only; its accessible name stays "Reset demo". */}
+      {armed ? "Click again to reset" : <span className="sr-only sm:not-sr-only">Reset demo</span>}
     </Button>
   );
 }

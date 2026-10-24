@@ -1,18 +1,17 @@
 "use client";
-// Left column: arrived messages only, WhatsApp-style previews (FR-E1).
+// Left column: arrived messages only, one row each: name, time, status, preview (FR-E1).
 import { Paperclip } from "lucide-react";
 import { customerOf, fmtDateTime, type InboundMessage, type State } from "@/engine/model";
 import { Badge, Empty, cx } from "@/components/ui";
-import { SlipThumb } from "./bubble";
 import { STATUS_LABEL, STATUS_TONE, arrivedMessages, messageStatus } from "./status";
 
 export function MessageList({ state, selectedId, onSelect }: { state: State; selectedId: string | null; onSelect: (id: string) => void }) {
   const messages = arrivedMessages(state);
   if (!messages.length) {
-    return <Empty>No replies yet. Messages appear here when the demo clock passes their arrival time.</Empty>;
+    return <div className="px-5 pb-5"><Empty>No replies yet.</Empty></div>;
   }
   return (
-    <ul className="space-y-2">
+    <ul className="divide-y divide-hairline">
       {messages.map((m) => (
         <li key={m.id}>
           <MessageRow state={state} m={m} active={m.id === selectedId} onSelect={() => onSelect(m.id)} />
@@ -29,30 +28,22 @@ function MessageRow({ state, m, active, onSelect }: { state: State; m: InboundMe
     <button
       type="button"
       onClick={onSelect}
+      aria-current={active || undefined}
       className={cx(
-        "w-full rounded-lg border p-2.5 text-left transition-colors",
-        active ? "border-emerald-400 bg-emerald-50/60 ring-1 ring-emerald-300" : "border-slate-200 bg-white hover:bg-slate-50",
+        "block w-full border-l-[3px] px-5 py-5 text-left transition-colors",
+        active ? "border-l-[#397cf4] bg-navy-soft" : "border-l-transparent hover:bg-canvas",
       )}
     >
-      <div className="flex items-center justify-between gap-2">
-        <div className="min-w-0">
-          <div className="truncate text-sm font-semibold text-slate-900">{c.name}</div>
-          <div className="text-[11px] text-slate-500">
-            {c.contact} · {fmtDateTime(m.receivedAt)}
-          </div>
-        </div>
-        <Badge tone={STATUS_TONE[status]}>{STATUS_LABEL[status]}</Badge>
+      <div className="flex flex-col gap-1.5">
+        <div className="min-w-0 truncate text-[13px] font-semibold text-ink">{c.name}</div>
+        <span className="num shrink-0 text-[11px] text-ink2">{fmtDateTime(m.receivedAt)}</span>
       </div>
-      <div className="mt-2 flex items-start gap-2 rounded-md bg-[#efeae2] p-1.5">
-        <div className="min-w-0 flex-1 rounded-md rounded-tl-none bg-white px-2 py-1 text-xs text-slate-800 shadow-sm">
-          <p className="line-clamp-2">{m.text}</p>
-          {m.image && (
-            <div className="mt-0.5 flex items-center gap-1 text-[10px] text-slate-500">
-              <Paperclip className="h-3 w-3" /> slip image
-            </div>
-          )}
-        </div>
-        {m.image && <SlipThumb src={m.image} />}
+      <div className="mt-1.5 flex items-center gap-2 text-xs text-ink2">
+        {m.image && <Paperclip className="h-3 w-3 shrink-0" aria-label="Slip attached" />}
+        <span className="min-w-0 flex-1 truncate">{m.text}</span>
+        <Badge tone={STATUS_TONE[status]} className="shrink-0">
+          {STATUS_LABEL[status]}
+        </Badge>
       </div>
     </button>
   );

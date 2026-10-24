@@ -1,7 +1,8 @@
 "use client";
 // Right column: one message, Bukti's reading of it, and what the rules made of
 // it. Every button dispatches an engine action; the UI never changes money.
-import { AlertTriangle, CheckCircle2, FileText, Landmark, Loader2, ScanText, Sparkles, XCircle } from "lucide-react";
+import type { ReactNode } from "react";
+import { CheckCircle2, Clock, HelpCircle, Loader2, Sparkles, XCircle } from "lucide-react";
 import {
   customerOf,
   fmtDate,
@@ -11,13 +12,14 @@ import {
   invoiceOf,
   outstanding,
   type ExtractionRecord,
+  type Handoff,
   type InboundMessage,
   type Receipt,
   type State,
 } from "@/engine/model";
 import { CONFIDENCE_MIN } from "@/engine/rules";
-import { useKutip } from "@/lib/store";
-import { Badge, Button, Card, CardHeader, RuleTag, cx } from "@/components/ui";
+import { useKachingg } from "@/lib/store";
+import { Badge, Button, Card, CardHeader, RuleTag, cx, stagger } from "@/components/ui";
 import { ChatBackdrop, ChatBubble, SlipThumb } from "./bubble";
 import { HighlightedText, type QuoteMark } from "./highlight";
 import { MARK_CLASS, dayLabel, fieldRows, type FieldRow } from "./fields";
@@ -46,18 +48,20 @@ export function MessageDetail({
   const loading = run?.loading === true;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <Card>
         <CardHeader
-          kicker={`WhatsApp · ${c.whatsapp} · linked to customer`}
           title={
-            <span className="flex flex-wrap items-center gap-2">
-              {c.name} <span className="font-normal text-slate-500">({c.contact})</span>
-            </span>
+            <>
+              {c.name} <span className="font-normal text-ink2">({c.contact})</span>
+              <span className="mt-0.5 block text-xs font-normal tracking-normal text-ink2">
+                WhatsApp <span className="num">{c.whatsapp}</span>
+              </span>
+            </>
           }
           right={<Badge tone={STATUS_TONE[status]}>{STATUS_LABEL[status]}</Badge>}
         />
-        <div className="p-3">
+        <div className="p-5">
           <ChatBackdrop>
             <ChatBubble time={fmtDateTime(msg.receivedAt)}>
               {msg.image && (
@@ -71,86 +75,123 @@ export function MessageDetail({
             </ChatBubble>
           </ChatBackdrop>
 
-          <div className="mt-3 flex flex-wrap items-center gap-3">
-            {!rec && (
-              <Button onClick={onRead} disabled={loading} className="bg-sky-600 hover:bg-sky-700 disabled:bg-sky-300">
+          {!rec && (
+            <div className="mt-4">
+              <Button onClick={onRead} disabled={loading}>
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
                 {loading ? "Bukti is reading…" : "Read with Bukti AI"}
               </Button>
-            )}
-            <RunLabel run={run} rec={rec} />
-          </div>
+            </div>
+          )}
         </div>
       </Card>
 
-      {rec && <AiReadPanel rec={rec} rows={rows} />}
+      {!rec && loading && <ReadingSkeleton />}
+      {rec && <AiReadPanel rec={rec} rows={rows} run={run} />}
       {rec && <Outcome state={state} msg={msg} rec={rec} />}
     </div>
   );
 }
 
-function RunLabel({ run, rec }: { run: RunInfo | undefined; rec: ExtractionRecord | undefined }) {
-  if (run?.loading) return <span className="text-xs text-slate-500">Sending the message to claude-opus-5-5…</span>;
+/** One small chip naming where the reading came from: "Cached result" or "Live · model" (FR-E11). */
+function SourceChip({ run, rec }: { run: RunInfo | undefined; rec: ExtractionRecord }) {
   if (run && !run.loading) {
     return (
-      <Badge tone={run.failed ? "rose" : run.cached ? "amber" : "sky"} className="text-xs">
-        {run.label}
-      </Badge>
+      <span title={run.label}>
+        <Badge tone={run.failed ? "rose" : run.cached ? "amber" : "sky"} pulse={!run.failed && !run.cached}>
+          {run.failed || !run.cached ? run.label : "Cached result"}
+        </Badge>
+      </span>
     );
   }
-  if (rec) {
-    return (
-      <Badge tone={rec.cached ? "amber" : "sky"} className="text-xs">
+  return (
+    <span title={rec.model}>
+      <Badge tone={rec.cached ? "amber" : "sky"} pulse={!rec.cached}>
         {rec.cached ? "Cached result" : `Live · ${rec.model}`}
       </Badge>
-    );
-  }
-  return <span className="text-xs text-slate-500">Bukti extracts the fields; the rules decide. Nothing is marked paid without a bank line.</span>;
+    </span>
+  );
 }
 
 /* ---------- AI READ ---------- */
 
 const pct = (c: number) => `${Math.round(c * 100)}%`;
+const FIELD_GRID = "grid grid-cols-[minmax(0,6.5rem)_minmax(0,1fr)_auto] gap-3 sm:grid-cols-[8.5rem_minmax(0,1fr)_auto]";
 
-function AiReadPanel({ rec, rows }: { rec: ExtractionRecord; rows: FieldRow[] }) {
+/** The field table's shape while Bukti reads. Hidden from assistive tech: the button already says Bukti is reading. */
+function ReadingSkeleton() {
+  const widths = ["w-28", "w-20", "w-36", "w-24", "w-32"];
   return (
-    <Card tone="ai">
-      <CardHeader
-        kicker={
-          <span className="inline-flex items-center gap-1.5">
-            <ScanText className="h-3.5 w-3.5" /> AI read
-          </span>
-        }
-        title="What Bukti read"
-        right={<span className="font-mono text-[10px] text-slate-500">{rec.model}</span>}
-      />
-      <div className="divide-y divide-sky-100 px-4">
-        {rows.map((r) => (
-          <div key={r.key} className="grid grid-cols-[8.5rem_1fr_auto] items-start gap-3 py-2 text-sm">
-            <div className="text-xs font-medium text-slate-500">{r.label}</div>
-            <div className="min-w-0">
-              <div className="font-semibold text-slate-900">{r.value}</div>
-              {r.quote && r.tone && (
-                <div className="mt-0.5 text-xs text-slate-600">
-                  quote: <mark className={cx("rounded px-0.5", MARK_CLASS[r.tone])}>{r.quote}</mark>
+    <div className="panel panel-ai k-rise" aria-hidden>
+      <div className="panel-header">
+        <div className="k-shimmer h-6 w-28" />
+        <div className="k-shimmer h-6 w-20 rounded-full" />
+      </div>
+      <div className="px-5 pb-4">
+        <div className={cx(FIELD_GRID, "h-[30px] items-center border-b border-line")}>
+          <div className="k-shimmer h-3 w-10" />
+          <div className="k-shimmer h-3 w-12" />
+          <div className="k-shimmer h-3 w-16" />
+        </div>
+        <div className="divide-y divide-hairline">
+          {widths.map((w) => (
+            <div key={w} className={cx(FIELD_GRID, "min-h-[38px] items-center py-2.5")}>
+              <div className="k-shimmer h-3 w-16" />
+              <div className={cx("k-shimmer h-3.5 max-w-full", w)} />
+              <div className="k-shimmer h-3 w-8" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AiReadPanel({ rec, rows, run }: { rec: ExtractionRecord; rows: FieldRow[]; run: RunInfo | undefined }) {
+  return (
+    <Card tone="ai" rise={0}>
+      <CardHeader title="Bukti read" right={<SourceChip run={run} rec={rec} />} />
+      <div className="px-5 pb-2">
+        <div className={cx(FIELD_GRID, "h-[30px] items-center border-b border-line text-xs text-ink2")}>
+          <span>Field</span>
+          <span>Value</span>
+          <span className="text-right">Confidence</span>
+        </div>
+        <div className="divide-y divide-hairline">
+          {rows.map((r, i) => (
+            <div key={r.key} className={cx(FIELD_GRID, "k-rise min-h-[38px] items-start py-2.5 text-[13px]")} style={stagger(i + 1)}>
+              <div className="text-xs text-ink2">{r.label}</div>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <span className="font-semibold text-ink">{r.value}</span>
+                  {r.source === "slip" && r.key !== "slip" && <Badge tone="violet">from slip</Badge>}
                 </div>
-              )}
+                {r.quote && r.tone && (
+                  <div className="mt-1 text-xs">
+                    {/* Kept for screen readers (and text checks); inline-block so it stays on the quote's line. */}
+                    <span className="inline-block h-px w-px overflow-hidden whitespace-pre [clip-path:inset(50%)]">quote: </span>
+                    <mark className={cx("rounded px-0.5", MARK_CLASS[r.tone])}>{r.quote}</mark>
+                  </div>
+                )}
+              </div>
+              <div className="text-right">
+                {r.confidence !== null && (
+                  <span
+                    className={cx("font-mono text-xs", r.confidence < CONFIDENCE_MIN ? "font-semibold text-amber-800" : "text-ink")}
+                    title={r.confidence < CONFIDENCE_MIN ? `Below ${pct(CONFIDENCE_MIN)}: goes to a person (M4)` : undefined}
+                  >
+                    {pct(r.confidence)}
+                  </span>
+                )}
+              </div>
             </div>
-            <div className="flex flex-col items-end gap-1">
-              {r.confidence !== null && (
-                <span className={cx("font-mono text-xs", r.confidence < CONFIDENCE_MIN ? "font-semibold text-amber-700" : "text-slate-700")}>
-                  {pct(r.confidence)}
-                </span>
-              )}
-              {r.source && <Badge tone={r.source === "slip" ? "violet" : "slate"}>{r.source === "slip" ? "from slip" : "from message"}</Badge>}
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
       {rec.rejectedQuotes.length > 0 && (
-        <div className="mx-4 mb-3 rounded-md border border-rose-200 bg-rose-50 p-2 text-xs text-rose-800">
-          <div className="mb-1 flex items-center gap-1.5 font-semibold">
-            <RuleTag id="FR-E3" /> Verbatim gate dropped these (quote not found in the message):
+        <div className="mx-5 mb-4 border-l-2 border-l-rose-700 pl-3 text-xs text-rose-800">
+          <div className="mb-1 flex items-center gap-1.5 font-medium">
+            <RuleTag id="FR-E3" /> Dropped: quote not in the message
           </div>
           <ul className="list-disc pl-5">
             {rec.rejectedQuotes.map((q) => (
@@ -159,14 +200,61 @@ function AiReadPanel({ rec, rows }: { rec: ExtractionRecord; rows: FieldRow[] })
           </ul>
         </div>
       )}
-      <p className="px-4 pb-3 text-[11px] text-slate-500">
-        Highlights show the exact words each field came from. Confidence below {pct(CONFIDENCE_MIN)} goes to a person (M4).
-      </p>
     </Card>
   );
 }
 
-/* ---------- what the rules did ---------- */
+/* ---------- what the rules did: one compact stack of checks ---------- */
+
+type Tone = "good" | "bad" | "warn" | "plain";
+const TONE_TEXT: Record<Tone, string> = {
+  good: "text-emerald-800",
+  bad: "text-rose-800",
+  warn: "text-amber-800",
+  plain: "text-ink",
+};
+const TONE_ICON: Record<Tone, ReactNode> = {
+  good: <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />,
+  bad: <XCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />,
+  warn: <Clock className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />,
+  plain: null,
+};
+
+function CheckRow({
+  rule,
+  label,
+  tone,
+  status,
+  right,
+  detail,
+  title,
+}: {
+  rule: string;
+  label: string;
+  tone: Tone;
+  status: ReactNode;
+  right?: ReactNode;
+  detail?: ReactNode;
+  title?: string;
+}) {
+  return (
+    <li className="grid grid-cols-[minmax(0,6.5rem)_minmax(0,1fr)] gap-3 px-5 py-3.5 sm:grid-cols-[8.5rem_minmax(0,1fr)]" title={title}>
+      <div className="flex h-5 items-center gap-1.5 self-start text-xs text-ink2">
+        <RuleTag id={rule} /> {label}
+      </div>
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className={cx("flex min-w-0 items-start gap-1.5 text-[13px] font-medium", TONE_TEXT[tone])}>
+            {TONE_ICON[tone]}
+            <span>{status}</span>
+          </span>
+          {right}
+        </div>
+        {detail && <div className="mt-1 text-xs text-ink2">{detail}</div>}
+      </div>
+    </li>
+  );
+}
 
 function Outcome({ state, msg, rec }: { state: State; msg: InboundMessage; rec: ExtractionRecord }) {
   const receipt = state.receipts.find((r) => r.messageId === msg.id) ?? null;
@@ -174,52 +262,50 @@ function Outcome({ state, msg, rec }: { state: State; msg: InboundMessage; rec: 
   const ex = rec.extraction;
   const isPromise = ex.intent === "promise_to_pay" || (ex.amount === null && ex.promised_date_candidates.length > 0);
   const promised = state.invoices.find((i) => i.promise?.messageId === msg.id) ?? null;
+  // A reply with no payment content (e.g. "ok noted") has nothing for the bank check to verify.
+  const nothingToCheck = ex.intent === "other" && !isPromise && !receipt && handoffs.length === 0;
 
   return (
-    <>
-      {handoffs
-        .filter((h) => h.resolved === null)
-        .map((h) => (
-          <div key={h.id} className="flex items-start gap-2 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-            <RuleTag id="M4" />
-            <span>
-              Needs a human: <b>{h.question}</b> Answer it in the queue at the top of this page.
-            </span>
-          </div>
-        ))}
+    <Card rise={2}>
+      <CardHeader title="Checks" />
+      <ul className="divide-y divide-hairline">
+        {handoffs
+          .filter((h) => h.resolved === null)
+          .map((h) => (
+            <CheckRow key={h.id} rule="M4" label="Hand-off" tone="warn" status={h.question} detail="Answer in the queue above" />
+          ))}
 
-      {isPromise ? (
-        <Card>
-          <CardHeader kicker={<RuleTag id="M5" />} title="Promise to pay" />
-          <div className="px-4 py-3 text-sm text-slate-700">
-            {promised?.promise ? (
-              <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                {promised.number}: promised {dayLabel(promised.promise.date)}. Reminders paused until {fmtDate(addDays(promised.promise.date, 1))}.
-              </span>
-            ) : (
-              "No date confirmed yet. Nothing is paid until a bank line arrives."
-            )}
-          </div>
-        </Card>
-      ) : (
-        <BankCheck state={state} receipt={receipt} noLine={handoffs.some((h) => h.kind === "claim_unverified")} />
-      )}
+        {isPromise ? (
+          <CheckRow
+            rule="M5"
+            label="Promise"
+            tone={promised?.promise ? "good" : "warn"}
+            status={promised?.promise ? `${promised.number} promised ${dayLabel(promised.promise.date)}` : "No date confirmed yet"}
+            detail={promised?.promise ? `Reminders paused until ${fmtDate(addDays(promised.promise.date, 1))}` : undefined}
+          />
+        ) : nothingToCheck ? (
+          <CheckRow rule="M1" label="Bank" tone="plain" status="No payment mentioned: nothing to check" />
+        ) : (
+          <BankCheck state={state} receipt={receipt} noLine={handoffs.some((h) => h.kind === "claim_unverified")} />
+        )}
 
-      {receipt?.deduction && <DeductionPanel state={state} receipt={receipt} />}
-      {receipt && <ProposedAction state={state} receipt={receipt} />}
+        {receipt?.deduction && <DeductionCheck state={state} receipt={receipt} />}
+        {receipt && <ReceiptCheck state={state} receipt={receipt} />}
 
-      {handoffs
-        .filter((h) => h.resolved !== null)
-        .map((h) => (
-          <div key={h.id} className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600">
-            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
-            <span>
-              {h.question} → <b>{resolvedText(h.resolved!)}</b> by {h.resolvedBy}
-            </span>
-          </div>
-        ))}
-    </>
+        {handoffs
+          .filter((h) => h.resolved !== null)
+          .map((h) => (
+            <ResolvedRow key={h.id} h={h} />
+          ))}
+      </ul>
+      {receipt && <Actions state={state} receipt={receipt} />}
+    </Card>
+  );
+}
+
+function ResolvedRow({ h }: { h: Handoff }) {
+  return (
+    <CheckRow rule="M4" label="Answered" tone="plain" status={`${h.question} → ${resolvedText(h.resolved!)}`} detail={`by ${h.resolvedBy}`} />
   );
 }
 
@@ -230,145 +316,134 @@ const resolvedText = (option: string) =>
 
 function BankCheck({ state, receipt, noLine }: { state: State; receipt: Receipt | null; noLine: boolean }) {
   const line = receipt ? state.bankLines.find((b) => b.id === receipt.bankLineId) ?? null : null;
-  return (
-    <Card tone={line ? "good" : "bad"}>
-      <CardHeader
-        kicker={
-          <span className="inline-flex items-center gap-1.5">
-            <RuleTag id="M1" /> Bank check
+  if (line) {
+    return (
+      <CheckRow
+        rule="M1"
+        label="Bank"
+        tone="good"
+        status="VERIFIED against the bank statement"
+        title="Same amount, within 3 days of the claim, payer name or invoice number in the description."
+        detail={
+          <span className="num break-words">
+            {fmtDateTime(line.at)} · {fmtRM(line.amount, { cents: true })} · {line.description}
           </span>
         }
-        title={line ? "VERIFIED against the bank statement" : "CLAIM only: not verified"}
-        right={<Landmark className={cx("h-4 w-4", line ? "text-emerald-600" : "text-rose-600")} />}
       />
-      <div className="px-4 py-3 text-sm">
-        {line ? (
-          <>
-            <div className="rounded-md border border-emerald-200 bg-white px-3 py-2 font-mono text-xs text-slate-800">
-              {fmtDateTime(line.at)} · {fmtRM(line.amount, { cents: true })} · {line.description}
-            </div>
-            <p className="mt-2 text-xs text-slate-600">Same amount, within 3 days of the claim, payer name or invoice number in the description.</p>
-          </>
-        ) : (
-          <div className="flex items-start gap-1.5 text-rose-800">
-            <XCircle className="mt-0.5 h-4 w-4 shrink-0" />
-            <span>
-              {noLine ? "No bank line found: not marked paid." : "No bank line found: not marked paid. The invoice must be identified first."}
-            </span>
-          </div>
-        )}
-      </div>
-    </Card>
+    );
+  }
+  return (
+    <CheckRow
+      rule="M1"
+      label="Bank"
+      tone="bad"
+      status="CLAIM only: not verified"
+      detail={noLine ? "No bank line found: not marked paid." : "No bank line found: not marked paid. The invoice must be identified first."}
+    />
   );
 }
 
-function DeductionPanel({ state, receipt }: { state: State; receipt: Receipt }) {
+function DeductionCheck({ state, receipt }: { state: State; receipt: Receipt }) {
   const ded = receipt.deduction!;
   const inv = invoiceOf(state, receipt.invoiceId);
   const d = inv.delivery;
+  const amount = fmtRM(ded.amount, { cents: true });
   return (
-    <Card tone="warn">
-      <CardHeader
-        kicker={
-          <span className="inline-flex items-center gap-1.5">
-            <RuleTag id="M3" /> Deduction
-          </span>
-        }
-        title={`${fmtRM(ded.amount, { cents: true })} · ${ded.reason}`}
-        right={<AlertTriangle className="h-4 w-4 text-amber-600" />}
-      />
-      <div className="space-y-2 px-4 py-3 text-sm text-slate-700">
-        {ded.linkedDo ? (
-          <div className="flex items-start gap-1.5">
-            <FileText className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" />
-            <span>
-              Linked to <b>{ded.linkedDo}</b>: {d.route}, delivered {fmtDate(d.date)} (destination {d.destination} named in the reason).
-            </span>
-          </div>
-        ) : (
-          <div>Not linked to any delivery on {inv.number}: the Owner should check the reason.</div>
-        )}
-        <div className="text-xs text-slate-500">
-          Customer&apos;s words: <mark className={cx("rounded px-0.5", MARK_CLASS.deduction)}>{ded.quote}</mark>
-        </div>
-      </div>
-    </Card>
+    <CheckRow
+      rule="M3"
+      label="Deduction"
+      tone={ded.linkedDo ? "plain" : "warn"}
+      status={ded.linkedDo ? `${amount} · Linked to ${ded.linkedDo} (${d.destination})` : `${amount} · not linked to a delivery`}
+      title={ded.linkedDo ? `${ded.reason}. ${ded.linkedDo}: ${d.route}, delivered ${fmtDate(d.date)}.` : ded.reason}
+      detail={ded.linkedDo ? undefined : `Owner to check the reason on ${inv.number}`}
+    />
   );
 }
 
-function ProposedAction({ state, receipt }: { state: State; receipt: Receipt }) {
-  const dispatch = useKutip((s) => s.dispatch);
+const INVOICE_TONE = { paid: "violet", part_paid: "amber" } as const;
+
+function ReceiptCheck({ state, receipt }: { state: State; receipt: Receipt }) {
+  const inv = invoiceOf(state, receipt.invoiceId);
+  const ded = receipt.deduction;
+  const original = inv.amount + (ded?.status === "accepted" ? ded.amount : 0);
+  const sum = fmtRM(receipt.amount + (ded?.amount ?? 0));
+  const arithmetic = `${fmtRM(receipt.amount)} paid${ded ? ` + ${fmtRM(ded.amount)} stated deduction` : ""} = ${sum}; ${inv.number} was ${fmtRM(original)}. Outstanding now ${fmtRM(outstanding(inv))}.`;
+  return (
+    <CheckRow
+      rule="M2"
+      label="Receipt"
+      tone="plain"
+      status={`${fmtRM(receipt.amount)} → ${inv.number}`}
+      right={
+        <Badge tone={inv.status === "paid" || inv.status === "part_paid" ? INVOICE_TONE[inv.status] : "slate"}>
+          {inv.status.replace("_", " ").toUpperCase()}
+        </Badge>
+      }
+      title={arithmetic}
+      detail={
+        <span className="num">
+          {fmtRM(receipt.amount)}
+          {ded ? ` + ${fmtRM(ded.amount)} deduction` : ""} = {sum} · outstanding {fmtRM(outstanding(inv))}
+        </span>
+      }
+    />
+  );
+}
+
+function Actions({ state, receipt }: { state: State; receipt: Receipt }) {
+  const dispatch = useKachingg((s) => s.dispatch);
   const inv = invoiceOf(state, receipt.invoiceId);
   const ded = receipt.deduction;
   const isOwner = state.role === "owner";
-  const original = inv.amount + (ded?.status === "accepted" ? ded.amount : 0);
   const cn = state.creditNotes.find((n) => n.invoiceId === inv.id);
   const approved = receipt.status === "approved";
 
   return (
-    <Card tone={approved ? "good" : undefined}>
-      <CardHeader
-        kicker={
-          <span className="inline-flex items-center gap-1.5">
-            <RuleTag id="M2" /> Proposed action
-          </span>
-        }
-        title={`Receipt ${fmtRM(receipt.amount)} → ${inv.number}`}
-        right={<Badge tone={inv.status === "paid" ? "violet" : inv.status === "part_paid" ? "amber" : "slate"}>{inv.status.replace("_", " ").toUpperCase()}</Badge>}
-      />
-      <div className="space-y-3 px-4 py-3 text-sm text-slate-700">
-        <p className="text-xs text-slate-600">
-          {fmtRM(receipt.amount)} paid{ded ? ` + ${fmtRM(ded.amount)} stated deduction` : ""} = {fmtRM(receipt.amount + (ded?.amount ?? 0))}; {inv.number} was{" "}
-          {fmtRM(original)}. Outstanding now {fmtRM(outstanding(inv))}.
+    <div className="space-y-3 border-t border-line px-5 py-4 text-[13px]">
+      {approved ? (
+        <div className="flex items-center gap-1.5 text-emerald-800">
+          <CheckCircle2 className="h-4 w-4 shrink-0" aria-hidden /> Receipt approved by {receipt.approvedBy}
+          {ded?.status === "pending" ? ` · ${fmtRM(ded.amount)} deduction under review` : ""}
+        </div>
+      ) : (
+        <div className="flex flex-wrap items-center gap-3">
+          <Button onClick={() => dispatch({ type: "APPROVE_RECEIPT", receiptId: receipt.id })} title="Slip amount equals the bank line (FR-E12)">
+            <CheckCircle2 className="h-4 w-4" /> Approve receipt
+          </Button>
+          <span className="text-xs text-ink2">Clerk or Owner</span>
+        </div>
+      )}
+
+      {ded?.status === "pending" && !approved && <p className="text-xs text-ink2">Deduction: Owner decides after approval</p>}
+      {ded?.status === "pending" && approved && isOwner && (
+        <div className="flex flex-wrap items-center gap-2">
+          <Button size="sm" onClick={() => dispatch({ type: "DECIDE_DEDUCTION", receiptId: receipt.id, decision: "accepted" })}>
+            Accept deduction (drafts credit note)
+          </Button>
+          <Button size="sm" variant="secondary" onClick={() => dispatch({ type: "DECIDE_DEDUCTION", receiptId: receipt.id, decision: "rejected" })}>
+            Reject
+          </Button>
+          <span className="text-xs text-ink2">Owner only</span>
+        </div>
+      )}
+      {ded?.status === "pending" && approved && !isOwner && (
+        <p className="flex items-center gap-1.5 text-xs text-ink2">
+          <HelpCircle className="h-3.5 w-3.5 shrink-0" aria-hidden /> Deduction: waiting for the Owner
         </p>
-
-        {approved ? (
-          <div className="flex items-center gap-1.5 text-emerald-800">
-            <CheckCircle2 className="h-4 w-4" /> Receipt approved by {receipt.approvedBy}
-            {ded?.status === "pending" ? ` · ${fmtRM(ded.amount)} deduction under review` : ""}
-          </div>
-        ) : (
-          <div className="flex flex-wrap items-center gap-2">
-            <Button onClick={() => dispatch({ type: "APPROVE_RECEIPT", receiptId: receipt.id })}>
-              <CheckCircle2 className="h-4 w-4" /> Approve receipt
-            </Button>
-            <span className="text-[11px] text-slate-500">Owner or Clerk: slip amount equals the bank line (FR-E12).</span>
-          </div>
-        )}
-
-        {ded && (
-          <div className="rounded-md border border-amber-200 bg-amber-50/60 p-3">
-            <div className="mb-2 text-xs font-semibold text-slate-800">
-              Deduction {fmtRM(ded.amount)} <RuleTag id="M3" />
-            </div>
-            {ded.status === "pending" && !approved && <p className="text-xs text-slate-600">Decided by the Owner after the receipt is approved.</p>}
-            {ded.status === "pending" && approved && isOwner && (
-              <div className="flex flex-wrap gap-2">
-                <Button size="sm" onClick={() => dispatch({ type: "DECIDE_DEDUCTION", receiptId: receipt.id, decision: "accepted" })}>
-                  Accept deduction (drafts credit note)
-                </Button>
-                <Button size="sm" variant="secondary" onClick={() => dispatch({ type: "DECIDE_DEDUCTION", receiptId: receipt.id, decision: "rejected" })}>
-                  Reject
-                </Button>
-              </div>
-            )}
-            {ded.status === "pending" && approved && !isOwner && (
-              <p className="text-xs text-slate-600">Waiting for the Owner: accepting a deduction changes what the customer owes.</p>
-            )}
-            {ded.status === "accepted" && (
-              <p className="flex items-center gap-1.5 text-xs text-emerald-800">
-                <CheckCircle2 className="h-3.5 w-3.5" /> Accepted by {ded.decidedBy}. {inv.number} PAID
-                {cn ? `; credit note ${cn.id} drafted (${fmtRM(cn.amount)}, not submitted)` : ""}.
-              </p>
-            )}
-            {ded.status === "rejected" && (
-              <p className="text-xs text-rose-800">
-                Rejected by {ded.decidedBy}: {fmtRM(outstanding(inv))} still owed on {inv.number}.
-              </p>
-            )}
-          </div>
-        )}
-      </div>
-    </Card>
+      )}
+      {ded?.status === "accepted" && (
+        <p className="flex items-start gap-1.5 text-emerald-800">
+          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+          <span>
+            {inv.number} PAID{cn ? `; credit note ${cn.id} drafted (${fmtRM(cn.amount)}, not submitted)` : ""} · accepted by {ded.decidedBy}
+          </span>
+        </p>
+      )}
+      {ded?.status === "rejected" && (
+        <p className="text-rose-800">
+          Deduction rejected by {ded.decidedBy} · {fmtRM(outstanding(inv))} still owed on {inv.number}
+        </p>
+      )}
+    </div>
   );
 }

@@ -4,7 +4,7 @@ import { invoiceOf, type State } from "./model";
 import { apply, run, warningOptions, type Action } from "./reducer";
 import { chasePlan, forecast, visibleBankLines, visibleMessages } from "./rules";
 import { seedState } from "./seed";
-import { RM, act, addMessage, advance, as, draft, extract, playDemo, refused, scanned, withExtraction } from "./testkit";
+import { RM, act, addMessage, advance, as, demoOnly, draft, extract, playDemo, refused, scanned, withExtraction } from "./testkit";
 
 const texts = (s: State, actor?: string) => s.log.filter((l) => !actor || l.actor === actor).map((l) => l.text);
 const lastLog = (s: State) => s.log.at(-1)!;
@@ -28,7 +28,7 @@ describe("permissions (§9.3)", () => {
     ["decide a credit check", () => {
       const s = playDemo().credit;
       const t = act(act(s, as("clerk")), { type: "ENTER_BOOKING", customerId: "c-hupseng", route: "Klang → Ipoh", amount: 100000, terms: "credit", creditDays: 30 });
-      return [act(t, as("owner")), { type: "DECIDE_CREDIT", bookingId: t.bookings[1].id, decision: "cod" }];
+      return [act(t, as("owner")), { type: "DECIDE_CREDIT", bookingId: demoOnly(t.bookings)[1].id, decision: "cod" }];
     }],
     ["accept a deduction", () => {
       const s = playDemo().receiptApproved;
@@ -143,14 +143,14 @@ describe("demo clock (FR-H1)", () => {
 
   it("messages and bank lines are not visible before their time", () => {
     const s = act(scanned(), advance("2026-10-23T14:20"));
-    expect(visibleMessages(s).map((m) => m.id)).toEqual(["m-hupseng"]);
-    expect(visibleBankLines(s).map((b) => b.id)).toEqual(["bl-0919"]);
+    expect(demoOnly(visibleMessages(s)).map((m) => m.id)).toEqual(["m-hupseng"]);
+    expect(demoOnly(visibleBankLines(s)).map((b) => b.id)).toEqual(["bl-0919"]);
     const r = refused(s, extract("m-megabina"));
     expect(r.error).toBe("That message has not arrived yet.");
     expect(r.state).toBe(s);
     const later = act(s, advance("2026-10-23T14:25"));
-    expect(visibleBankLines(later).map((b) => b.id)).toEqual(["bl-0919", "bl-2304"]);
-    expect(visibleMessages(later).map((m) => m.id)).toEqual(["m-hupseng"]);
+    expect(demoOnly(visibleBankLines(later)).map((b) => b.id)).toEqual(["bl-0919", "bl-2304"]);
+    expect(demoOnly(visibleMessages(later)).map((m) => m.id)).toEqual(["m-hupseng"]);
   });
 
   it("every action is stamped with the current demo time", () => {
@@ -278,7 +278,7 @@ describe("R4 credit check (actions)", () => {
       { type: "ENTER_BOOKING", customerId: "c-hupseng", route: "Klang → Johor Bahru", amount: 240000, terms: "prepaid", creditDays: 0 },
       { type: "ENTER_BOOKING", customerId: "c-megabina", route: "Shah Alam → Puchong", amount: 120000, terms: "credit", creditDays: 30 },
     ]);
-    expect(s.bookings.map((b) => [b.customerId, b.terms, b.status, b.checkInvoiceId, b.createdBy])).toEqual([
+    expect(demoOnly(s.bookings).map((b) => [b.customerId, b.terms, b.status, b.checkInvoiceId, b.createdBy])).toEqual([
       ["c-hupseng", "credit", "on_hold", "INV-2268", "Nurul"],
       ["c-hupseng", "cod", "accepted", null, "Nurul"],
       ["c-hupseng", "prepaid", "accepted", null, "Nurul"],
@@ -289,9 +289,9 @@ describe("R4 credit check (actions)", () => {
 
   it("the Owner's decision is stored on the order and logged; only an on-hold order can be decided", () => {
     const { credit } = playDemo();
-    expect(credit.bookings[0]).toMatchObject({ status: "deposit_requested", depositPct: 50, decidedBy: "Lim Siew Lan" });
+    expect(demoOnly(credit.bookings)[0]).toMatchObject({ status: "deposit_requested", depositPct: 50, decidedBy: "Lim Siew Lan" });
     expect(lastLog(credit).text).toBe("credit decision: ask 50% deposit");
-    expect(refused(credit, { type: "DECIDE_CREDIT", bookingId: credit.bookings[0].id, decision: "cod" }).error).toBe("This booking is not on hold.");
+    expect(refused(credit, { type: "DECIDE_CREDIT", bookingId: demoOnly(credit.bookings)[0].id, decision: "cod" }).error).toBe("This booking is not on hold.");
   });
 });
 
@@ -374,8 +374,9 @@ describe("Bukti", () => {
     expect(refused(s, { type: "RESOLVE_HANDOFF", handoffId: s.handoffs[0].id, option: "2026-10-24" }).error).toBe("Pick one of the offered dates.");
   });
 
-  it("M4: a single confident date sets the promise directly", () => {
-    const one = withExtraction("m-hupseng", { promised_date_candidates: ["2026-10-30"], promised_date_confidence: 0.93 });
+  it("M4: a single confident, non-relative date sets the promise directly", () => {
+    // Relative weekdays (下礼拜五) are always ambiguous; see review-fixes.test.ts.
+    const one = withExtraction("m-hupseng", { promised_date_candidates: ["2026-10-30"], promised_date_confidence: 0.93, promised_date_quote: "才过数" });
     const s = act(act(scanned(), advance("2026-10-20T11:05")), extract("m-hupseng", one));
     expect(s.handoffs).toEqual([]);
     expect(invoiceOf(s, "INV-2268").promise).toEqual({ date: "2026-10-30", messageId: "m-hupseng" });
