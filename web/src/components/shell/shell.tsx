@@ -14,6 +14,7 @@ import GuidePage from "@/components/pages/guide";
 import ApprovalsPage from "@/components/pages/approvals";
 import UsagePage from "@/components/pages/usage";
 import { Header } from "./header";
+import { Tour } from "@/components/tour/tour";
 
 const noopSubscribe = () => () => {};
 
@@ -53,6 +54,7 @@ export default function Shell() {
           </div>
         </main>
       </div>
+      <Tour />
     </div>
   );
 }

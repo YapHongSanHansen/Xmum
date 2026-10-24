@@ -21,14 +21,16 @@ export function Card({
   className,
   tone,
   rise,
+  ...data
 }: {
   children: ReactNode;
   className?: string;
   tone?: "warn" | "bad" | "good" | "ai";
   rise?: number;
-}) {
+} & { [attr: `data-${string}`]: string | undefined }) {
   return (
     <div
+      {...data}
       className={cx("panel", tone && `panel-${tone}`, rise !== undefined && "k-rise", className)}
       style={rise !== undefined ? stagger(rise) : undefined}
     >
