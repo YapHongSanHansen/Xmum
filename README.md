@@ -10,9 +10,9 @@ Kutip is a cash-collection assistant for Malaysian micro and small businesses, b
 
 ## The problem
 
-Small Malaysian businesses that sell to other businesses usually sell **on credit**. A printing shop delivers 500 cake boxes to a café, and the café says *"I'll pay in 30 days."*
+Small Malaysian businesses that sell to other businesses usually sell **on credit**. A haulage firm delivers three lorry-loads of tiles for a hardware wholesaler, and the wholesaler says *"I'll pay in 30 days."*
 
-The café pays after 60 days, or 90. Meanwhile the shop must pay **salary on the 31st**, plus rent and its own suppliers. The money it has earned is stuck in other people's pockets.
+The wholesaler pays after 60 days, or 90. Meanwhile the haulier must pay **salary on the 31st**, plus rent and its own suppliers. The money it has earned is stuck in other people's pockets.
 
 So the owner spends evenings on WhatsApp asking *"boss, can pay already?"*, and:
 
@@ -53,59 +53,64 @@ flowchart LR
 
 ## See it in action
 
-*All names and numbers are fictional.* CetakPantas Print is a 4-person printing shop. On Tuesday morning, Kutip spots a problem 11 days ahead:
+*All names and numbers are fictional.* The demo company is **Lori Laju Logistics**, a 12-person haulage firm in Klang with 6 lorries. Transport has the longest SME payment delays in Malaysia (76 days on average), and per-trip invoices mean many payment slips.
+
+On Tuesday at 08:00, Kutip spots a salary shortfall 11 days ahead:
 
 ```text
 ┌────────────────────────────────────────────────────────────────────┐
-│ EARLY WARNING · payroll 31 Oct                   Owner only        │
+│ EARLY WARNING · 31 Oct salaries                  Owner only        │
 ├────────────────────────────────────────────────────────────────────┤
 │ Short RM2,000 in 11 days, if nobody else pays                      │
-│ Chase plan sent: Kafe Dua Beradik RM3,180 (usually pays fast)      │
 ├────────────────────────────────────────────────────────────────────┤
-│ YOUR OPTIONS (pick any, all logged)                                │
+│ YOUR OPTIONS (pick any, all logged)                      R6        │
 │ [ ] Ask a regular customer to pay early                            │
-│ [ ] Ask paper supplier to move 5 Nov bill to 15 Nov                │
+│ [x] Ask the diesel supplier to move the 5 Nov bill                 │
 │ [ ] Hold new credit for customers 30+ days late                    │
-│ [ ] Note: talk to my bank myself                                   │
+│ [ ] Talk to my bank myself (note only)                             │
+├────────────────────────────────────────────────────────────────────┤
+│ Kutip lists options only. It does not recommend a lender.          │
 └────────────────────────────────────────────────────────────────────┘
 ```
 
-On Wednesday, a customer who is 42 days late orders more boxes on credit:
+On Wednesday, a customer who is already 46 days late books another lorry on credit:
 
 ```text
 ┌────────────────────────────────────────────────────────────────────┐
-│ CREDIT CHECK · new order · Hock Lee Catering      Owner only       │
+│ CREDIT CHECK · new booking · Syarikat Hup Seng Trading   R4        │
 ├────────────────────────────────────────────────────────────────────┤
-│ New order: 300 food boxes · RM2,850 · on 60-day credit             │
-│ Already owes: INV-0398 RM4,750 · 42 days late                      │
-│ Promised (20 Oct reply): pay on Fri 30 Oct                         │
-│ Total owed if accepted: RM7,600                                    │
+│ New booking: Klang → Johor Bahru · 1 lorry · RM2,400 · 60 days     │
+│ Already owes: INV-2268 RM6,850 · 46 days late                      │
+│ Promised: pay on Fri 30 Oct                                        │
+│ Total owed if accepted: RM9,250                                    │
 ├────────────────────────────────────────────────────────────────────┤
 │ [ Accept on credit ]  [ Ask 50% deposit ]  [ Cash on delivery ]    │
 └────────────────────────────────────────────────────────────────────┘
 ```
 
-On Friday, another customer says they've paid. Bukti reads the message and checks the bank before anything is marked paid:
+On Friday, a customer says they've paid, with a deduction. Bukti reads the message and the slip, then checks the bank before anything is marked paid:
 
 ```text
 ┌────────────────────────────────────────────────────────────────────┐
-│ BUKTI · new reply · Kafe Dua Beradik          Fri 23 Oct 14:30     │
+│ BUKTI · Mega Bina Hardware Trading         Fri 23 Oct 14:30        │
 ├────────────────────────────────────────────────────────────────────┤
-│ "Dah bank in boss, RM3,180 for the cake box invoice ya.            │
-│  Slip attached"                              + slip.jpg            │
+│ "Hi kak, payment for INV-2304 done ya. Bank in RM2,770 just        │
+│  now, deduct RM330 for the 2 pallet tiles pecah at Bukit Raja.     │
+│  Slip attached"                                 + slip.png         │
 ├────────────────────────────────────────────────────────────────────┤
 │ AI READ (exact words shown for every field)                        │
-│ Amount     RM3,180.00    "RM3,180"           98%                   │
-│ Invoice    INV-0412      "cake box invoice"  91%                   │
+│ Amount     RM2,770.00   "RM2,770"                      98%         │
+│ Invoice    INV-2304     "INV-2304"                     97%         │
+│ Deduction  RM330.00     "deduct RM330 for the 2 pallet…"  90%      │
 ├────────────────────────────────────────────────────────────────────┤
-│ BANK CHECK                                                         │
-│ 23/10 DUITNOW CR 3,180.00 KAFE DUA BERADIK INV0412   ✓ match       │
+│ BANK CHECK  M1     23/10 DUITNOW CR 2,770.00 MEGA BINA   ✓         │
+│ DEDUCTION   M3     linked to DO-8812 · Shah Alam → Bukit Raja      │
 ├────────────────────────────────────────────────────────────────────┤
-│ Proposed: INV-0412 → PAID · reminders stop                         │
+│ Clerk: approve receipt RM2,770 · Owner: accept or reject RM330     │
 └────────────────────────────────────────────────────────────────────┘
 ```
 
-The full walkthrough, including the chase plan, approvals, hand-offs and activity log, is in [`docs/idea/kutip-bukti.md`](docs/idea/kutip-bukti.md#5-example-flow-all-names-and-numbers-fictional).
+The full script is in [`docs/PRD.md`](docs/PRD.md#13-preliminary-demo-script-about-3-4-minutes), and every expected log line is in section 13a.
 
 ## Why Kutip is different
 
@@ -147,11 +152,34 @@ Orbyte is a shared business hub for SMEs. Kutip is designed as a module inside i
 
 | | |
 |---|---|
-| ✅ | Problem research, competitor scan, idea brief |
-| ✅ | Product requirements document (v0.2: haulage demo, stack decided, Orbyte hub frame) |
-| ⬜ | Team decisions: stack, LLM, demo sector, deadline (see PRD section 18) |
-| ⬜ | Preliminary-round MVP: the full journey running live on synthetic data |
+| ✅ | Problem research, competitor scan, idea brief, PRD (v0.2) |
+| ✅ | Rules engine (`web/src/engine`) running the full demo script in tests |
+| 🔄 | Web app: Orbyte hub frame, Today, Bookings, Bukti inbox, activity log |
 | ⬜ | Interviews with 5-10 Malaysian B2B sellers |
+
+## Run it locally
+
+```bash
+cd web
+pnpm install
+pnpm test          # rules engine: every seed check and the demo script
+pnpm dev           # http://localhost:3000
+```
+
+Optional: set `ANTHROPIC_API_KEY` in `web/.env.local` to let Bukti read messages live with Claude. Without it, Bukti uses saved results for the three demo messages and labels them "cached result". Use **Reset demo** in the header to start the script again.
+
+## Tools and AI declaration
+
+Declared under handbook section 8.4.
+
+| Used for | Tool |
+|---|---|
+| App | Next.js 16, React 19, TypeScript, Tailwind CSS 4, Zustand, Zod, lucide-react |
+| Tests | Vitest |
+| AI inside the product | Claude Opus 5.5 (Anthropic API) reads customer replies and payment slips (Bukti). Rules, not AI, make every decision |
+| Hosting | Vercel |
+| AI tools used to build | Claude Code (Anthropic) for research, documentation and code generation, reviewed and adapted by the team |
+| Data | Synthetic only: every business, person, bank, slip and message is fictional. No pre-existing project code is used |
 
 ## Docs
 
