@@ -1,5 +1,6 @@
 "use client";
-// The simulated bank CSV, as far as the demo clock has reached (rule M1 input).
+// The simulated bank feed (bank alerts and CSV transaction exports), as far as
+// the demo clock has reached (rule M1 input).
 import { useState } from "react";
 import { fmtDateTime, fmtRM, invoiceOf, type State } from "@/engine/model";
 import { visibleBankLines } from "@/engine/rules";
@@ -17,7 +18,7 @@ export function BankStatement({ state }: { state: State }) {
       <CardHeader
         title="Bank feed"
         right={
-          <span title="Simulated bank CSV: incoming credits only">
+          <span title="Simulated bank feed: incoming credits from forwarded bank alerts and CSV transaction exports">
             <Badge>credits only</Badge>
           </span>
         }
@@ -41,7 +42,10 @@ export function BankStatement({ state }: { state: State }) {
               return (
                 <tr key={b.id} className={cx(tbl.row, "align-top", !matched && "text-ink2")}>
                   <td className={tbl.td}>
-                    <div className="num whitespace-nowrap text-[11px] text-ink2">{fmtDateTime(b.at)}</div>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className="num whitespace-nowrap text-[11px] text-ink2">{fmtDateTime(b.at)}</span>
+                      <SourceChip alert={b.source === "alert"} />
+                    </div>
                     <div className={cx("num mt-0.5 break-words text-[11px]", matched && "text-ink")}>{b.description}</div>
                   </td>
                   <td className={cx(tbl.td, "text-right")}>
@@ -70,5 +74,20 @@ export function BankStatement({ state }: { state: State }) {
         </div>
       )}
     </Card>
+  );
+}
+
+/** How the line arrived: a forwarded bank alert, or a CSV transaction export (absent means CSV). */
+function SourceChip({ alert }: { alert: boolean }) {
+  return (
+    <span
+      title={alert ? "Arrived by bank alert (simulated)" : "Imported from a CSV transaction export"}
+      className={cx(
+        "inline-flex h-4 items-center rounded-full px-1.5 text-[10px] font-medium leading-none",
+        alert ? "bg-sky-100 text-sky-700" : "bg-hairline text-ink2",
+      )}
+    >
+      {alert ? "alert" : "CSV"}
+    </span>
   );
 }

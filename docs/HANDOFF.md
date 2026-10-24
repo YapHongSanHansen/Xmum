@@ -84,6 +84,7 @@ Reference on the author's machine: `~/Documents/GitHub/soapay/packages/ui/src/st
 | `web/src/engine/seed.ts` | Synthetic seed + `DEMO_STOPS` for the clock |
 | `web/src/engine/rules.ts` | F1 forecast, G1 gap impact, R1–R6, S1, verbatim gate, M1–M3 helpers |
 | `web/src/engine/reducer.ts` | `apply(state, action)`: role checks, state changes, activity log |
+| `web/src/engine/bank-alerts.ts` | `parseBankAlert()`: forwarded bank credit alerts (simulated mailbox) → credit lines for M1; rules only, debits refused, balance ignored |
 | `web/src/engine/*.test.ts`, `web/eval/*.test.ts` | 158 tests (rules, reducer, demo script, imports, card actions, review fixes, eval scorer) |
 | `web/src/lib/store.ts` | Zustand store (persist key `kachingg-demo-v1`) |
 | `web/src/lib/extract-server.ts` | Claude call: `claude-opus-5-5` (override `KACHINGG_AI_MODEL`; the old `KUTIP_AI_MODEL` is still read), structured JSON output, effort low, 9 s timeout, cached fallback with a reason |
