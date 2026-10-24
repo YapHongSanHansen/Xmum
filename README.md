@@ -10,7 +10,7 @@ Formerly called Kutip during research; the research notes in `docs/research/` an
 
 > XMUM Hackathon · Domain 2: *Orbyte Smart SME Challenge — Less Busywork, Better Business* · sponsored by Alpha Red
 >
-> **Live demo:** https://kachingg-app.vercel.app · open **Demo guide** in the sidebar for the 3-minute walk-through. All data is synthetic.
+> **Live demo:** https://kachingg-app.vercel.app · open **Guide** at the top for the 3-minute walk-through. All data is synthetic.
 
 ---
 
