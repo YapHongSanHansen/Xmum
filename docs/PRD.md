@@ -551,10 +551,10 @@ Found by the engine test suite and left for P1.
 | # | Limitation | Plan |
 |---|---|---|
 | 1 | Tier 0 courtesy reminders (D-3) are not proposed; the chase plan lists overdue invoices only | Add Tier 0 rows outside the R3 ranking (they are already F1 inflows) |
-| 2 | An unverified "already paid" claim pauses reminders until the Owner marks it paid; there is no expiry | Add a claim expiry or a "reject claim" action |
+| 2 | ~~An unverified "already paid" claim pauses reminders until the Owner marks it paid; there is no expiry~~ | **Done:** the Owner can "Reject claim" (`REJECT_CLAIM`, Owner only, logged) on the hand-off card or, after the slip request is sent, in the Inbox's "Says paid, not in the bank" list; reminders resume. No automatic expiry yet |
 | 3 | A verified but unapproved receipt on a not-yet-due invoice counts as neither cash nor inflow, so the forecast dips until it is approved | Count verified receipts as pending inflows |
 | 4 | Reset is not written to the activity log | Intentional for the demo, so the log starts at the 08:00 scan |
 | 5 | A reminder released after quiet hours keeps its approval time | Store the release time separately |
 | 6 | The live AI call has not been exercised against the API in this build (no key on the build machine); the cached results are the tested path | Run the three seeded messages live once a key is set, and record the result |
-| 7 | No screens for invoice CSV import (FR-A1), owner bank-balance entry (FR-A4) or bank CSV import (FR-A5): the demo starts from data already imported | Add the three import forms on the Connect page |
-| 8 | Snooze, mark disputed and "I'll call instead" on the approval card (FR-C9) are not built | Add the three actions to the engine and the drawer |
+| 7 | ~~No screens for invoice CSV import (FR-A1), owner bank-balance entry (FR-A4) or bank CSV import (FR-A5)~~ | **Done** on the Connect page: invoice and bank CSV imports with a preview and invalid rows listed with line and reason (Owner and Clerk; the Clerk's bank preview shows credit lines only), and the Owner-only balance entry, all logged. The demo still starts from the seed. Bank debits are stored but do not move cash: P0 cash is the entered balance (F1) |
+| 8 | ~~Snooze, mark disputed and "I'll call instead" on the approval card (FR-C9) are not built~~ | **Done:** all three are in the drawer and the engine, with the approve tier rules (Tier 2 Owner only) and logged with the actor. Snooze skips the row until the date; a call counts as contact for 5 days (R2). Un-disputing an invoice is not built yet |
