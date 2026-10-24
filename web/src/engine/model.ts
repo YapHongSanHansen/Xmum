@@ -58,6 +58,12 @@ export interface Invoice {
   reminders: ReminderSent[];
   promise: { date: string; messageId: string } | null;
   openClaimMessageId: string | null;
+  /** FR-C9: a person snoozed the reminder; it returns to the plan on `until`. */
+  snooze: { until: string; by: string } | null;
+  /** FR-C9 "I'll call instead": phone follow-ups a person chose over a message. */
+  calls: { at: string; by: string }[];
+  /** Payment terms in days, when the source carries them (FR-A1 CSV). */
+  termsDays?: number;
 }
 
 export interface Outflow {
@@ -214,7 +220,10 @@ export interface State {
   customers: Customer[];
   invoices: Invoice[];
   outflows: Outflow[];
+  /** Credit lines only: the input for matching (M1). Every role sees these. */
   bankLines: BankLine[];
+  /** Debit lines from an imported statement (FR-A5). Owner only, never shown to the Clerk. */
+  bankDebits: BankLine[];
   messages: InboundMessage[];
   extractions: Record<string, ExtractionRecord>;
   receipts: Receipt[];

@@ -23,6 +23,7 @@ import {
 import {
   CONFIDENCE_MIN,
   WARN_WITHIN_DAYS,
+  HORIZON_DAYS,
   canApprove,
   chasePlan,
   creditExposure,
@@ -36,6 +37,7 @@ import {
   resolveInvoice,
   shortfalls,
 } from "./rules";
+import { parseBankCsv, parseDate, parseInvoiceCsv, toBankLine } from "./imports";
 import { seedState } from "./seed";
 
 export type CreditDecision = "accepted" | "deposit_requested" | "cod" | "call_first";
@@ -53,7 +55,14 @@ export type Action =
   | { type: "APPLY_EXTRACTION"; messageId: string; extraction: Extraction; model: string; cached: boolean }
   | { type: "RESOLVE_HANDOFF"; handoffId: string; option: string }
   | { type: "APPROVE_RECEIPT"; receiptId: string }
-  | { type: "DECIDE_DEDUCTION"; receiptId: string; decision: "accepted" | "rejected" };
+  | { type: "DECIDE_DEDUCTION"; receiptId: string; decision: "accepted" | "rejected" }
+  | { type: "REJECT_CLAIM"; invoiceId: string }
+  | { type: "IMPORT_INVOICES"; csv: string }
+  | { type: "ENTER_BANK_BALANCE"; amount: number }
+  | { type: "IMPORT_BANK_STATEMENT"; csv: string }
+  | { type: "SNOOZE_REMINDER"; invoiceId: string; until: string }
+  | { type: "MARK_DISPUTED"; invoiceId: string }
+  | { type: "CALL_INSTEAD"; invoiceId: string };
 
 export interface Result {
   state: State;
@@ -67,6 +76,11 @@ const refuse = (msg: string): never => {
 const requireOwner = (s: State, what: string) => {
   if (s.role !== "owner") refuse(`Only the Owner can ${what}.`);
 };
+/** §9.3 rows open to more than the Owner. Sales and Accountant (P1) will be refused here. */
+const requireRole = (s: State, roles: Role[], what: string) => {
+  if (!roles.includes(s.role)) refuse(`Your role cannot ${what}.`);
+};
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
 
 function log(s: State, kind: ActorKind, actor: string, text: string, extra: Partial<LogEntry> = {}) {
   s.log.push({ seq: s.log.length + 1, at: s.now, kind, actor, text, ...extra });
@@ -346,7 +360,21 @@ function coverageChanges(s: State, before: ReturnType<typeof forecast>) {
     if (a && b.forecast < 0 && a.forecast >= 0) {
       log(s, "SYSTEM", "SYSTEM", `${fmtDate(a.dueDate)} ${a.short}: covered (${fmtRM(a.forecast, { sign: true })})`);
     }
+    // Only a lower bank balance (FR-A4) can open a new gap; a receipt never does.
+    if (a && b.forecast >= 0 && a.forecast < 0) {
+      log(s, "SYSTEM", "SYSTEM", `${fmtDate(a.dueDate)} ${a.short}: now short ${fmtRM(a.gap)}`);
+    }
   }
+}
+
+/* ---------- FR-C9 card actions ---------- */
+
+/** Snooze, dispute and "I'll call instead" follow the approve rules (FR-C6): Tier 0/1 either role, Tier 2 Owner only. */
+function cardRow(s: State, invoiceId: string) {
+  const row = chasePlan(s).find((r) => r.invoice.id === invoiceId);
+  if (!row || row.state !== "remind" || row.tier === null || row.tier > 2) return refuse("This invoice has no reminder to act on right now.");
+  if (!canApprove(row.tier, s.role)) refuse("Only the Owner can act on a firm (Tier 2) reminder.");
+  return { tier: row.tier, inv: invoiceOf(s, invoiceId) };
 }
 
 /* ---------- apply ---------- */
@@ -522,6 +550,115 @@ export function apply(prev: State, action: Action): Result {
         } else {
           log(s, "USER", me(s), `rejected ${fmtRM(ded.amount)} deduction: still owed on ${inv.number}`, { refs: [inv.id] });
         }
+        break;
+      }
+
+      case "REJECT_CLAIM": {
+        // PRD §22 row 2: an "already paid" claim with no bank line would otherwise pause reminders forever (M5).
+        requireOwner(s, "reject a payment claim");
+        const inv = s.invoices.find((i) => i.id === action.invoiceId) ?? refuse("Unknown invoice.");
+        const messageId = inv.openClaimMessageId ?? refuse("This invoice has no open payment claim.");
+        if (s.receipts.some((r) => r.invoiceId === inv.id && r.messageId === messageId)) {
+          refuse("This claim matched a bank line; decide the receipt instead.");
+        }
+        inv.openClaimMessageId = null;
+        for (const h of s.handoffs) {
+          if (h.kind === "claim_unverified" && h.messageId === messageId && !h.resolved) {
+            h.resolved = "reject_claim";
+            h.resolvedBy = me(s);
+          }
+        }
+        log(s, "USER", me(s), `rejected unverified claim on ${inv.number}: not in the bank, reminders resume (M5)`, { refs: [inv.id, messageId] });
+        break;
+      }
+
+      case "IMPORT_INVOICES": {
+        requireRole(s, ["owner", "clerk"], "import invoices");
+        const p = parseInvoiceCsv(action.csv, s);
+        if (p.error) refuse(p.error);
+        if (!p.rows.length) refuse("No valid rows to import.");
+        for (const r of p.rows) {
+          s.invoices.push({
+            id: r.number,
+            number: r.number,
+            customerId: r.customerId,
+            amount: r.amount,
+            paid: 0,
+            issueDate: r.issueDate,
+            dueDate: r.dueDate,
+            termsDays: r.termsDays,
+            status: r.status,
+            delivery: { ...r.delivery, date: r.issueDate },
+            reminders: [],
+            promise: null,
+            openClaimMessageId: null,
+            snooze: null,
+            calls: [],
+          });
+        }
+        const skipped = p.invalid.length ? `; ${plural(p.invalid.length, "row")} not imported` : "";
+        log(s, "USER", me(s), `imported ${plural(p.rows.length, "invoice")} from CSV: ${p.rows.map((r) => r.number).join(", ")}${skipped}`, {
+          refs: p.rows.map((r) => r.number),
+        });
+        break;
+      }
+
+      case "ENTER_BANK_BALANCE": {
+        requireOwner(s, "enter the bank balance");
+        if (!Number.isInteger(action.amount) || action.amount < 0) refuse("Enter the balance as an amount of zero or more.");
+        const before = forecast(s);
+        s.bankBalance = { amount: action.amount, enteredAt: s.now, enteredBy: me(s) };
+        // F1 (P0): cash = the latest entered balance + receipts approved after it.
+        s.approvedReceiptTotal = 0;
+        log(s, "USER", me(s), "entered today's bank balance (FR-A4)");
+        // The figure sits on a SYSTEM line, which the activity log redacts for the Clerk (FR-B5).
+        log(s, "SYSTEM", "SYSTEM", `bank balance ${fmtRM(action.amount, { cents: true })}, entered by ${me(s)}`);
+        coverageChanges(s, before);
+        break;
+      }
+
+      case "IMPORT_BANK_STATEMENT": {
+        // Either role may import (§9.3: the Clerk approves VERIFIED matches); debits stay Owner only.
+        requireRole(s, ["owner", "clerk"], "import a bank statement");
+        const p = parseBankCsv(action.csv, s);
+        if (p.error) refuse(p.error);
+        if (!p.credits.length && !p.debits.length) refuse("No valid lines to import.");
+        const credits = p.credits.map((r) => toBankLine(r, nextId(s, "BL")));
+        s.bankLines.push(...credits);
+        s.bankLines.sort((a, b) => a.at.localeCompare(b.at));
+        s.bankDebits.push(...p.debits.map((r) => toBankLine(r, nextId(s, "BD"))));
+        const debits = p.debits.length ? `, ${plural(p.debits.length, "debit line")} kept for the Owner` : "";
+        const skipped = p.invalid.length ? `; ${plural(p.invalid.length, "row")} not imported` : "";
+        log(s, "USER", me(s), `imported bank statement: ${plural(credits.length, "credit line")} for matching (M1)${debits}${skipped}`);
+        for (const b of credits) {
+          const amt = fmtRM(b.amount, { cents: true }).replace("RM", "");
+          log(s, "BANK", "BANK", `line ${b.at.slice(8, 10)}/${b.at.slice(5, 7)} ${amt} ${b.description} (imported)`, { refs: [b.id] });
+        }
+        break;
+      }
+
+      case "SNOOZE_REMINDER": {
+        const { tier, inv } = cardRow(s, action.invoiceId);
+        const today = dayOf(s.now);
+        if (parseDate(action.until) !== action.until || action.until <= today || action.until > addDays(today, HORIZON_DAYS)) {
+          refuse(`Pick a snooze date after today and within ${HORIZON_DAYS} days.`);
+        }
+        inv.snooze = { until: action.until, by: me(s) };
+        log(s, "USER", me(s), `snoozed Tier ${tier} ${inv.number} until ${fmtDate(action.until)}`, { refs: [inv.id] });
+        break;
+      }
+
+      case "MARK_DISPUTED": {
+        const { inv } = cardRow(s, action.invoiceId);
+        inv.status = "disputed";
+        log(s, "USER", me(s), `marked ${inv.number} disputed: reminders paused (M5)`, { refs: [inv.id] });
+        break;
+      }
+
+      case "CALL_INSTEAD": {
+        const { tier, inv } = cardRow(s, action.invoiceId);
+        inv.calls.push({ at: s.now, by: me(s) });
+        log(s, "USER", me(s), `will call instead of sending Tier ${tier} ${inv.number}: phone follow-up recorded`, { refs: [inv.id] });
         break;
       }
     }

@@ -161,6 +161,8 @@ export const RECENT_REMINDER_REASON = "reminder sent";
 function suppressReason(s: State, inv: Invoice): string | null {
   const today = dayOf(s.now);
   if (inv.status === "disputed") return "invoice disputed";
+  // FR-C9: a person snoozed the reminder; it comes back on the snooze date.
+  if (inv.snooze && today < inv.snooze.until) return `snoozed until ${fmtDate(inv.snooze.until)} by ${inv.snooze.by}`;
   if (inv.openClaimMessageId) {
     // M5: an open claim pauses reminders until it is settled.
     const receipt = s.receipts.find((r) => r.invoiceId === inv.id && r.messageId === inv.openClaimMessageId);
@@ -180,6 +182,14 @@ function suppressReason(s: State, inv: Invoice): string | null {
     .filter((r) => daysBetween(r.at, s.now) < 5)
     .sort((a, b) => a.at.localeCompare(b.at));
   if (recent.length) return `${RECENT_REMINDER_REASON} ${fmtDate(dayOf(recent[recent.length - 1].at))}, under 5 days ago`;
+  // FR-C9 "I'll call instead": a phone call counts as contact for the same 5 days.
+  const call = s.invoices
+    .filter((i) => i.customerId === inv.customerId)
+    .flatMap((i) => i.calls)
+    .filter((c) => daysBetween(c.at, s.now) < 5)
+    .sort((a, b) => a.at.localeCompare(b.at))
+    .at(-1);
+  if (call) return `phone call ${fmtDate(dayOf(call.at))} by ${call.by}, under 5 days ago`;
   return null;
 }
 
@@ -203,6 +213,10 @@ export function chasePlan(s: State): PlanRow[] {
       const customer = customerOf(s, invoice.customerId);
       const base = { invoice, customer, daysLate: daysOverdue(invoice, s.now), expected: 0, p: 0, closesGap: false, rank: null };
       const sentToday = invoice.reminders.find((r) => dayOf(r.at) === today);
+      const calledToday = invoice.calls.find((c) => dayOf(c.at) === today);
+      if (calledToday && !sentToday) {
+        return { ...base, tier: null, state: "sent_today" as const, rule: "FR-C9", reason: `phone call instead, ${timeOf(calledToday.at)} by ${calledToday.by}` };
+      }
       if (sentToday) {
         return {
           ...base,
@@ -373,7 +387,9 @@ export function resolveInvoice(s: State, customerId: string, ex: Extraction): In
 /** M3: a deduction links to the delivery whose destination or DO number it names. */
 export function linkDeduction(reason: string, inv: Invoice): string | null {
   const r = reason.toLowerCase();
-  if (r.includes(inv.delivery.destination.toLowerCase()) || r.includes(inv.delivery.doNumber.toLowerCase())) {
+  // A CSV-imported invoice may have no delivery order: an empty field links nothing.
+  const names = (s: string) => s !== "" && r.includes(s.toLowerCase());
+  if (inv.delivery.doNumber && (names(inv.delivery.destination) || names(inv.delivery.doNumber))) {
     return inv.delivery.doNumber;
   }
   return null;
