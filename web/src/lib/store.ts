@@ -22,7 +22,7 @@ interface Store {
   dismissWelcome: () => void;
 }
 
-export const useKutip = create<Store>()(
+export const useKachingg = create<Store>()(
   persist(
     (set, get) => ({
       state: seedState(),
@@ -45,7 +45,7 @@ export const useKutip = create<Store>()(
       dismissWelcome: () => set({ welcomeDismissed: true }),
     }),
     {
-      name: "kutip-demo-v1",
+      name: "kachingg-demo-v1",
       partialize: (s) => ({ state: s.state, page: s.page, moduleName: s.moduleName, welcomeDismissed: s.welcomeDismissed }),
       // A stale or corrupt saved state falls back to the seed.
       merge: (persisted, current) => {

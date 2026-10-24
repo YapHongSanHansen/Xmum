@@ -6,7 +6,7 @@ import { Button } from "@/components/ui";
 export default function ErrorPage({ retry }: { error: unknown; retry: () => void }) {
   const resetDemo = () => {
     try {
-      localStorage.removeItem("kutip-demo-v1");
+      localStorage.removeItem("kachingg-demo-v1");
     } catch {
       // storage may be blocked; a reload still starts from the seed
     }

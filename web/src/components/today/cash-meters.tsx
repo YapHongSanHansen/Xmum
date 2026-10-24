@@ -1,12 +1,12 @@
 "use client";
 import { Wallet } from "lucide-react";
-import { useKutip } from "@/lib/store";
+import { useKachingg } from "@/lib/store";
 import { Badge, Card, CardHeader, Figure } from "@/components/ui";
 import { fmtDate, fmtDateTime, fmtRM } from "@/engine/model";
 import { cashNow, forecast } from "@/engine/rules";
 
 export default function CashMeters() {
-  const state = useKutip((s) => s.state);
+  const state = useKachingg((s) => s.state);
   const owner = state.role === "owner";
   const rows = forecast(state);
   return (

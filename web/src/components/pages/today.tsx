@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useState } from "react";
 import { CalendarDays, CheckCircle2, ScanLine } from "lucide-react";
-import { useKutip } from "@/lib/store";
+import { useKachingg } from "@/lib/store";
 import { Badge, Button, PageTitle } from "@/components/ui";
 import { dayOf, fmtDate } from "@/engine/model";
 import { chasePlan } from "@/engine/rules";
@@ -14,8 +14,8 @@ import ApprovalPanel from "@/components/today/approval-panel";
 import WelcomePanel from "@/components/welcome/welcome-panel";
 
 export default function TodayPage() {
-  const state = useKutip((s) => s.state);
-  const dispatch = useKutip((s) => s.dispatch);
+  const state = useKachingg((s) => s.state);
+  const dispatch = useKachingg((s) => s.dispatch);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const close = useCallback(() => setSelectedId(null), []);
   const scanned = state.scannedDays.includes(dayOf(state.now));

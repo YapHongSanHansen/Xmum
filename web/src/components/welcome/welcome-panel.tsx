@@ -2,15 +2,15 @@
 import { ArrowRight, BookOpen, X } from "lucide-react";
 import { Button } from "@/components/ui";
 import type { State } from "@/engine/model";
-import { useKutip } from "@/lib/store";
+import { useKachingg } from "@/lib/store";
 export const atDemoStart = (s: State) => s.log.length === 0 && s.scannedDays.length === 0;
 export default function WelcomePanel() {
-  const show = useKutip((s) => atDemoStart(s.state) && !s.welcomeDismissed);
-  const go = useKutip((s) => s.go);
-  const dismiss = useKutip((s) => s.dismissWelcome);
+  const show = useKachingg((s) => atDemoStart(s.state) && !s.welcomeDismissed);
+  const go = useKachingg((s) => s.go);
+  const dismiss = useKachingg((s) => s.dismissWelcome);
   if (!show) return null;
   return (
-    <section className="flex flex-wrap items-center gap-4 rounded-2xl border border-white bg-white/50 p-4" aria-label="Welcome to Kutip">
+    <section className="flex flex-wrap items-center gap-4 rounded-2xl border border-white bg-white/50 p-4" aria-label="Welcome to Kachingg">
       <BookOpen className="h-5 w-5 text-ink2" aria-hidden />
       <div className="min-w-0 flex-1">
         <h2 className="text-sm font-medium">Meet your collection assistant.</h2>

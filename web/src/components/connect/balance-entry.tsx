@@ -6,11 +6,11 @@ import { Badge, Button, Card, CardHeader, RuleTag } from "@/components/ui";
 import { fmtDateTime, fmtRM } from "@/engine/model";
 import { parseAmount } from "@/engine/imports";
 import { cashNow } from "@/engine/rules";
-import { useKutip } from "@/lib/store";
+import { useKachingg } from "@/lib/store";
 
 export function BalanceEntry() {
-  const state = useKutip((s) => s.state);
-  const dispatch = useKutip((s) => s.dispatch);
+  const state = useKachingg((s) => s.state);
+  const dispatch = useKachingg((s) => s.dispatch);
   const [value, setValue] = useState("");
   const [saved, setSaved] = useState(false);
   const amount = value.trim() ? parseAmount(value) : null;

@@ -1,18 +1,18 @@
-// Kutip's assumptions about Orbyte's API (docs/orbyte-integration.md). Orbyte
+// Kachingg's assumptions about Orbyte's API (docs/orbyte-integration.md). Orbyte
 // has no public API, so every shape here is the team's own assumption, served
 // today by a simulated Orbyte (/api/orbyte-mock/v1) full of synthetic data.
-// Money is integer sen, like the rest of Kutip. Times are local MYT strings.
+// Money is integer sen, like the rest of Kachingg. Times are local MYT strings.
 import type { Lang, Role } from "../engine/model";
 
 /** Orbyte's role names for the two people in the demo workspace. */
 export type OrbyteRole = "Owner" | "Finance clerk";
 
-/** Organization → Clients. One per Kutip customer. */
+/** Organization → Clients. One per Kachingg customer. */
 export interface OrbyteClient {
   /** e.g. "ORB-CL-0001" */
   id: string;
-  /** Explicit link to Kutip's customer record. */
-  kutipCustomerId: string;
+  /** Explicit link to Kachingg's customer record. */
+  kachinggCustomerId: string;
   name: string;
   contactPerson: string;
   /** Fictional numbers (+60 12-000 0xxx). */
@@ -34,18 +34,18 @@ export interface OrbyteProject {
   status: OrbyteProjectStatus;
   /** Job value in sen. */
   value: number;
-  /** The Kutip invoice raised for this job, if any. */
+  /** The Kachingg invoice raised for this job, if any. */
   invoiceNumber: string | null;
 }
 
-/** Organization → Users, with the Kutip role each Orbyte role maps to. */
+/** Organization → Users, with the Kachingg role each Orbyte role maps to. */
 export interface OrbyteUser {
   /** e.g. "ORB-US-0001" */
   id: string;
-  kutipUserId: string;
+  kachinggUserId: string;
   name: string;
   orbyteRole: OrbyteRole;
-  kutipRole: Role;
+  kachinggRole: Role;
 }
 
 export interface OrbyteWalletTransaction {
@@ -65,10 +65,10 @@ export interface OrbyteWallet {
 
 export type OrbyteApprovalKind = "reminder" | "receipt" | "deduction" | "credit_check" | "hand_off";
 
-/** A decision Kutip would place in Orbyte's shared approvals inbox. */
+/** A decision Kachingg would place in Orbyte's shared approvals inbox. */
 export interface OrbyteApprovalRequest {
   id: string;
-  module: "kutip";
+  module: "kachingg";
   kind: OrbyteApprovalKind;
   title: string;
   /** Lowest Orbyte role allowed to decide it ("Finance clerk" = either role). */
@@ -76,17 +76,17 @@ export interface OrbyteApprovalRequest {
   refs: string[];
 }
 
-/** One Kutip activity-log line, written to Orbyte's audit trail. */
+/** One Kachingg activity-log line, written to Orbyte's audit trail. */
 export interface OrbyteAuditEvent {
   id: string;
   at: string;
   actor: string;
   action: string;
   refs: string[];
-  source: "kutip";
+  source: "kachingg";
 }
 
-export const KUTIP_EVENT_TYPES = [
+export const KACHINGG_EVENT_TYPES = [
   "gap.detected",
   "warning.raised",
   "credit.held",
@@ -98,16 +98,16 @@ export const KUTIP_EVENT_TYPES = [
   "claim.unverified",
 ] as const;
 
-export type KutipEventType = (typeof KUTIP_EVENT_TYPES)[number];
+export type KachinggEventType = (typeof KACHINGG_EVENT_TYPES)[number];
 
 /**
- * An event Kutip emits for Orbyte (or any other module) to consume. `data`
+ * An event Kachingg emits for Orbyte (or any other module) to consume. `data`
  * never carries bank balance, payroll or gap amounts; the only amounts are
  * invoice, receipt and credit-note amounts.
  */
-export interface KutipEvent {
+export interface KachinggEvent {
   id: string;
-  type: KutipEventType;
+  type: KachinggEventType;
   at: string;
   refs: string[];
   data: Record<string, string | number | boolean | null>;

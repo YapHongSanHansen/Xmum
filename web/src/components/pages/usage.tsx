@@ -5,7 +5,7 @@
 // the Owner and the Clerk see the same view.
 import { Badge, Card, CardHeader, Figure, PageTitle, cx, tbl } from "@/components/ui";
 import { fmtRM, type State } from "@/engine/model";
-import { useKutip } from "@/lib/store";
+import { useKachingg } from "@/lib/store";
 
 /** Illustrative: 1 credit = RM0.10 (in sen). */
 const CREDIT_SEN = 10;
@@ -79,7 +79,7 @@ const credits = (n: number) => `${n.toLocaleString("en-MY")} cr`;
 const ringgit = (cr: number) => fmtRM(cr * CREDIT_SEN, { cents: true });
 
 export default function UsagePage() {
-  const state = useKutip((s) => s.state);
+  const state = useKachingg((s) => s.state);
   const lines = monthUsage(state);
   const total = totalCredits(lines);
   const typical = totalCredits(typicalLines);

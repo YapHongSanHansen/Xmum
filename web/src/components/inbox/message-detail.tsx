@@ -18,7 +18,7 @@ import {
   type State,
 } from "@/engine/model";
 import { CONFIDENCE_MIN } from "@/engine/rules";
-import { useKutip } from "@/lib/store";
+import { useKachingg } from "@/lib/store";
 import { Badge, Button, Card, CardHeader, RuleTag, cx } from "@/components/ui";
 import { ChatBackdrop, ChatBubble, SlipThumb } from "./bubble";
 import { HighlightedText, type QuoteMark } from "./highlight";
@@ -353,7 +353,7 @@ function ReceiptCheck({ state, receipt }: { state: State; receipt: Receipt }) {
 }
 
 function Actions({ state, receipt }: { state: State; receipt: Receipt }) {
-  const dispatch = useKutip((s) => s.dispatch);
+  const dispatch = useKachingg((s) => s.dispatch);
   const inv = invoiceOf(state, receipt.invoiceId);
   const ded = receipt.deduction;
   const isOwner = state.role === "owner";

@@ -1,6 +1,6 @@
 "use client";
-// Connect (PRD FR-O2): the data sources Kutip reads and what each provides,
-// the CSV imports and owner balance entry (FR-A1, FR-A4, FR-A5), Kutip's
+// Connect (PRD FR-O2): the data sources Kachingg reads and what each provides,
+// the CSV imports and owner balance entry (FR-A1, FR-A4, FR-A5), Kachingg's
 // illustrative API, and data handling.
 import type { ReactNode } from "react";
 import { ChevronDown, Lock, Landmark, MessageCircle, Users, FileSpreadsheet } from "lucide-react";
@@ -12,7 +12,7 @@ import { OrbytePanel } from "@/components/connect/orbyte-panel";
 import { fmtDateTime, fmtRM, type Lang } from "@/engine/model";
 import { visibleBankLines } from "@/engine/rules";
 import { DEMO_START } from "@/engine/seed";
-import { useKutip } from "@/lib/store";
+import { useKachingg } from "@/lib/store";
 
 const LANG_LABEL: Record<Lang, string> = { en: "EN", bm: "BM", zh: "ZH" };
 
@@ -39,7 +39,7 @@ const WEBHOOKS = [
 ];
 
 const PDPA = [
-  "The SME is the data user under PDPA 2010 (as amended in 2024); Kutip acts as its processor.",
+  "The SME is the data user under PDPA 2010 (as amended in 2024); Kachingg acts as its processor.",
   "Contact data is used only to follow up invoices the customer has received, with a notice line on invoices.",
   "Role-based access: clerk and sales never see cash figures; opt-out per contact is honoured.",
   "Bukti keeps only the fields it needs, masks account numbers, and stores slip images encrypted with an owner-set retention limit.",
@@ -47,7 +47,7 @@ const PDPA = [
 ];
 
 export default function ConnectPage() {
-  const s = useKutip((st) => st.state);
+  const s = useKachingg((st) => st.state);
   const owner = s.role === "owner";
 
   const openInvoices = s.invoices.filter((i) => i.status !== "paid").length;

@@ -5,15 +5,15 @@
 import { useState, type ReactNode } from "react";
 import { CalendarClock, ExternalLink, Lock, MessageCircle, Moon, Phone, RotateCcw, Send, TriangleAlert, X } from "lucide-react";
 import { useDialog } from "@/lib/use-dialog";
-import { useKutip } from "@/lib/store";
+import { useKachingg } from "@/lib/store";
 import { Badge, Button, RuleTag, cx } from "@/components/ui";
 import { addDays, dayOf, fmtDate, fmtDateTime, fmtRM, outstanding, userOf } from "@/engine/model";
 import { HORIZON_DAYS, canApprove, gapImpact, inQuietHours, payBy, renderReminder, waShareLink, type PlanRow } from "@/engine/rules";
 import { LANG_LABEL, TierBadge, tierName } from "./bits";
 
 export default function ApprovalPanel({ row, onClose }: { row: PlanRow; onClose: () => void }) {
-  const state = useKutip((s) => s.state);
-  const dispatch = useKutip((s) => s.dispatch);
+  const state = useKachingg((s) => s.state);
+  const dispatch = useKachingg((s) => s.dispatch);
   const { invoice, customer } = row;
   const tier = (row.tier ?? 1) as 0 | 1 | 2;
   const myName = userOf(state, state.role).name;
@@ -180,7 +180,7 @@ export default function ApprovalPanel({ row, onClose }: { row: PlanRow; onClose:
 
 /** FR-C9: the other card actions. Each is an engine action, role-checked and logged with the actor. */
 function CardActions({ invoiceId, invoiceNumber, today, onDone }: { invoiceId: string; invoiceNumber: string; today: string; onDone: () => void }) {
-  const dispatch = useKutip((s) => s.dispatch);
+  const dispatch = useKachingg((s) => s.dispatch);
   const [until, setUntil] = useState(addDays(today, 3));
   const [confirmDispute, setConfirmDispute] = useState(false);
   const first = addDays(today, 1);
@@ -245,7 +245,7 @@ function CardActions({ invoiceId, invoiceNumber, today, onDone }: { invoiceId: s
 
 /** Clerk view of G1: whether paying covers the next bill, never the amounts (FR-B5). */
 function ClerkNextBill({ row }: { row: PlanRow }) {
-  const state = useKutip((s) => s.state);
+  const state = useKachingg((s) => s.state);
   const next = gapImpact(state, row.invoice)[0];
   const answer = !next ? "no bill is short" : next.after >= 0 ? "yes" : next.after > next.before ? "partly" : "no";
   return (
@@ -259,7 +259,7 @@ function ClerkNextBill({ row }: { row: PlanRow }) {
 }
 
 function OwnerGapImpact({ row }: { row: PlanRow }) {
-  const state = useKutip((s) => s.state);
+  const state = useKachingg((s) => s.state);
   const impact = gapImpact(state, row.invoice);
   if (impact.length === 0) return <div className="text-[13px] text-ink2">No shortfall in the next 30 days.</div>;
   return (

@@ -1,4 +1,4 @@
-# Replit config for the Kutip demo (Next.js app in web/).
+# Replit config for the Kachingg demo (Next.js app in web/).
 # Not yet tested on Replit: if the Run button fails, ask Replit Agent to
 # "run and publish the Next.js app in the web folder with pnpm".
 modules = ["nodejs-22"]

@@ -1,5 +1,5 @@
 // A synthetic Orbyte workspace for the demo company. Every name, number and
-// amount is fictional; client fields come from Kutip's seed so the two never
+// amount is fictional; client fields come from Kachingg's seed so the two never
 // drift apart. Served by the simulated Orbyte API (/api/orbyte-mock/v1).
 import { rm } from "../engine/model";
 import { seedState } from "../engine/seed";
@@ -7,8 +7,8 @@ import type { OrbyteClient, OrbyteProject, OrbyteSnapshot, OrbyteUser, OrbyteWal
 
 export const ORBYTE_WORKSPACE = "Lori Laju Logistics Sdn Bhd";
 
-/** Explicit Orbyte client id ↔ Kutip customer id mapping, with Orbyte tags. */
-const CLIENT_MAP: [orbyteId: string, kutipCustomerId: string, tags: string[]][] = [
+/** Explicit Orbyte client id ↔ Kachingg customer id mapping, with Orbyte tags. */
+const CLIENT_MAP: [orbyteId: string, kachinggCustomerId: string, tags: string[]][] = [
   ["ORB-CL-0001", "c-megabina", ["hardware", "credit 30d"]],
   ["ORB-CL-0002", "c-hupseng", ["trading", "credit 30d"]],
   ["ORB-CL-0003", "c-kilang", ["furniture", "credit 30d"]],
@@ -19,18 +19,18 @@ const CLIENT_MAP: [orbyteId: string, kutipCustomerId: string, tags: string[]][] 
 
 function buildClients(): OrbyteClient[] {
   const seed = seedState();
-  return CLIENT_MAP.map(([id, kutipCustomerId, tags]) => {
-    const c = seed.customers.find((x) => x.id === kutipCustomerId);
-    if (!c) throw new Error(`Orbyte mock: no seed customer ${kutipCustomerId}`);
-    return { id, kutipCustomerId, name: c.name, contactPerson: c.contact, whatsapp: c.whatsapp, language: c.lang, tags };
+  return CLIENT_MAP.map(([id, kachinggCustomerId, tags]) => {
+    const c = seed.customers.find((x) => x.id === kachinggCustomerId);
+    if (!c) throw new Error(`Orbyte mock: no seed customer ${kachinggCustomerId}`);
+    return { id, kachinggCustomerId, name: c.name, contactPerson: c.contact, whatsapp: c.whatsapp, language: c.lang, tags };
   });
 }
 
-export const orbyteClientId = (kutipCustomerId: string) => CLIENT_MAP.find(([, k]) => k === kutipCustomerId)?.[0] ?? null;
+export const orbyteClientId = (kachinggCustomerId: string) => CLIENT_MAP.find(([, k]) => k === kachinggCustomerId)?.[0] ?? null;
 
 function buildProjects(): OrbyteProject[] {
   const seed = seedState();
-  // One project per delivery job Kutip has an invoice for…
+  // One project per delivery job Kachingg has an invoice for…
   const invoiced: Omit<OrbyteProject, "id">[] = seed.invoices.map((inv) => ({
     clientId: orbyteClientId(inv.customerId)!,
     name: `${inv.delivery.doNumber} ${inv.delivery.route}`,
@@ -39,7 +39,7 @@ function buildProjects(): OrbyteProject[] {
     value: inv.amount,
     invoiceNumber: inv.number,
   }));
-  // …plus two jobs that are done but not yet invoiced (no Kutip invoice).
+  // …plus two jobs that are done but not yet invoiced (no Kachingg invoice).
   const extra: Omit<OrbyteProject, "id">[] = [
     { clientId: "ORB-CL-0005", name: "DO-8897 Klang → Kajang", doNumber: "DO-8897", status: "completed", value: rm(2800), invoiceNumber: null },
     { clientId: "ORB-CL-0003", name: "DO-8899 Muar → Port Klang", doNumber: "DO-8899", status: "in_progress", value: rm(4100), invoiceNumber: null },
@@ -48,8 +48,8 @@ function buildProjects(): OrbyteProject[] {
 }
 
 const USERS: OrbyteUser[] = [
-  { id: "ORB-US-0001", kutipUserId: "u-owner", name: "Lim Siew Lan", orbyteRole: "Owner", kutipRole: "owner" },
-  { id: "ORB-US-0002", kutipUserId: "u-clerk", name: "Nurul", orbyteRole: "Finance clerk", kutipRole: "clerk" },
+  { id: "ORB-US-0001", kachinggUserId: "u-owner", name: "Lim Siew Lan", orbyteRole: "Owner", kachinggRole: "owner" },
+  { id: "ORB-US-0002", kachinggUserId: "u-clerk", name: "Nurul", orbyteRole: "Finance clerk", kachinggRole: "clerk" },
 ];
 
 const WALLET: OrbyteWallet = {
@@ -57,8 +57,8 @@ const WALLET: OrbyteWallet = {
   unit: "credits",
   transactions: [
     { id: "ORB-WT-0001", at: "2026-10-01T09:00", description: "Monthly credit top-up (illustrative)", credits: 1500 },
-    { id: "ORB-WT-0002", at: "2026-10-12T18:00", description: "Kutip · invoices chased (illustrative)", credits: -180 },
-    { id: "ORB-WT-0003", at: "2026-10-19T18:00", description: "Kutip · Bukti slip reads (illustrative)", credits: -80 },
+    { id: "ORB-WT-0002", at: "2026-10-12T18:00", description: "Kachingg · invoices chased (illustrative)", credits: -180 },
+    { id: "ORB-WT-0003", at: "2026-10-19T18:00", description: "Kachingg · Bukti slip reads (illustrative)", credits: -80 },
   ],
 };
 

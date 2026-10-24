@@ -8,12 +8,12 @@ import { Upload } from "lucide-react";
 import { Button, Card, CardHeader, RuleTag } from "@/components/ui";
 import { fmtDateTime, fmtRM } from "@/engine/model";
 import { SAMPLE_BANK_CSV, bankPreviewFor, parseBankCsv, type BankRow } from "@/engine/imports";
-import { useKutip } from "@/lib/store";
+import { useKachingg } from "@/lib/store";
 import { CsvSource, FormatNote, InvalidRows, LedgerTable, cellCls, numCls, rowCls } from "./csv-source";
 
 export function BankImport() {
-  const state = useKutip((s) => s.state);
-  const dispatch = useKutip((s) => s.dispatch);
+  const state = useKachingg((s) => s.state);
+  const dispatch = useKachingg((s) => s.dispatch);
   const owner = state.role === "owner";
   const [text, setText] = useState("");
   const [done, setDone] = useState<string | null>(null);

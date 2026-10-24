@@ -1,6 +1,6 @@
 // Replays the PRD §13 demo script on the seed with the pure engine and the
 // cached (hand-written) extractions. Deterministic and synthetic: it backs
-// GET /api/kutip/v1/events. Mirrors engine/testkit.ts playDemo(), which is
+// GET /api/kachingg/v1/events. Mirrors engine/testkit.ts playDemo(), which is
 // test-only and must not be imported by runtime code.
 import { CACHED_EXTRACTIONS, CACHED_MODEL } from "../engine/cached";
 import type { State } from "../engine/model";

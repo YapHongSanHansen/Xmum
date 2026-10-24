@@ -1,7 +1,7 @@
 "use client";
 // FR-C1–C4: today's chase plan. Every row carries its rule ID and a one-line reason.
 import { Ban, Check, Clock, Gavel, Phone } from "lucide-react";
-import { useKutip } from "@/lib/store";
+import { useKachingg } from "@/lib/store";
 import { Badge, Button, Card, CardHeader, Empty, RuleTag, cx, tbl } from "@/components/ui";
 import { dayOf, fmtRM, outstanding, type State } from "@/engine/model";
 import { chasePlan, type PlanRow } from "@/engine/rules";
@@ -42,7 +42,7 @@ function shortReason(row: PlanRow): string {
 }
 
 export default function ChasePlan({ selectedId, onReview }: { selectedId: string | null; onReview: (invoiceId: string) => void }) {
-  const state = useKutip((s) => s.state);
+  const state = useKachingg((s) => s.state);
   const rows = chasePlan(state);
   const remindCount = rows.filter((r) => r.state === "remind").length;
 
@@ -87,7 +87,7 @@ export default function ChasePlan({ selectedId, onReview }: { selectedId: string
 }
 
 function PlanTableRow({ state, row, selected, onReview }: { state: State; row: PlanRow; selected: boolean; onReview: (id: string) => void }) {
-  const dispatch = useKutip((s) => s.dispatch);
+  const dispatch = useKachingg((s) => s.dispatch);
   const muted = row.state === "skipped" || row.state === "waiting";
   const isOwner = state.role === "owner";
   const queued = row.state === "sent_today" && row.invoice.reminders.some((r) => r.status === "queued" && dayOf(r.at) === dayOf(state.now));

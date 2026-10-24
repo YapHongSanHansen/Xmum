@@ -1,13 +1,13 @@
-// The Orbyte connector: Kutip's one seam to Orbyte. Today it reads the
+// The Orbyte connector: Kachingg's one seam to Orbyte. Today it reads the
 // simulated Orbyte API (/api/orbyte-mock/v1); a real Orbyte API means a new
 // base URL and an auth header, nothing else. The mapping helpers below are
-// pure and deterministic: (Kutip state or log) → Orbyte-shaped records.
+// pure and deterministic: (Kachingg state or log) → Orbyte-shaped records.
 import { customerOf, fmtDate, fmtRM, type LogEntry, type Role, type State } from "../engine/model";
 import { chasePlan } from "../engine/rules";
 import { orbyteClientId, orbyteWorkspace } from "./mock-data";
 import type {
-  KutipEvent,
-  KutipEventType,
+  KachinggEvent,
+  KachinggEventType,
   OrbyteApprovalRequest,
   OrbyteAuditEvent,
   OrbyteClient,
@@ -63,28 +63,28 @@ export async function readOrbyte(c: OrbyteConnector): Promise<OrbyteSnapshot> {
   return { clients, projects, users, wallet };
 }
 
-/* ---------- Orbyte → Kutip ---------- */
+/* ---------- Orbyte → Kachingg ---------- */
 
 export interface ClientRow {
   client: OrbyteClient;
-  /** Kutip customer name, or null if the client has no Kutip customer. */
-  kutipName: string | null;
+  /** Kachingg customer name, or null if the client has no Kachingg customer. */
+  kachinggName: string | null;
   openInvoices: number;
 }
 
-/** Orbyte clients joined to Kutip customers, with each one's open invoice count. */
+/** Orbyte clients joined to Kachingg customers, with each one's open invoice count. */
 export function clientRows(s: State, clients: OrbyteClient[]): ClientRow[] {
   return clients.map((client) => {
-    const c = s.customers.find((x) => x.id === client.kutipCustomerId);
+    const c = s.customers.find((x) => x.id === client.kachinggCustomerId);
     return {
       client,
-      kutipName: c?.name ?? null,
-      openInvoices: s.invoices.filter((i) => i.customerId === client.kutipCustomerId && i.status !== "paid").length,
+      kachinggName: c?.name ?? null,
+      openInvoices: s.invoices.filter((i) => i.customerId === client.kachinggCustomerId && i.status !== "paid").length,
     };
   });
 }
 
-/* ---------- Kutip → Orbyte ---------- */
+/* ---------- Kachingg → Orbyte ---------- */
 
 /** FR-B5: the Clerk never sees cash or gap figures; same rule as the activity log page. */
 const redactForClerk = (e: LogEntry) =>
@@ -98,17 +98,17 @@ export function toOrbyteAudit(log: LogEntry[], role: Role = "owner"): OrbyteAudi
     actor: e.actor,
     action: role === "clerk" ? redactForClerk(e) : e.text,
     refs: e.refs ?? [],
-    source: "kutip",
+    source: "kachingg",
   }));
 }
 
 /**
- * Activity log → KutipEvents, in log order. Deterministic: the same state
+ * Activity log → KachinggEvents, in log order. Deterministic: the same state
  * gives the same events. `data` carries no bank balance, payroll or gap
  * amounts; only invoice, receipt and credit-note amounts appear.
  */
-export function toKutipEvents(s: State): KutipEvent[] {
-  const out: KutipEvent[] = [];
+export function toKachinggEvents(s: State): KachinggEvent[] {
+  const out: KachinggEvent[] = [];
   const openGaps = new Set<string>();
   let warningIx = 0;
   const invNo = (id: string | undefined) => s.invoices.find((i) => i.id === id)?.number ?? id ?? null;
@@ -116,7 +116,7 @@ export function toKutipEvents(s: State): KutipEvent[] {
   for (const e of s.log) {
     const base = `KE-${String(e.seq).padStart(4, "0")}`;
     let n = 0;
-    const emit = (type: KutipEventType, refs: string[], data: KutipEvent["data"]) => {
+    const emit = (type: KachinggEventType, refs: string[], data: KachinggEvent["data"]) => {
       out.push({ id: n++ === 0 ? base : `${base}-${n}`, type, at: e.at, refs, data });
     };
     const refs = e.refs ?? [];
@@ -176,10 +176,10 @@ export function toKutipEvents(s: State): KutipEvent[] {
   return out;
 }
 
-/** What Kutip would place in Orbyte's shared approvals inbox right now. No cash or gap figures. */
+/** What Kachingg would place in Orbyte's shared approvals inbox right now. No cash or gap figures. */
 export function pendingOrbyteApprovals(s: State): OrbyteApprovalRequest[] {
   const out: OrbyteApprovalRequest[] = [];
-  const add = (r: Omit<OrbyteApprovalRequest, "id" | "module">) => out.push({ id: `ORB-AP-${String(out.length + 1).padStart(4, "0")}`, module: "kutip", ...r });
+  const add = (r: Omit<OrbyteApprovalRequest, "id" | "module">) => out.push({ id: `ORB-AP-${String(out.length + 1).padStart(4, "0")}`, module: "kachingg", ...r });
 
   for (const row of chasePlan(s)) {
     if (row.state !== "remind" || row.tier === null || row.tier > 2) continue;

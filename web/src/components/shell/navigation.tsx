@@ -1,5 +1,5 @@
 "use client";
-import { useKutip, type Page } from "@/lib/store";
+import { useKachingg, type Page } from "@/lib/store";
 import { inboxCount } from "./counts";
 import { approvalsCount } from "@/components/pages/approvals";
 const PAGES: { key: Page; label: string }[] = [
@@ -12,12 +12,12 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "usage", label: "Usage" },
 ];
 export function Navigation() {
-  const page = useKutip((s) => s.page);
-  const go = useKutip((s) => s.go);
-  const inbox = useKutip((s) => inboxCount(s.state));
-  const approvals = useKutip((s) => approvalsCount(s.state));
+  const page = useKachingg((s) => s.page);
+  const go = useKachingg((s) => s.go);
+  const inbox = useKachingg((s) => inboxCount(s.state));
+  const approvals = useKachingg((s) => approvalsCount(s.state));
   return (
-    <nav className="top-nav" aria-label="Kutip">
+    <nav className="top-nav" aria-label="Kachingg">
       {PAGES.map(({ key, label }) => {
         const count = key === "inbox" ? inbox : key === "approvals" ? approvals : 0;
         return (

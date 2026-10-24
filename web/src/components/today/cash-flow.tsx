@@ -4,10 +4,10 @@ import { CalendarDays, Sparkles } from "lucide-react";
 import { Badge, Card, CardHeader } from "@/components/ui";
 import { dayOf, fmtDate, fmtRM } from "@/engine/model";
 import { cashStages } from "@/lib/cash-outlook";
-import { useKutip } from "@/lib/store";
+import { useKachingg } from "@/lib/store";
 
 export default function CashFlow() {
-  const state = useKutip((s) => s.state);
+  const state = useKachingg((s) => s.state);
   const [selected, setSelected] = useState("now");
   const stages = cashStages(state);
   const active = stages.find((s) => s.id === selected) ?? stages[0];
@@ -70,7 +70,7 @@ export default function CashFlow() {
 }
 
 export function ClerkOverview() {
-  const state = useKutip((s) => s.state);
+  const state = useKachingg((s) => s.state);
   return (
     <Card className="p-7">
       <span className="inline-flex rounded-full bg-sky-100 p-3 text-sky-700">

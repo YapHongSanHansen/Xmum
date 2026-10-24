@@ -2,54 +2,54 @@
 // ORBYTE_SYNC action, and the simulated route handlers.
 import { describe, expect, it } from "vitest";
 import { GET as orbyteGET } from "../app/api/orbyte-mock/v1/[resource]/route";
-import { GET as manifestGET } from "../app/api/kutip/v1/manifest/route";
-import { GET as eventsGET } from "../app/api/kutip/v1/events/route";
+import { GET as manifestGET } from "../app/api/kachingg/v1/manifest/route";
+import { GET as eventsGET } from "../app/api/kachingg/v1/events/route";
 import { fmtRM } from "../engine/model";
 import { apply } from "../engine/reducer";
 import { seedState } from "../engine/seed";
 import { playDemo } from "../engine/testkit";
-import { clientRows, httpOrbyteConnector, localOrbyteConnector, pendingOrbyteApprovals, readOrbyte, toKutipEvents, toOrbyteAudit } from "./connector";
+import { clientRows, httpOrbyteConnector, localOrbyteConnector, pendingOrbyteApprovals, readOrbyte, toKachinggEvents, toOrbyteAudit } from "./connector";
 import { orbyteWorkspace } from "./mock-data";
 import { replayDemo } from "./replay";
-import { KUTIP_EVENT_TYPES } from "./types";
+import { KACHINGG_EVENT_TYPES } from "./types";
 
 const params = (resource: string) => ({ params: Promise.resolve({ resource }) });
 
-describe("Orbyte mock workspace ↔ Kutip seed", () => {
+describe("Orbyte mock workspace ↔ Kachingg seed", () => {
   const seed = seedState();
   const w = orbyteWorkspace();
 
   it("every seed customer has exactly one Orbyte client, and vice versa", () => {
     for (const c of seed.customers) {
-      const matches = w.clients.filter((x) => x.kutipCustomerId === c.id);
+      const matches = w.clients.filter((x) => x.kachinggCustomerId === c.id);
       expect(matches, c.id).toHaveLength(1);
       expect(matches[0]).toMatchObject({ name: c.name, whatsapp: c.whatsapp, language: c.lang, contactPerson: c.contact });
     }
     expect(w.clients).toHaveLength(seed.customers.length);
     expect(new Set(w.clients.map((c) => c.id)).size).toBe(w.clients.length);
-    for (const cl of w.clients) expect(seed.customers.some((c) => c.id === cl.kutipCustomerId)).toBe(true);
+    for (const cl of w.clients) expect(seed.customers.some((c) => c.id === cl.kachinggCustomerId)).toBe(true);
   });
 
   it("every seed delivery has an Orbyte project on the right client", () => {
     for (const inv of seed.invoices) {
       const p = w.projects.find((x) => x.doNumber === inv.delivery.doNumber);
       expect(p, inv.delivery.doNumber).toBeDefined();
-      expect(w.clients.find((c) => c.id === p!.clientId)!.kutipCustomerId).toBe(inv.customerId);
+      expect(w.clients.find((c) => c.id === p!.clientId)!.kachinggCustomerId).toBe(inv.customerId);
       expect(p!.invoiceNumber).toBe(inv.number);
     }
     expect(w.projects.find((p) => p.doNumber === "DO-8812")!.name).toBe("DO-8812 Shah Alam → Bukit Raja");
     expect(w.projects.filter((p) => p.invoiceNumber === null).length).toBeGreaterThanOrEqual(2);
   });
 
-  it("maps Orbyte roles to Kutip roles", () => {
-    expect(w.users.map((u) => `${u.name}:${u.orbyteRole}→${u.kutipRole}`)).toEqual(["Lim Siew Lan:Owner→owner", "Nurul:Finance clerk→clerk"]);
+  it("maps Orbyte roles to Kachingg roles", () => {
+    expect(w.users.map((u) => `${u.name}:${u.orbyteRole}→${u.kachinggRole}`)).toEqual(["Lim Siew Lan:Owner→owner", "Nurul:Finance clerk→clerk"]);
   });
 
   it("clientRows joins open invoice counts", () => {
     const rows = clientRows(seed, w.clients);
     const total = rows.reduce((n, r) => n + r.openInvoices, 0);
     expect(total).toBe(seed.invoices.filter((i) => i.status !== "paid").length);
-    expect(rows.every((r) => r.kutipName !== null)).toBe(true);
+    expect(rows.every((r) => r.kachinggName !== null)).toBe(true);
   });
 
   it("the HTTP connector reads the mock route handlers", async () => {
@@ -59,9 +59,9 @@ describe("Orbyte mock workspace ↔ Kutip seed", () => {
   });
 });
 
-describe("KutipEvents from the replayed demo", () => {
+describe("KachinggEvents from the replayed demo", () => {
   const final = replayDemo();
-  const events = toKutipEvents(final);
+  const events = toKachinggEvents(final);
 
   it("the runtime replay matches the test-kit demo run", () => {
     expect(final.log).toEqual(playDemo().final.log);
@@ -74,11 +74,11 @@ describe("KutipEvents from the replayed demo", () => {
     expect(idx.every((i) => i >= 0), JSON.stringify(types)).toBe(true);
     expect([...idx].sort((a, b) => a - b)).toEqual(idx);
     for (const t of ["warning.raised", "credit.decided", "reminder.sent", "claim.unverified"]) expect(types).toContain(t);
-    expect(types.every((t) => (KUTIP_EVENT_TYPES as readonly string[]).includes(t))).toBe(true);
+    expect(types.every((t) => (KACHINGG_EVENT_TYPES as readonly string[]).includes(t))).toBe(true);
   });
 
   it("is deterministic with unique ids", () => {
-    expect(toKutipEvents(replayDemo())).toEqual(events);
+    expect(toKachinggEvents(replayDemo())).toEqual(events);
     expect(new Set(events.map((e) => e.id)).size).toBe(events.length);
   });
 
@@ -95,14 +95,14 @@ describe("KutipEvents from the replayed demo", () => {
   });
 });
 
-describe("Kutip → Orbyte audit and approvals", () => {
+describe("Kachingg → Orbyte audit and approvals", () => {
   const final = replayDemo();
 
   it("toOrbyteAudit maps every log line and redacts cash and gap figures for the Clerk", () => {
     const owner = toOrbyteAudit(final.log, "owner");
     const clerk = toOrbyteAudit(final.log, "clerk");
     expect(owner).toHaveLength(final.log.length);
-    expect(owner.every((a) => a.source === "kutip")).toBe(true);
+    expect(owner.every((a) => a.source === "kachingg")).toBe(true);
     expect(owner.some((a) => a.action.includes(fmtRM(200000)))).toBe(true);
     const clerkText = clerk.map((a) => a.action).join("\n");
     for (const sen of [200000, 1320000, 77000]) expect(clerkText).not.toContain(fmtRM(sen));
@@ -168,8 +168,8 @@ describe("simulated route handlers", () => {
 
   it("manifest and events are simulated and synthetic", async () => {
     const m = await (await manifestGET()).json();
-    expect(m).toMatchObject({ simulated: true, data: "synthetic", name: "kutip" });
-    expect(m.events).toEqual([...KUTIP_EVENT_TYPES]);
+    expect(m).toMatchObject({ simulated: true, data: "synthetic", name: "kachingg" });
+    expect(m.events).toEqual([...KACHINGG_EVENT_TYPES]);
     const res = await eventsGET();
     expect(res.headers.get("x-simulated")).toBe("true");
     const ev = await res.json();

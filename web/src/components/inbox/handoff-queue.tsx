@@ -6,7 +6,7 @@
 import { useState, type ReactNode } from "react";
 import { Ban, HelpCircle, Send } from "lucide-react";
 import { customerOf, fmtDateTime, invoiceOf, timeOf, type Handoff, type Invoice, type State } from "@/engine/model";
-import { useKutip } from "@/lib/store";
+import { useKachingg } from "@/lib/store";
 import { Badge, Button, Card, RuleTag, cx } from "@/components/ui";
 import { ChatBackdrop, ChatBubble } from "./bubble";
 import { dayLabel } from "./fields";
@@ -58,7 +58,7 @@ function OpenHandoffs({ state, open, onOpen }: { state: State; open: Handoff[]; 
 }
 
 export function HandoffCard({ state, h, onOpen }: { state: State; h: Handoff; onOpen?: () => void }) {
-  const dispatch = useKutip((s) => s.dispatch);
+  const dispatch = useKachingg((s) => s.dispatch);
   const msg = state.messages.find((m) => m.id === h.messageId)!;
   const c = customerOf(state, msg.customerId);
   const inv = h.invoiceId ? invoiceOf(state, h.invoiceId) : null;
@@ -179,7 +179,7 @@ function WaitingClaims({ state, invoices, onOpen }: { state: State; invoices: In
 
 /** Owner only (§9.3: changes what a customer is treated as owing). The engine checks the role too. */
 function RejectClaimButton({ isOwner, invoiceId }: { isOwner: boolean; invoiceId: string }) {
-  const dispatch = useKutip((s) => s.dispatch);
+  const dispatch = useKachingg((s) => s.dispatch);
   return (
     <Button
       size="sm"

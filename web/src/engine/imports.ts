@@ -182,7 +182,7 @@ export function parseInvoiceCsv(text: string, s: State): InvoiceImport {
     if (cell("terms") && termsDays === null) problems.push(`bad terms "${cell("terms")}" (use days, e.g. 30)`);
 
     const status = cell("status").toLowerCase().replace(/[\s-]+/g, "_");
-    if (status === "paid") problems.push("already paid: Kutip imports unpaid invoices only");
+    if (status === "paid") problems.push("already paid: Kachingg imports unpaid invoices only");
     else if (status === "part_paid") problems.push("part_paid needs the amount already paid, which this file does not carry");
     else if (status && status !== "open" && status !== "disputed") problems.push(`unknown status "${cell("status")}" (use open or disputed)`);
 
