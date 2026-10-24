@@ -1,5 +1,5 @@
 "use client";
-import { ArrowRight, BookOpen, X } from "lucide-react";
+import { ArrowRight, BookOpen, Sparkles, X } from "lucide-react";
 import { Button } from "@/components/ui";
 import type { State } from "@/engine/model";
 import { useKachingg } from "@/lib/store";
@@ -8,14 +8,19 @@ export default function WelcomePanel() {
   const show = useKachingg((s) => atDemoStart(s.state) && !s.welcomeDismissed);
   const go = useKachingg((s) => s.go);
   const dismiss = useKachingg((s) => s.dismissWelcome);
+  const startTour = useKachingg((s) => s.startTour);
   if (!show) return null;
   return (
     <section className="flex flex-wrap items-center gap-4 rounded-2xl border border-white bg-white/50 p-4" aria-label="Welcome to Kachingg">
       <BookOpen className="h-5 w-5 text-ink2" aria-hidden />
       <div className="min-w-0 flex-1">
         <h2 className="text-sm font-medium">Meet your collection assistant.</h2>
-        <p className="mt-1 text-xs text-ink2">Take a three-minute tour, from a cash warning to a verified payment.</p>
+        <p className="mt-1 text-xs text-ink2">A one-minute tour points at each part of the screen. The Guide has the full story.</p>
       </div>
+      <Button size="sm" onClick={startTour}>
+        <Sparkles className="h-3.5 w-3.5" aria-hidden />
+        Start the tour
+      </Button>
       <Button size="sm" variant="secondary" onClick={() => go("guide")}>
         Explore the demo
         <ArrowRight className="h-3.5 w-3.5" />

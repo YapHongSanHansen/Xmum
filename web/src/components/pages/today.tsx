@@ -38,12 +38,14 @@ export default function TodayPage() {
               {fmtDate(state.now)} · Next 30 days
             </span>
             {scanned ? (
-              <Badge tone="emerald">
-                <CheckCircle2 className="h-3 w-3" />
-                Scan complete
-              </Badge>
+              <span data-tour="scan" className="inline-flex">
+                <Badge tone="emerald">
+                  <CheckCircle2 className="h-3 w-3" />
+                  Scan complete
+                </Badge>
+              </span>
             ) : (
-              <Button onClick={() => dispatch({ type: "RUN_SCAN" })}>
+              <Button onClick={() => dispatch({ type: "RUN_SCAN" })} data-tour="scan">
                 <ScanLine className="h-4 w-4" />
                 Run daily scan
               </Button>

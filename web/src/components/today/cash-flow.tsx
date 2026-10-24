@@ -25,7 +25,7 @@ export default function CashFlow() {
   const range = highest - lowest;
   const zero = (highest / range) * 100;
   return (
-    <Card rise={0}>
+    <Card rise={0} data-tour="cash-outlook">
       <CardHeader
         title="Cash outlook"
         kicker="A little clarity for the days ahead"

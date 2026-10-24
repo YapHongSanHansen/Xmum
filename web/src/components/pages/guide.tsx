@@ -1,7 +1,7 @@
 "use client";
 // Demo guide: the PRD §13 script as a checklist. Each tick is derived from
 // state, so it stays true after a reload and resets with the demo.
-import { ArrowRight, Check, FastForward, Play, UserRound } from "lucide-react";
+import { ArrowRight, Check, FastForward, Play, Sparkles, UserRound } from "lucide-react";
 import { Badge, Button, PageTitle, cx } from "@/components/ui";
 import { dayOf, fmtDateTime, type Role, type State } from "@/engine/model";
 import { DEMO_START, DEMO_STOPS } from "@/engine/seed";
@@ -126,6 +126,7 @@ export default function GuidePage() {
   const s = useKachingg((st) => st.state);
   const dispatch = useKachingg((st) => st.dispatch);
   const go = useKachingg((st) => st.go);
+  const startTour = useKachingg((st) => st.startTour);
   const done = STEPS.map((st) => st.done(s));
   const doneCount = done.filter(Boolean).length;
   const nextIdx = done.findIndex((d) => !d);
@@ -142,6 +143,14 @@ export default function GuidePage() {
           </Badge>
         }
       />
+
+      <div className="mb-6 flex flex-wrap items-center gap-3 rounded-2xl border border-white bg-white/50 p-4">
+        <p className="min-w-0 flex-1 text-[13px] text-ink2">New here? A one-minute tour points at each part of the screen.</p>
+        <Button size="sm" onClick={startTour}>
+          <Sparkles className="h-3.5 w-3.5" aria-hidden />
+          Start the tour
+        </Button>
+      </div>
 
       <div className="mb-6 h-2 overflow-hidden rounded-full bg-white">
         <div className="striped-fill transition-[width] duration-500" style={{ width: `${(doneCount / STEPS.length) * 100}%` }} />

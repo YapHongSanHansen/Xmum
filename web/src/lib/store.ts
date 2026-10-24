@@ -16,10 +16,15 @@ interface Store {
   toast: { kind: "error" | "info"; text: string } | null;
   /** The judge welcome on Today was closed. Persisted; cleared by RESET. */
   welcomeDismissed: boolean;
+  /** Index of the open "Start tour" step, or null. Never persisted, so a reload never reopens it. */
+  tourStep: number | null;
   dispatch: (a: Action) => boolean;
   go: (page: Page, moduleName?: string) => void;
   clearToast: () => void;
   dismissWelcome: () => void;
+  startTour: () => void;
+  setTourStep: (n: number) => void;
+  endTour: () => void;
 }
 
 export const useKachingg = create<Store>()(
@@ -30,6 +35,7 @@ export const useKachingg = create<Store>()(
       moduleName: null,
       toast: null,
       welcomeDismissed: false,
+      tourStep: null,
       dispatch: (a) => {
         const r = apply(get().state, a);
         if (r.error) {
@@ -43,6 +49,10 @@ export const useKachingg = create<Store>()(
       go: (page, moduleName) => set({ page, moduleName: moduleName ?? null }),
       clearToast: () => set({ toast: null }),
       dismissWelcome: () => set({ welcomeDismissed: true }),
+      // The tour only moves between pages; it never changes demo data.
+      startTour: () => set({ tourStep: 0 }),
+      setTourStep: (n) => set({ tourStep: n }),
+      endTour: () => set({ tourStep: null }),
     }),
     {
       name: "kachingg-demo-v1",
