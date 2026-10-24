@@ -14,36 +14,37 @@ export function BankStatement({ state }: { state: State }) {
           <Empty>No bank lines yet. Credits appear here as the demo clock passes them; use &ldquo;Advance to&rdquo; in the header.</Empty>
         </div>
       ) : (
-        <div className={tbl.wrap}>
-          <table className={cx(tbl.table, "text-xs")}>
-            <thead>
-              <tr className={tbl.headRow}>
-                <th className={tbl.th}>Date</th>
-                <th className={cx(tbl.th, "text-right")}>Amount</th>
-                <th className={tbl.th}>Description</th>
-                <th className={tbl.th}>Matched</th>
-              </tr>
-            </thead>
-            <tbody>
-              {lines.map((b) => (
-                <tr key={b.id} className={cx(tbl.row, "align-top")}>
-                  <td className={cx(tbl.td, "num whitespace-nowrap text-ink2")}>{fmtDateTime(b.at)}</td>
-                  <td className={cx(tbl.td, "num whitespace-nowrap text-right font-medium text-ink")}>{fmtRM(b.amount, { cents: true })}</td>
-                  <td className={cx(tbl.td, "break-words text-ink [overflow-wrap:anywhere]")}>{b.description}</td>
-                  <td className={tbl.td}>
+        // Two stacked columns so the feed fits the narrow Inbox column without squeezing.
+        <table className={cx(tbl.table, "text-xs")}>
+          <thead>
+            <tr className={tbl.headRow}>
+              <th className={tbl.th}>Date · description</th>
+              <th className={cx(tbl.th, "text-right")}>Amount · matched</th>
+            </tr>
+          </thead>
+          <tbody>
+            {lines.map((b) => (
+              <tr key={b.id} className={cx(tbl.row, "align-top")}>
+                <td className={tbl.td}>
+                  <div className="num whitespace-nowrap text-ink2">{fmtDateTime(b.at)}</div>
+                  <div className="num mt-0.5 break-words text-[11px] text-ink">{b.description}</div>
+                </td>
+                <td className={cx(tbl.td, "text-right")}>
+                  <div className="num whitespace-nowrap text-[13px] font-medium text-ink">{fmtRM(b.amount, { cents: true })}</div>
+                  <div className="mt-1">
                     {b.matchedInvoiceId ? (
-                      <Badge tone="emerald" className="num whitespace-nowrap">
+                      <Badge tone="emerald" className="num">
                         {invoiceOf(state, b.matchedInvoiceId).number}
                       </Badge>
                     ) : (
-                      <span className="text-ink2">—</span>
+                      <span className="text-ink2">not matched</span>
                     )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
     </Card>
   );

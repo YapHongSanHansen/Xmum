@@ -95,8 +95,8 @@ function PlanTableRow({ state, row, selected, onReview }: { state: State; row: P
         </div>
       </td>
       <td className={tbl.td}>
-        <div className={cx("num text-xs", muted ? "text-ink2" : "text-ink")}>{row.invoice.number}</div>
-        <div className="text-xs text-ink2">due {fmtDate(row.invoice.dueDate)}</div>
+        <div className={cx("num whitespace-nowrap text-xs", muted ? "text-ink2" : "text-ink")}>{row.invoice.number}</div>
+        <div className="whitespace-nowrap text-xs text-ink2">due {fmtDate(row.invoice.dueDate)}</div>
       </td>
       <td className={cx(tbl.td, "num whitespace-nowrap text-right", muted ? "text-ink2" : "font-medium text-ink")}>{fmtRM(outstanding(row.invoice))}</td>
       <td className={cx(tbl.td, "num text-right")}>{row.daysLate}</td>
