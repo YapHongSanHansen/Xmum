@@ -1,7 +1,8 @@
-// Bukti's AI step (PRD FR-E2, FR-E11). Server only: reads one seeded message
-// (and its slip image), asks Claude for the structured fields, validates them
-// with zod, and falls back to the cached extraction on any failure. It never
-// decides whether anything is paid; the engine's rules do that.
+// Bukti's AI step (PRD FR-E2, FR-E11). Server only: reads one message (and its
+// slip image), asks Claude for the structured fields and validates them with
+// zod. extractMessage() is the live call alone, shared with web/eval; extract()
+// serves the route and falls back to the cached extraction on any failure. It
+// never decides whether anything is paid; the engine's rules do that.
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import Anthropic from "@anthropic-ai/sdk";
@@ -159,21 +160,20 @@ async function slipBase64(image: string): Promise<string> {
   return (await readFile(file)).toString("base64");
 }
 
+/** One live reading, or why there is none. Never a cached or invented value. */
+export type LiveRead =
+  | { ok: true; extraction: Extraction; model: string; ms: number }
+  | { ok: false; reason: string };
+
 /**
- * Reads one seeded message with Claude. Returns null only for an unknown
- * message id. Missing key, API error, timeout, refusal or invalid output all
- * return the cached extraction with a reason.
+ * Reads any message with Claude, live only. Missing key, API error, timeout,
+ * refusal or invalid output return { ok: false, reason }; the caller decides
+ * what to do (the route falls back to the cached extraction, the eval does
+ * not score it). Used by extract() below and by web/eval.
  */
-const liveCache = new Map<string, ExtractResult>();
-
-export async function extract(messageId: string): Promise<ExtractResult | null> {
-  const hit = liveCache.get(messageId);
-  if (hit) return hit;
-  const msg = seedState().messages.find((m) => m.id === messageId);
-  if (!msg) return null;
-  const fallback = (reason: string) => cachedFor(messageId, reason) ?? null;
-
-  if (!process.env.ANTHROPIC_API_KEY) return fallback("no API key");
+export async function extractMessage(msg: InboundMessage): Promise<LiveRead> {
+  const fail = (reason: string): LiveRead => ({ ok: false, reason });
+  if (!process.env.ANTHROPIC_API_KEY) return fail("no API key");
 
   const started = Date.now();
   try {
@@ -196,8 +196,8 @@ export async function extract(messageId: string): Promise<ExtractResult | null> 
       output_config: { effort: "low", format: { type: "json_schema", schema: EXTRACTION_JSON_SCHEMA } },
     });
 
-    if (response.stop_reason === "refusal") return fallback("model declined");
-    if (response.stop_reason === "max_tokens") return fallback("output cut off");
+    if (response.stop_reason === "refusal") return fail("model declined");
+    if (response.stop_reason === "max_tokens") return fail("output cut off");
     const text = response.content
       .filter((b): b is Anthropic.Beta.Messages.BetaTextBlock => b.type === "text")
       .map((b) => b.text)
@@ -206,18 +206,36 @@ export async function extract(messageId: string): Promise<ExtractResult | null> 
     try {
       json = JSON.parse(text);
     } catch {
-      return fallback("invalid JSON from model");
+      return fail("invalid JSON from model");
     }
     const parsed = ExtractionSchema.safeParse(json);
-    if (!parsed.success) return fallback("output failed validation");
-    const result: ExtractResult = { extraction: parsed.data, model: response.model || LIVE_MODEL, cached: false, ms: Date.now() - started };
-    liveCache.set(messageId, result);
-    return result;
+    if (!parsed.success) return fail("output failed validation");
+    return { ok: true, extraction: parsed.data, model: response.model || LIVE_MODEL, ms: Date.now() - started };
   } catch (e) {
-    if (e instanceof Anthropic.APIConnectionTimeoutError) return fallback("timed out");
-    if (e instanceof Anthropic.AuthenticationError) return fallback("API key rejected");
-    if (e instanceof Anthropic.RateLimitError) return fallback("rate limited");
-    if (e instanceof Anthropic.APIError) return fallback(`API error ${e.status ?? ""}`.trim());
-    return fallback("AI call failed");
+    if (e instanceof Anthropic.APIConnectionTimeoutError) return fail("timed out");
+    if (e instanceof Anthropic.AuthenticationError) return fail("API key rejected");
+    if (e instanceof Anthropic.RateLimitError) return fail("rate limited");
+    if (e instanceof Anthropic.APIError) return fail(`API error ${e.status ?? ""}`.trim());
+    return fail("AI call failed");
   }
+}
+
+/**
+ * Reads one seeded message with Claude. Returns null only for an unknown
+ * message id. Missing key, API error, timeout, refusal or invalid output all
+ * return the cached extraction with a reason.
+ */
+const liveCache = new Map<string, ExtractResult>();
+
+export async function extract(messageId: string): Promise<ExtractResult | null> {
+  const hit = liveCache.get(messageId);
+  if (hit) return hit;
+  const msg = seedState().messages.find((m) => m.id === messageId);
+  if (!msg) return null;
+
+  const read = await extractMessage(msg);
+  if (!read.ok) return cachedFor(messageId, read.reason) ?? null;
+  const result: ExtractResult = { extraction: read.extraction, model: read.model, cached: false, ms: read.ms };
+  liveCache.set(messageId, result);
+  return result;
 }
