@@ -86,7 +86,7 @@ const STEPS: Step[] = [
     title: "Mega Bina pays, less a deduction",
     who: ["clerk", "owner"],
     look: "Clerk approves the verified receipt; only then is 31 Oct covered. Owner accepts the deduction.",
-    facts: "2nd warning 5 Nov · RM2,770 + RM330 (DO-8812) · 31 Oct +RM770 · INV-2304 PAID · CN-0057",
+    facts: "2nd warning 5 Nov · RM2,770 + RM330 (DO-8812) · 31 Oct covered · INV-2304 PAID · CN-0057",
     refs: "FR-H1, E1–E6, E12, B4 · M1, M3",
     page: "inbox",
     stop: DEMO_STOPS[2].at,
