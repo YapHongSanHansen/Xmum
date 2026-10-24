@@ -31,21 +31,21 @@ function WarningCard({ state, w }: { state: State; w: Warning }) {
   const stillShort = now !== undefined && now.forecast < 0;
   return (
     <Card tone={stillShort ? "warn" : "good"}>
-      <div className="flex items-start justify-between gap-3 border-b border-amber-200/70 px-4 py-3">
+      <div className="flex items-start justify-between gap-3 border-b border-hairline px-4 py-3">
         <div className="flex items-start gap-2.5">
           <TriangleAlert className={cx("mt-0.5 h-4 w-4 shrink-0", stillShort ? "text-amber-700" : "text-emerald-700")} aria-hidden />
           <div>
-            <div className="text-[11px] font-semibold uppercase tracking-wide text-amber-800">
+            <div className={cx("font-mono text-xs font-medium", stillShort ? "text-amber-800" : "text-emerald-700")}>
               Early warning · {fmtDate(outflow.dueDate)} {outflow.short}
             </div>
-            <div className="text-sm font-semibold text-slate-900">
+            <div className="mt-0.5 text-[15px] font-semibold tracking-[-0.01em] text-ink">
               {now === undefined
                 ? `${outflow.label}: bill date has passed`
                 : stillShort
                   ? `Short ${fmtRM(now.gap)} for ${outflow.short} ${daysAwayText(now.daysAway)}, if nobody else pays`
                   : `Now covered (${fmtRM(now.forecast, { sign: true })}) for ${outflow.short}`}
             </div>
-            <div className="mt-0.5 text-xs text-slate-500 tabular-nums">
+            <div className="mt-0.5 text-xs text-ink2 tabular-nums">
               Raised {fmtDateTime(w.raisedAt)} at a gap of {fmtRM(w.gap)} · {outflow.label} {fmtRM(outflow.amount)}
             </div>
           </div>
@@ -53,7 +53,7 @@ function WarningCard({ state, w }: { state: State; w: Warning }) {
         <RuleTag id="R6" />
       </div>
       <div className="px-4 py-3">
-        <div className="mb-2 text-xs font-medium text-slate-600">Your options (tick what you will do; each choice is logged)</div>
+        <div className="mb-2 text-xs font-medium text-ink2">Your options (tick what you will do; each choice is logged)</div>
         <ul className="grid gap-1.5 sm:grid-cols-2">
           {options.map((opt) => {
             const chosen = w.chosen.includes(opt);
@@ -64,16 +64,16 @@ function WarningCard({ state, w }: { state: State; w: Warning }) {
                   disabled={chosen}
                   onClick={() => dispatch({ type: "CHOOSE_WARNING_OPTION", warningId: w.id, option: opt })}
                   className={cx(
-                    "flex w-full items-center gap-2 rounded-md border px-2.5 py-2 text-left text-sm transition-colors",
+                    "flex min-h-[38px] w-full items-center gap-2 rounded-[2px] border px-2.5 py-2 text-left text-[13px] transition-colors",
                     chosen
                       ? "cursor-default border-emerald-300 bg-emerald-50 text-emerald-900"
-                      : "border-slate-200 bg-white text-slate-800 hover:border-slate-300 hover:bg-slate-50",
+                      : "border-line bg-surface text-ink hover:border-navy hover:bg-canvas",
                   )}
                 >
                   {chosen ? (
                     <CircleCheck className="h-4 w-4 shrink-0 text-emerald-600" aria-hidden />
                   ) : (
-                    <Square className="h-4 w-4 shrink-0 text-slate-400" aria-hidden />
+                    <Square className="h-4 w-4 shrink-0 text-ink2" aria-hidden />
                   )}
                   <span>{opt}</span>
                 </button>
@@ -81,7 +81,7 @@ function WarningCard({ state, w }: { state: State; w: Warning }) {
             );
           })}
         </ul>
-        <div className="mt-3 text-[11px] text-slate-500">Kutip lists options only. It does not recommend a lender.</div>
+        <div className="mt-3 text-[11px] text-ink2">Kutip lists options only. It does not recommend a lender.</div>
       </div>
     </Card>
   );

@@ -29,12 +29,12 @@ export default function WelcomePanel() {
         type="button"
         onClick={dismiss}
         aria-label="Dismiss welcome"
-        className="absolute right-2.5 top-2.5 rounded-[2px] p-1 text-ink3 hover:bg-canvas hover:text-ink"
+        className="absolute right-2.5 top-2.5 rounded-[2px] p-1 text-ink2 hover:bg-canvas hover:text-ink"
       >
         <X className="h-4 w-4" />
       </button>
 
-      <div className="grid grid-cols-[1fr_320px] gap-6 px-6 py-5">
+      <div className="grid gap-6 px-4 py-5 sm:px-6 lg:grid-cols-[1fr_320px]">
         <div>
           <div className="eyebrow">Welcome to Kutip</div>
           <h2 id="welcome-title" className="mt-1.5 text-[19px] font-semibold leading-snug tracking-[-0.01em] text-ink">
@@ -54,7 +54,7 @@ export default function WelcomePanel() {
               Run the 08:00 scan
             </Button>
           </div>
-          <p className="mt-3 text-[11px] text-ink3">All data is synthetic. Orbyte frame is simulated.</p>
+          <p className="mt-3 text-[11px] text-ink2">All data is synthetic. Orbyte frame is simulated.</p>
         </div>
 
         <div className="border border-hairline bg-canvas px-4 py-3">
