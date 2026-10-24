@@ -21,7 +21,7 @@ python submission/build_pdfs.py --team "YourTeamName"
 Taygood
 
 ### project_name
-Kutip: cash-collection assistant for the Orbyte hub
+Kachingg: credit-control assistant for the Orbyte hub
 
 ### leader_name
 Hansen Yap Hong San
@@ -36,7 +36,7 @@ Taylor's University
 TODO: number of members
 
 ### live_url
-Hosted on Vercel (confirmed by the team). TODO: add the live deployment URL
+https://kachingg-app.vercel.app (Vercel)
 
 ### repo_url
 https://github.com/YapHongSanHansen/Xmum (public)
@@ -70,11 +70,11 @@ The owner of a 5-20 person firm (haulier, printer, wholesaler, catering supplier
 ### prelim.solution
 > 2.2 The Proposed AI Solution. Maximum 300 words.
 
-**Kutip** is a cash-collection module for the Orbyte business hub. It promises only what the owner controls: **never be surprised on payroll day, and stop giving credit to customers who don't pay.**
+**Kachingg** is a credit-control module for the Orbyte business hub. It promises only what the owner controls: **never be surprised on payroll day, and stop giving credit to customers who don't pay.**
 
 One journey, end to end:
 - **Trigger:** an 08:00 daily scan, a new credit order, or a customer reply.
-- **Connected data:** invoices, bills, bank balance and statement lines, payment history (CSV standing in for Orbyte Connect).
+- **Connected data:** invoices, bills, bank balance and statement lines, payment history, plus Orbyte clients via our connector (simulated Orbyte API).
 - **Decision:** deterministic rules, each with a visible ID, forecast the cash gap and warn 10+ days ahead, hold new credit for customers 30+ days late, and rank who to chase by how much each invoice closes the gap.
 - **Human approval:** the clerk approves gentle reminders; the owner approves firm reminders, credit decisions and deductions.
 - **Outcome:** a WhatsApp reminder from a fixed BM/English/Chinese template, an invoice verified, the cash meter updated, and an append-only activity log.
@@ -88,9 +88,9 @@ One journey, end to end:
 
 **Frontend:** Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4, lucide-react.
 **Data (Phase 1):** synthetic seed in a Zustand store persisted to the browser; money as integer sen. **Phase 2:** hosted database (Convex or Postgres) behind the same engine.
-**Rules engine:** pure TypeScript, deterministic; 97 Vitest tests replay every rule and the full demo script.
+**Rules engine:** pure TypeScript, deterministic; 182 Vitest tests replay every rule and the full demo script.
 **AI:** Claude Opus 5.5 via the Anthropic API (official SDK); image + text in, JSON out, validated with Zod; cached results as fallback.
-**Messaging:** WhatsApp click-to-chat (wa.me) links; a person presses send. **Hosting:** Vercel (confirmed by the team; live URL to be added). **Code:** public GitHub repo.
+**Messaging:** WhatsApp click-to-chat (wa.me) links; a person presses send. **Hosting:** Vercel, live at kachingg-app.vercel.app. **Orbyte:** `OrbyteConnector` + simulated Orbyte API; Kachingg exposes `/api/kachingg/v1` (manifest, events) for other modules. **Code:** public GitHub repo.
 
 **Block diagram**
 - Browser UI (simulated Orbyte hub, Owner/Clerk roles) → Rules engine (forecast, credit check, chase plan, bank match) → Human approval → Outcome + activity log
@@ -106,8 +106,8 @@ One journey, end to end:
 **Define:** a customer can always refuse to pay, so we reframed the problem around what the owner controls: knowing early, the credit decision, who to chase, and correct records.
 **Ideate:** we scored a shortlist of SME pains against the judging rubric and scanned competitors (Bukku, Paidnice, Peakflo) to find the gap: early warning and credit holds for micro firms that work on WhatsApp.
 **Prototype:** a working module inside a simulated Orbyte hub, with synthetic data and a frozen demo clock so the whole journey runs live and repeatably.
-**Test:** 97 automated tests replay every rule and the demo script; AI output is bounded by the exact-quote check and the bank match.
-**Ready for Phase 2:** the app is one Next.js unit that deploys to Vercel. Next we interview 5-10 Malaysian B2B sellers, run timed first-use trials (goal: learned in under 10 minutes), measure extraction accuracy on 30-50 mixed-language messages, and move the engine onto a hosted database.
+**Test:** 182 automated tests replay every rule and the demo script; AI output is bounded by the exact-quote check and the bank match.
+**Ready for Phase 2:** the app is one Next.js unit that deploys to Vercel. Next we interview 5-10 Malaysian B2B sellers, run timed first-use trials (goal: learned in under 10 minutes), run our 40-message mixed-language accuracy test live, and move the engine onto a hosted database.
 
 ### prelim.sdg_target
 **SDG 8.3:** promote policies that support productive activities, decent job creation and entrepreneurship, and encourage the formalisation and growth of micro-, small- and medium-sized enterprises, including through access to financial services.
@@ -173,7 +173,7 @@ TODO: confirm whether any member has an employment, internship or consulting agr
 ### tech.architecture
 > 2.1 System Architecture Overview. Maximum 200 words.
 
-The user opens Kutip in a browser: a Next.js 16 / React 19 app shown as a module inside a simulated Orbyte hub, with Owner and Clerk roles. Synthetic data (invoices, outflows, bank-statement lines, customer messages and slip images) loads from a seed into a Zustand store kept in the browser.
+The user opens Kachingg in a browser: a Next.js 16 / React 19 app presented as an Orbyte module, with Owner and Clerk roles. Customers and users come through an Orbyte connector (simulated Orbyte API). Synthetic data (invoices, bills, bank lines, messages and slips) loads from a seed into a Zustand store kept in the browser.
 
 Every state change goes through a pure TypeScript rules engine: cash forecast and early warning, credit check, chase-plan ranking, the exact-quote check, bank-line matching and approval rights. Each step is written to an append-only activity log.
 
@@ -187,25 +187,27 @@ Next.js 16.4 and React 19.3 | Web framework, UI and the server route for the AI 
 Tailwind CSS 4.3 and lucide-react 1.61 | Styling and icons | MIT; ISC
 Zustand 5 and Zod 4.6 | Client state store; validation of the AI's JSON output | MIT
 @anthropic-ai/sdk 1.3 | Client for the Anthropic API | Apache-2.0
-Vitest 5.0 and ESLint 9 | Unit tests (97 passing) and linting | MIT
+Vitest 5.0 and ESLint 9 | Unit tests (182 passing) and linting | MIT
 
 ### tech.apis
 Anthropic Messages API (Anthropic) | Bukti: reads a customer reply and slip image into structured fields with Claude Opus 5.5 | Paid, pay-as-you-go. Optional: cached results are used without a key
 WhatsApp click-to-chat links, wa.me (Meta) | Opens WhatsApp with an approved reminder prefilled; a person presses send. A link, not an API call | Free
-No other external APIs | Bank data, accounting data and Orbyte Connect are simulated with synthetic CSV data | Not applicable
+Simulated Orbyte API (ours) | /api/orbyte-mock/v1: clients, projects, users, wallet; stands in for Orbyte using our documented API assumptions | Not applicable (synthetic)
+Kachingg module API (ours) | /api/kachingg/v1: manifest and events (gap.detected, credit.held, proof.verified…) for other Orbyte modules | Not applicable
+No other external APIs | Bank and accounting data are synthetic CSV | Not applicable
 
 ### tech.cloud
 Vercel | Hosts the Next.js app and the /api/extract route, as confirmed by the team; live URL to be added. API key is a server environment variable | Plan and region to be confirmed
 GitHub | Public code repository and commit history | Free
 Anthropic API (cloud inference) | Runs Claude Opus 5.5 for Bukti | Pay-as-you-go; hosted by Anthropic outside Malaysia
-Orbyte (Alpha Red Solutions) | Sponsor workspace: a synthetic Kutip client and project record; no runtime integration | Sponsor account; region not stated
+Orbyte (Alpha Red Solutions) | Sponsor workspace: a synthetic client and project record for the app; no runtime integration (Orbyte has no public API) | Sponsor account; region not stated
 No database or authentication service | Demo state lives in the browser and resets from the seed; roles are simulated | Not applicable
 
 ### tech.models
 Claude Opus 5.5 (claude-opus-5-5) | Anthropic, via API | Pre-trained, used as-is with a prompt and JSON schema; no fine-tuning | Anthropic Commercial Terms of Service
 
 ### tech.datasets
-Kutip demo seed (Lori Laju Logistics) | This repo: web/src/engine/seed.ts | Synthetic, team-created | Apache-2.0 (this repo) | N
+Kachingg demo seed (Lori Laju Logistics) | This repo: web/src/engine/seed.ts | Synthetic, team-created | Apache-2.0 (this repo) | N
 Synthetic payment slip (fictional "Bank Cempaka") | This repo: web/public/slips/ | Synthetic, team-created | Apache-2.0 (this repo) | N
 Cached AI extractions for the 3 demo messages | This repo: web/src/engine/cached.ts | Synthetic, team-created | Apache-2.0 (this repo) | N
 Experian State of Credit 2025 (figures cited) | experian.com.my, 21 May 2025 | Public report; cited in docs only, not loaded in the app | Experian copyright | N
@@ -220,34 +222,34 @@ OpenAI Codex desktop | Repository review; drafting the declaration | Minor
 ### tech.aireview
 > Maximum 100 words.
 
-Team members reviewed and adapted AI-generated code and documents before committing them. The rules engine is covered by 97 Vitest tests that replay every seed check and the full demo script, including the expected activity log. Research figures were spot-checked against their sources, with corrections marked in place. Inside the product, AI output is never trusted directly: each field must quote the customer's exact words, low-confidence items go to a person, and payments need a matching bank line.
+Team members reviewed and adapted AI-generated code and documents before committing them. The rules engine is covered by 182 Vitest tests that replay every seed check and the full demo script, including the expected activity log. Research figures were spot-checked against their sources, with corrections marked in place. Inside the product, AI output is never trusted directly: each field must quote the customer's exact words, low-confidence items go to a person, and payments need a matching bank line.
 
 ### tech.sponsor_yesno
 Yes
 
 ### tech.sponsor
 Alpha Red Solutions | Orbyte briefing | Shaped our simulated hub frame
-Alpha Red Solutions | Orbyte platform access (no API, credits or data provided) | Explored modules and roles; created a synthetic Kutip client and project record. The prototype calls no Orbyte API
+Alpha Red Solutions | Orbyte platform access (no API, credits or data provided) | Explored modules and roles; created a synthetic client and project record. The prototype calls no Orbyte API
 
 ### tech.sponsor_essential
 > Maximum 100 words.
 
-Not essential. The prototype runs fully without Orbyte: the hub frame, roles, approvals and Connect page are simulated inside our app, as the brief allows. Orbyte access only informed the design so that Kutip fits the hub. In a real deployment Kutip would use Orbyte Connect for accounting and bank data, Orbyte roles for permissions and the Orbyte audit trail; our planned invoice-source adapter is where that integration would go.
+Not essential. The prototype runs without the live Orbyte platform, as the brief allows. Kachingg reads Orbyte clients, projects, users and Wallet through an OrbyteConnector written against our documented API assumptions (docs/orbyte-integration.md); today a simulated Orbyte API with synthetic data stands behind it. Roles, approvals and the audit trail follow Orbyte's model. With a real Orbyte API, only the connector's base URL and authentication change. Orbyte access informed the data model.
 
 ### tech.privacy
 > 6.1 Data Handling & Privacy. Maximum 150 words.
 
 No real user data is collected. The prototype uses synthetic data only: every business, person, invoice, bank line, message and slip is fictional, and slips use a made-up bank. Demo state is kept in the viewer's browser and cleared by Reset demo; we run no database. When Bukti reads a message, the synthetic text and slip image are sent to the Anthropic API over HTTPS; the key stays on the server.
 
-For a real deployment under Malaysia's PDPA 2010 (as amended in 2024): the SME is the data user and Kutip/Orbyte its processor; contact data is used only to follow up invoices; clerks never see cash figures; extraction keeps only needed fields and masks account numbers; slip images are encrypted with an owner-set retention limit; the AI provider must not train on customer data; cross-border processing is disclosed, with in-region hosting preferred.
+For a real deployment under Malaysia's PDPA 2010 (as amended in 2024): the SME is the data user and Kachingg/Orbyte its processor; contact data is used only to follow up invoices; clerks never see cash figures; extraction keeps only needed fields and masks account numbers; slip images are encrypted with an owner-set retention limit; the AI provider must not train on customer data; cross-border processing is disclosed, with in-region hosting preferred.
 
 ### tech.limitations
 > 6.2 Known Limitations & Risks. Maximum 150 words.
 
 - **Misreading:** the model may misread an amount or invoice number, or invent a quote. Mitigation: each field must quote the message exactly or it is dropped; fields under 0.85 confidence go to a person; nothing is marked paid without a matching bank line; AI never writes customer messages.
 - **Ambiguous Manglish, BM and Chinese** (for example "next Friday"): handed to a person with one question instead of guessed.
-- **Single provider, outages, rate limits, latency:** a 25-second timeout and cached extractions keep the demo working; the AI step sits behind one server route, so the provider can be swapped.
-- **Unmeasured accuracy:** a 30-50 message test set with a 95% exact-amount target is planned; the live AI path is less tested than the cached path.
+- **Single provider, outages, rate limits, latency:** a 9-second timeout and cached extractions keep the demo working; the AI step sits behind one server route, so the provider can be swapped.
+- **Unmeasured accuracy:** a 40-message BM/English/Chinese test set and scorer are built (`pnpm eval:bukti`, 95% exact-amount target); the live score is pending an API key, and the live AI path is less tested than the cached path.
 - **Data residency:** the provider is hosted outside Malaysia.
 
 ### tech.checklist
@@ -256,7 +258,7 @@ For a real deployment under Malaysia's PDPA 2010 (as amended in 2024): the SME i
 - [x] No API keys, passwords, or other credentials are exposed in the code repository, prototype, or this document.
 - [x] Any use of generative-AI tools for development has been disclosed and reviewed by the team.
 - [x] Any use of official SDC sponsor resources has been declared in Section 5.
-- [ ] The prototype described here is accessible to judges through the links provided in Section 1. (TODO: tick once the live URL is in)
+- [x] The prototype described here is accessible to judges through the links provided in Section 1.
 - [ ] All fields in this template have been completed within the word limits stated. (TODO: tick once every TODO is filled)
 
 ---
@@ -277,7 +279,7 @@ If the organisers require Replit use for the final round, the repository can be 
 ### runpod_pou
 **Statement: RunPod was not used.**
 
-Our team did not use RunPod. Kutip's only AI step reads one short message and one slip image per customer reply, so it calls a hosted model (Claude Opus 5.5 via the Anthropic API) rather than running a GPU model. The rules engine needs no GPU.
+Our team did not use RunPod. Kachingg's only AI step reads one short message and one slip image per customer reply, so it calls a hosted model (Claude Opus 5.5 via the Anthropic API) rather than running a GPU model. The rules engine needs no GPU.
 
 - **Why not self-host now:** the step is small and infrequent, and a hosted API gave us image input and structured output on day one.
 - **Where RunPod would fit:** in a real deployment, Malaysian data-residency preferences (PDPA cross-border transfer) could justify an open-weight vision model on a GPU endpoint such as RunPod Serverless. The /api/extract route is the single place that would change.
