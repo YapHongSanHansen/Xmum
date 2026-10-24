@@ -86,6 +86,16 @@ export function CsvSource({
   );
 }
 
+/** File format help, folded away behind a native disclosure. */
+export function FormatNote({ children }: { children: ReactNode }) {
+  return (
+    <details className="text-xs text-ink2">
+      <summary className="w-fit cursor-pointer text-ink2 hover:text-ink">Format</summary>
+      <p className="mt-1.5 leading-relaxed">{children}</p>
+    </details>
+  );
+}
+
 /** Ledger table: 30px header row, 38px rows, hairline dividers. */
 export function LedgerTable({ head, children }: { head: { label: string; right?: boolean }[]; children: ReactNode }) {
   return (

@@ -7,7 +7,7 @@ import { Badge, Button, Card, CardHeader, RuleTag } from "@/components/ui";
 import { fmtDate, fmtRM } from "@/engine/model";
 import { SAMPLE_INVOICE_CSV, parseInvoiceCsv } from "@/engine/imports";
 import { useKutip } from "@/lib/store";
-import { CsvSource, InvalidRows, LedgerTable, cellCls, numCls, rowCls } from "./csv-source";
+import { CsvSource, FormatNote, InvalidRows, LedgerTable, cellCls, numCls, rowCls } from "./csv-source";
 
 export function InvoiceImport() {
   const state = useKutip((s) => s.state);
@@ -19,24 +19,20 @@ export function InvoiceImport() {
 
   const run = () => {
     if (dispatch({ type: "IMPORT_INVOICES", csv: text })) {
-      setDone(`Imported ${n} invoice${n === 1 ? "" : "s"}. Logged in the activity log; the next scan includes them.`);
+      setDone(`Imported ${n} invoice${n === 1 ? "" : "s"} · logged`);
       setText("");
     }
   };
 
   return (
     <Card>
-      <CardHeader
-        kicker="FR-A1 · Orbyte Connect"
-        title="Import invoices (CSV)"
-        right={<Badge tone="violet">Owner · Clerk</Badge>}
-      />
-      <div className="space-y-3 px-4 py-3">
-        <p className="text-xs text-ink2">
+      <CardHeader title="Invoices (CSV)" />
+      <div className="space-y-3 px-5 py-4">
+        <FormatNote>
           Columns: <span className="font-mono">number, customer, amount, issue date, due date, terms, status</span> (optional:{" "}
-          <span className="font-mono">do number, route, destination</span>). Customers must already be in Orbyte clients records. Dates as YYYY-MM-DD or
-          DD/MM/YYYY; status open or disputed.
-        </p>
+          <span className="font-mono">do number, route, destination</span>). Customers must be in your customer list. Dates as YYYY-MM-DD or DD/MM/YYYY;
+          status open or disputed.
+        </FormatNote>
         <CsvSource
           label="Invoice CSV"
           text={text}
@@ -90,8 +86,8 @@ export function InvoiceImport() {
                 <Upload className="h-4 w-4" aria-hidden />
                 Import {n} invoice{n === 1 ? "" : "s"}
               </Button>
-              <span className="text-[11px] text-ink2">
-                Invalid rows are listed and left out. Nothing is marked paid by an import <RuleTag id="M1" />
+              <span className="inline-flex items-center gap-1.5 text-xs text-ink2">
+                Never marks an invoice paid <RuleTag id="M1" />
               </span>
             </div>
           </>
