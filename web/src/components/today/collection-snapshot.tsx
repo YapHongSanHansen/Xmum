@@ -50,7 +50,7 @@ export function CollectionSnapshot() {
       <Card className="flex flex-col">
         <CardHeader title="Bukti inbox" right={<MessageCircle className="h-5 w-5 text-ink2" />} />
         <div className="flex flex-1 flex-col px-6 pb-6">
-          <Figure>{unread.toString().padStart(2, "0")}</Figure>
+          <Figure>{unread}</Figure>
           <p className="mt-3 text-xs leading-relaxed text-ink2">
             {unread > 0
               ? "Customer replies ready to review. Turn payment claims into verified receipts."

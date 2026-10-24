@@ -150,7 +150,15 @@ export default function ApprovalsPage() {
 
   return (
     <div className="min-w-0">
-      <PageTitle title="Approvals" subtitle="A little human judgement, right where it matters." />
+      <PageTitle
+        title="Approvals"
+        subtitle={
+          <>
+            A little human judgement, right where it matters.
+            <span className="mt-1 block text-xs">Also listed in Orbyte Approvals (simulated).</span>
+          </>
+        }
+      />
       <MetricRow
         items={[
           { label: "Waiting for you", value: mine.length },

@@ -24,7 +24,12 @@ export default function TodayPage() {
     <div>
       <PageTitle
         title="Overview"
-        subtitle="Your cash, your customers, and a clear next step."
+        subtitle={
+          <>
+            Your cash, your customers, and a clear next step.
+            <span className="mt-1 block text-xs">Customers and roles from Orbyte (simulated)</span>
+          </>
+        }
         right={
           <>
             <span className="inline-flex items-center gap-2 rounded-xl border border-white bg-surface px-4 py-3 text-xs shadow-sm">

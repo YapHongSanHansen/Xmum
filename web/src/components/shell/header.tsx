@@ -56,7 +56,7 @@ export function Header() {
             <Building2 className="h-3.5 w-3.5" aria-hidden />
             {state.business.name}
           </span>
-          <span className="rounded-full bg-white px-2 py-1 text-[10px]">Demo · synthetic data</span>
+          <span className="rounded-full bg-white px-2 py-1 text-[10px]">Orbyte module · simulated · synthetic data</span>
           <RoleSwitcher role={state.role} onChange={(role) => dispatch({ type: "SET_ROLE", role })} />
         </div>
         <div className="demo-tools">
@@ -85,24 +85,30 @@ export function Header() {
 
 function RoleSwitcher({ role, onChange }: { role: Role; onChange: (r: Role) => void }) {
   return (
-    <div className="inline-flex gap-0.5 rounded-lg bg-[#e6e7eb] p-0.5" role="group" aria-label="Role">
-      {ROLES.map((r) => (
-        <button
-          key={r.role}
-          type="button"
-          aria-pressed={role === r.role}
-          aria-label={r.label}
-          title={r.label}
-          onClick={() => role !== r.role && onChange(r.role)}
-          className={cx(
-            "rounded-md px-2.5 py-1 text-[11px] transition-colors",
-            role === r.role ? "bg-white text-ink shadow-sm" : "text-ink2 hover:text-ink",
-          )}
-        >
-          {r.short}
-        </button>
-      ))}
-    </div>
+    <span className="inline-flex items-center gap-1.5">
+      {/* Visible caption only; the group's accessible name says the same. */}
+      <span className="text-[10px]" aria-hidden>
+        Orbyte role
+      </span>
+      <div className="inline-flex gap-0.5 rounded-lg bg-[#e6e7eb] p-0.5" role="group" aria-label="Orbyte role">
+        {ROLES.map((r) => (
+          <button
+            key={r.role}
+            type="button"
+            aria-pressed={role === r.role}
+            aria-label={r.label}
+            title={r.label}
+            onClick={() => role !== r.role && onChange(r.role)}
+            className={cx(
+              "rounded-md px-2.5 py-1 text-[11px] transition-colors",
+              role === r.role ? "bg-white text-ink shadow-sm" : "text-ink2 hover:text-ink",
+            )}
+          >
+            {r.short}
+          </button>
+        ))}
+      </div>
+    </span>
   );
 }
 

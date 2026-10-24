@@ -68,7 +68,8 @@ export default function CashMeters() {
                       <div className="mt-1.5 flex justify-between text-[11px] text-ink2">
                         <span>{pct}% covered</span>
                         <span className={f.gap > 0 ? "text-rose-700" : "text-emerald-700"}>
-                          {f.gap > 0 ? `${fmtRM(f.gap)} short` : "Fully covered"}
+                          {/* Covered: show the surplus left after this bill (F1 forecast, ≥ 0 here). */}
+                          {f.gap > 0 ? `${fmtRM(f.gap)} short` : `Covered ${fmtRM(f.forecast, { sign: true })}`}
                         </span>
                       </div>
                     </>
