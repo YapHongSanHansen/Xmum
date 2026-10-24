@@ -80,7 +80,7 @@ export function CsvSource({
             Clear
           </Button>
         )}
-        {text && <span className="text-[11px] text-ink3">{source ?? (showText ? "pasted text" : "file loaded")}</span>}
+        {text && <span className="text-[11px] text-ink2">{source ?? (showText ? "pasted text" : "file loaded")}</span>}
       </div>
     </div>
   );
@@ -91,10 +91,10 @@ export function LedgerTable({ head, children }: { head: { label: string; right?:
   return (
     <div className="overflow-x-auto border border-line">
       <table className="w-full text-left text-xs">
-        <thead className="bg-canvas">
-          <tr className="h-[30px] border-b border-line text-[11px] font-medium uppercase tracking-wide text-ink3">
+        <thead>
+          <tr className="h-[30px] border-b border-line text-xs text-ink2">
             {head.map((h) => (
-              <th key={h.label} className={cx("px-2.5 font-medium", h.right && "text-right")}>
+              <th key={h.label} className={cx("whitespace-nowrap px-2.5 font-normal", h.right && "text-right")}>
                 {h.label}
               </th>
             ))}
@@ -115,14 +115,14 @@ export function InvalidRows({ rows, extra }: { rows: { line: number; reason: str
   if (!rows.length && !extra) return null;
   return (
     <div className="space-y-1.5">
-      <div className="text-[11px] font-medium uppercase tracking-wide text-rose-700">
+      <div className="font-mono text-[11px] font-medium text-rose-700">
         Not imported · {rows.length} row{rows.length === 1 ? "" : "s"}
       </div>
       {rows.length > 0 && (
         <ul className="divide-y divide-hairline border border-rose-200 bg-rose-50/40 text-xs">
           {rows.map((r) => (
             <li key={r.line} className="flex gap-3 px-2.5 py-2">
-              <span className="w-12 shrink-0 font-mono text-ink3">line {r.line}</span>
+              <span className="w-12 shrink-0 font-mono text-ink2">line {r.line}</span>
               {r.label && <span className="w-24 shrink-0 truncate font-mono text-ink2">{r.label}</span>}
               <span className="text-rose-700">{r.reason}</span>
             </li>

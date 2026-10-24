@@ -4,7 +4,7 @@
 // and the Orbyte platform pieces it reuses.
 import type { ComponentType, ReactNode } from "react";
 import { ArrowRight, Contact, FileSpreadsheet, Landmark, Lock, MessageCircle, ShieldCheck, Webhook } from "lucide-react";
-import { Badge, Button, Card, CardHeader, PageTitle } from "@/components/ui";
+import { Badge, Button, Card, CardHeader, PageTitle, cx, tbl } from "@/components/ui";
 import { BalanceEntry } from "@/components/connect/balance-entry";
 import { BankImport } from "@/components/connect/bank-import";
 import { InvoiceImport } from "@/components/connect/invoice-import";
@@ -129,7 +129,7 @@ export default function ConnectPage() {
         </SourceCard>
       </div>
 
-      <h2 className="mb-3 mt-8 text-sm font-semibold text-slate-900">Import data</h2>
+      <h2 className="mb-3 mt-8 text-[15px] font-semibold tracking-[-0.01em] text-ink">Import data</h2>
       <div className="space-y-4">
         <InvoiceImport />
         {/* FR-A4 / FR-B5: the Clerk never sees the balance form or its value. */}
@@ -147,7 +147,7 @@ export default function ConnectPage() {
         )}
       </div>
 
-      <h2 className="mb-3 mt-8 text-sm font-semibold text-slate-900">Reused from Orbyte</h2>
+      <h2 className="mb-3 mt-8 text-[15px] font-semibold tracking-[-0.01em] text-ink">Reused from Orbyte</h2>
       <div className="grid grid-cols-3 gap-4">
         <ReuseCard title="Roles" source="Orbyte org structure">
           Kutip&apos;s permissions follow the hub roles: {s.users.map((u) => `${u.name} (${u.role === "owner" ? "Owner" : "Clerk"})`).join(", ")}. The
@@ -190,26 +190,28 @@ export default function ConnectPage() {
               </Badge>
             }
           />
-          <div className="px-4 py-3">
-            <table className="w-full text-left text-sm">
+          <div className={tbl.wrap}>
+            <table className={tbl.table}>
               <tbody>
                 {ENDPOINTS.map(([method, path, what]) => (
-                  <tr key={path} className="border-b border-slate-100 last:border-0">
-                    <td className="w-14 py-1.5 align-top">
+                  <tr key={path} className={tbl.row}>
+                    <td className={cx(tbl.td, "w-14")}>
                       <span className={method === "GET" ? "font-mono text-[11px] font-semibold text-sky-700" : "font-mono text-[11px] font-semibold text-emerald-700"}>
                         {method}
                       </span>
                     </td>
-                    <td className="py-1.5 pr-3 align-top font-mono text-xs text-slate-800">{path}</td>
-                    <td className="py-1.5 align-top text-xs text-slate-500">{what}</td>
+                    <td className={cx(tbl.td, "font-mono text-xs text-ink")}>{path}</td>
+                    <td className={cx(tbl.td, "text-xs text-ink2")}>{what}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            <div className="mt-3 text-[11px] font-semibold uppercase tracking-wide text-slate-400">Webhooks</div>
+          </div>
+          <div className="border-t border-hairline px-4 py-3">
+            <div className="eyebrow">Webhooks</div>
             <div className="mt-1.5 flex flex-wrap gap-1.5">
               {WEBHOOKS.map((w) => (
-                <code key={w} className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[11px] text-slate-700 ring-1 ring-inset ring-slate-200">
+                <code key={w} className="inline-flex h-5 items-center rounded-[2px] border border-line bg-canvas px-1.5 font-mono text-[11px] text-ink">
                   {w}
                 </code>
               ))}
@@ -228,10 +230,10 @@ export default function ConnectPage() {
               </Badge>
             }
           />
-          <ul className="space-y-2 px-4 py-3 text-xs leading-relaxed text-slate-600">
+          <ul className="space-y-2 px-4 py-3 text-xs leading-relaxed text-ink2">
             {PDPA.map((p) => (
               <li key={p} className="flex gap-2">
-                <Lock className="mt-0.5 h-3 w-3 shrink-0 text-slate-400" aria-hidden />
+                <Lock className="mt-0.5 h-3 w-3 shrink-0 text-ink3" aria-hidden />
                 <span>{p}</span>
               </li>
             ))}
@@ -259,28 +261,28 @@ function SourceCard({
 }) {
   return (
     <Card>
-      <div className="flex items-start gap-3 border-b border-slate-200/80 px-4 py-3">
-        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-md bg-slate-100 text-slate-600">
+      <div className="flex items-start gap-3 border-b border-hairline px-4 py-3">
+        <div className="grid h-9 w-9 shrink-0 place-items-center border border-line bg-canvas text-navy">
           <IconCmp className="h-4.5 w-4.5" />
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold text-slate-900">{title}</span>
+            <span className="text-sm font-semibold text-ink">{title}</span>
             <Badge tone="amber">simulated</Badge>
           </div>
-          <div className="text-xs text-slate-500">{via}</div>
+          <div className="text-xs text-ink2">{via}</div>
         </div>
         <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-700">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
+          <span className="h-1.5 w-1.5 bg-emerald-500" aria-hidden />
           connected
         </span>
       </div>
       <div className="px-4 py-3">
-        <div className="mb-3 text-xs text-slate-600">
-          <span className="font-medium text-slate-700">Provides:</span> {provides}
+        <div className="mb-3 text-xs text-ink2">
+          <span className="font-medium text-ink">Provides:</span> {provides}
         </div>
         <div className="grid grid-cols-3 gap-3">{children}</div>
-        <div className="mt-3 border-t border-slate-100 pt-2 text-[11px] text-slate-500">{last}</div>
+        <div className="mt-3 border-t border-hairline pt-2 font-mono text-[11px] text-ink2">{last}</div>
       </div>
     </Card>
   );
@@ -289,11 +291,11 @@ function SourceCard({
 function Stat({ label, value, hint }: { label: string; value: ReactNode; hint?: string }) {
   return (
     <div className="min-w-0">
-      <div className="text-[11px] text-slate-500">{label}</div>
-      <div className="text-sm font-semibold break-words text-slate-900" title={typeof value === "string" ? value : undefined}>
+      <div className="font-mono text-[11px] text-ink2">{label}</div>
+      <div className={cx("text-sm font-semibold break-words text-ink", typeof value === "number" && "num")} title={typeof value === "string" ? value : undefined}>
         {value}
       </div>
-      {hint && <div className="text-[10px] text-slate-400">{hint}</div>}
+      {hint && <div className="text-[11px] text-ink2">{hint}</div>}
     </div>
   );
 }
@@ -302,7 +304,7 @@ function ReuseCard({ title, source, children, action }: { title: string; source:
   return (
     <Card className="flex flex-col">
       <CardHeader kicker={source} title={title} />
-      <div className="flex-1 px-4 py-3 text-xs leading-relaxed text-slate-600">{children}</div>
+      <div className="flex-1 px-4 py-3 text-xs leading-relaxed text-ink2">{children}</div>
       {action && <div className="px-4 pb-3">{action}</div>}
     </Card>
   );

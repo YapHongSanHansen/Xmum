@@ -70,7 +70,7 @@ export function InvoiceImport() {
               >
                 {preview.rows.map((r) => (
                   <tr key={r.line} className={rowCls}>
-                    <td className={`${cellCls} font-mono text-ink3`}>{r.line}</td>
+                    <td className={`${cellCls} font-mono text-ink2`}>{r.line}</td>
                     <td className={`${cellCls} font-mono text-ink`}>{r.number}</td>
                     <td className={`${cellCls} text-ink`}>{r.customerName}</td>
                     <td className={numCls}>{fmtRM(r.amount, { cents: true })}</td>
@@ -90,7 +90,7 @@ export function InvoiceImport() {
                 <Upload className="h-4 w-4" aria-hidden />
                 Import {n} invoice{n === 1 ? "" : "s"}
               </Button>
-              <span className="text-[11px] text-ink3">
+              <span className="text-[11px] text-ink2">
                 Invalid rows are listed and left out. Nothing is marked paid by an import <RuleTag id="M1" />
               </span>
             </div>

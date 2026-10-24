@@ -50,7 +50,7 @@ function OpenHandoffs({ state, open, onOpen }: { state: State; open: Handoff[]; 
           </span>
         }
         title={`Needs a human · ${open.length}`}
-        right={<span className="text-[11px] text-slate-500">Bukti never guesses: one question each</span>}
+        right={<span className="font-mono text-[11px] text-ink2">Bukti never guesses: one question each</span>}
       />
       <div className="grid gap-3 p-3 lg:grid-cols-2">
         {open.map((h) => (
@@ -69,15 +69,15 @@ export function HandoffCard({ state, h, onOpen }: { state: State; h: Handoff; on
   const resolve = (option: string) => dispatch({ type: "RESOLVE_HANDOFF", handoffId: h.id, option });
 
   return (
-    <div className="rounded-lg border border-amber-200 bg-white p-3 shadow-sm">
+    <div className="border border-amber-200 bg-surface p-3">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-1.5">
             <Badge tone="amber">{KIND_LABEL[h.kind]}</Badge>
-            {inv && <Badge>{inv.number}</Badge>}
-            <span className="text-[11px] text-slate-500">{h.id}</span>
+            {inv && <Badge className="num">{inv.number}</Badge>}
+            <span className="num text-[11px] text-ink2">{h.id}</span>
           </div>
-          <div className="mt-1 truncate text-xs text-slate-600">
+          <div className="mt-1 truncate text-xs text-ink2">
             {c.name} · {timeOf(msg.receivedAt)}
           </div>
         </div>
@@ -87,8 +87,8 @@ export function HandoffCard({ state, h, onOpen }: { state: State; h: Handoff; on
           </Button>
         )}
       </div>
-      <p className="mt-2 rounded bg-slate-50 px-2 py-1 text-xs italic text-slate-600">“{msg.text}”</p>
-      <div className="mt-2 flex items-start gap-1.5 text-sm font-semibold text-slate-900">
+      <p className="mt-2 border-l-2 border-l-line-strong bg-canvas px-2 py-1 text-xs italic text-ink2">“{msg.text}”</p>
+      <div className="mt-2 flex items-start gap-1.5 text-sm font-semibold text-ink">
         <HelpCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
         <span>{h.question}</span>
       </div>
@@ -110,11 +110,11 @@ function PromiseDateForm({ h, onConfirm }: { h: Handoff; onConfirm: (option: str
   return (
     <div className="mt-3">
       {h.options.length === 0 && (
-        <label className="flex items-center gap-2 text-sm text-slate-700">
+        <label className="flex items-center gap-2 text-sm text-ink">
           Promised date
           <input
             type="date"
-            className="rounded-md border border-slate-300 px-2 py-1 text-sm"
+            className="h-7 rounded-[2px] border border-line-strong bg-surface px-1.5 font-mono text-xs text-ink"
             onChange={(e) => setPicked(e.target.value || null)}
           />
         </label>
@@ -124,11 +124,11 @@ function PromiseDateForm({ h, onConfirm }: { h: Handoff; onConfirm: (option: str
           <label
             key={d}
             className={cx(
-              "flex cursor-pointer items-center gap-2 rounded-md border px-3 py-1.5 text-sm",
-              picked === d ? "border-emerald-500 bg-emerald-50 text-emerald-900" : "border-slate-300 bg-white text-slate-800 hover:bg-slate-50",
+              "flex h-[30px] cursor-pointer items-center gap-2 rounded-[2px] border px-3 text-[13px]",
+              picked === d ? "border-navy bg-navy-soft text-navy" : "border-line-strong bg-surface text-ink hover:bg-canvas",
             )}
           >
-            <input type="radio" name={`h-${h.id}`} value={d} checked={picked === d} onChange={() => setPicked(d)} className="accent-emerald-600" />
+            <input type="radio" name={`h-${h.id}`} value={d} checked={picked === d} onChange={() => setPicked(d)} className="accent-navy" />
             {dayLabel(d)}
           </label>
         ))}
@@ -137,7 +137,7 @@ function PromiseDateForm({ h, onConfirm }: { h: Handoff; onConfirm: (option: str
         <Button size="sm" disabled={!picked} onClick={() => picked && onConfirm(picked)}>
           Confirm
         </Button>
-        <span className="text-[11px] text-slate-500">
+        <span className="text-[11px] text-ink2">
           Confirming pauses reminders until the day after (<RuleTag id="M5" />)
         </span>
       </div>
@@ -156,19 +156,19 @@ function WaitingClaims({ state, invoices, onOpen }: { state: State; invoices: In
           </span>
         }
         title={`Says paid, not in the bank · ${invoices.length}`}
-        right={<span className="text-[11px] text-slate-500">Never marked paid without a matching bank line</span>}
+        right={<span className="font-mono text-[11px] text-ink2">Never marked paid without a matching bank line</span>}
       />
       <ul className="divide-y divide-hairline">
         {invoices.map((inv) => {
           const msg = state.messages.find((m) => m.id === inv.openClaimMessageId)!;
           const asked = state.handoffs.find((h) => h.messageId === msg.id && h.kind === "claim_unverified" && h.resolved === "send_reply");
           return (
-            <li key={inv.id} className="flex flex-wrap items-center gap-3 px-4 py-3 text-sm">
-              <Badge>{inv.number}</Badge>
+            <li key={inv.id} className="flex min-h-[38px] flex-wrap items-center gap-3 px-4 py-3 text-sm">
+              <Badge className="num">{inv.number}</Badge>
               <div className="min-w-0 flex-1">
-                <div className="truncate text-slate-900">{customerOf(state, inv.customerId).name}</div>
-                <div className="text-xs text-slate-500">
-                  Said paid {fmtDateTime(msg.receivedAt)}
+                <div className="truncate text-ink">{customerOf(state, inv.customerId).name}</div>
+                <div className="text-xs text-ink2">
+                  Said paid <span className="num">{fmtDateTime(msg.receivedAt)}</span>
                   {asked ? ` · slip requested by ${asked.resolvedBy}` : ""} · reminders paused until the bank shows it or the Owner rejects the claim
                 </div>
               </div>
@@ -205,7 +205,7 @@ function ClaimUnverifiedForm({ state, h, onResolve }: { state: State; h: Handoff
   const isOwner = state.role === "owner";
   return (
     <div className="mt-3 space-y-2">
-      <div className="text-[11px] text-slate-500">
+      <div className="text-[11px] text-ink2">
         <RuleTag id="M1" /> Not marked paid. Draft reply for approval:
       </div>
       {h.draftReply && (
@@ -231,7 +231,7 @@ function ClaimUnverifiedForm({ state, h, onResolve }: { state: State; h: Handoff
         {h.invoiceId && <RejectClaimButton isOwner={isOwner} invoiceId={h.invoiceId} />}
       </div>
       {!isOwner && (
-        <p className="text-[11px] text-slate-500">
+        <p className="text-[11px] text-ink2">
           Mark paid anyway and Reject claim are Owner only: one changes what the customer owes with no bank line, the other ends the pause on reminders.
         </p>
       )}

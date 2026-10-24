@@ -67,7 +67,7 @@ export function BalanceEntry() {
           </div>
           {bad && <div className="text-[11px] text-rose-700">Enter an amount of zero or more, like 12,000.00.</div>}
           {saved && <div className="text-[11px] text-emerald-700">Saved and logged with your name. The cash meters on Today use it now.</div>}
-          <p className="text-[11px] text-ink3">
+          <p className="text-[11px] text-ink2">
             Cash = this balance + receipts a person approves after it <RuleTag id="F1" />. The Clerk never sees this figure, only &ldquo;gap: yes/no&rdquo;.
           </p>
         </form>
