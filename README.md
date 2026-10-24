@@ -4,7 +4,9 @@ Team repo for the XMUM hackathon, **Domain 2: Orbyte Smart SME Challenge — Les
 
 ## Current idea: Kutip + Bukti
 
-Small Malaysian B2B businesses sell on credit, get paid 60-90 days late, and still have to pay salary on the 31st. **Kutip** tells the owner who to chase first to make payroll. **Bukti** reads customers' "dah bank in boss" replies and payment slips and checks the bank statement before marking anything paid.
+Small Malaysian B2B businesses sell on credit, get paid 60-90 days late, and still have to pay salary on the 31st. A customer can always choose not to pay, so the product focuses on what the owner controls: **never be surprised on payroll day, and stop giving credit to customers who don't pay.**
+
+**Kutip** warns the owner 10+ days before a payroll shortfall, stops new credit orders from customers who already pay late until the owner decides, and ranks who to chase first. **Bukti** reads customers' "dah bank in boss" replies and payment slips and checks the bank statement before marking anything paid.
 
 Status: idea brief, not yet a build spec. See the open decisions at the end of the idea brief.
 

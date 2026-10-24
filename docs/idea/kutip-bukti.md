@@ -2,6 +2,8 @@
 
 **Status:** idea brief from brainstorming on 25 Oct 2026. This is the team's current pick for Domain 2, but it is **not yet a build spec**. The open decisions at the end need answers before planning the build.
 
+> **Update (v2, 25 Oct 2026): reframed around what the owner controls.** A customer can always choose not to pay, and no source shows that reminders make customers pay faster. So the product no longer promises "chase them and they pay". It promises: **never be surprised on payroll day, and stop giving credit to customers who don't pay.** Changes in v2: new section 2a (what the owner can and cannot control); early warning (new rule R6) and the credit check (R4) are now headline features; two new example screens (Step 1b, Step 2b); pitch line, positioning, benefits, risks and demo steps updated. Reminders remain, but as the delivery channel, not the promise.
+
 **Working names:** *Kutip* ("collect") is the product. *Bukti* ("proof") is its AI reader.
 
 **Read with:** the brief in `../domain-2/brief.md` (text) or `../domain-2/Domain-2-brief.pdf` (source of truth), the evidence in `../research/01-pain-research-shortlist.md`, and the competitor scan in `../research/02-competitor-scan.md`.
@@ -17,14 +19,29 @@ So every month the owner chases customers by hand on WhatsApp ("boss, can pay al
 1. **"Who should I chase first?"** The owner has many unpaid invoices and chases randomly or from memory. Salary day arrives and there is not enough cash.
 2. **"Did this customer really pay?"** The customer says "dah bank in boss" and sends a screenshot. The clerk opens the bank app, finds the money and matches it to the right invoice by hand. Sometimes the shop chases a customer who already paid, which is embarrassing. Sometimes a screenshot is wrong and nobody notices.
 
+**Chasing alone does not solve it.** A customer can always choose not to pay, and a nicer reminder will not change that. The real damage comes from two things the owner *can* change: being **surprised** on payroll day, and **continuing to give credit** to customers who are already paying late.
+
 ## 2. The idea
 
 | Part | Job | Uses AI? |
 |---|---|---|
-| **Kutip** | Every morning, compare cash in the bank plus expected receipts with the bills due soon (payroll, rent, supplier). If there is a gap, rank overdue invoices by how much each one closes it, and prepare WhatsApp reminders in the customer's language. A clerk sends gentle ones; firm ones need the owner's approval. | No, rules only, so every decision can be explained in one line |
-| **Bukti** | Read customer replies and payment-slip screenshots (Manglish, BM, Chinese), extract amount, invoice, reference and promised date, then check the bank statement. An invoice is marked paid **only if a matching bank line exists**. Unclear items go to a human. | Yes, for reading only. Rules decide everything about money |
+| **Kutip** | Every morning, compare cash in the bank plus expected receipts with the bills due soon (payroll, rent, supplier). (1) **Early warning:** if a shortfall is coming, tell the owner 10+ days ahead and list the options they control. (2) **Credit check:** when a customer who is already 30+ days late orders again, ask the owner before goods leave on credit. (3) **Chase plan:** rank overdue invoices by how much each one closes the gap, and prepare WhatsApp reminders in the customer's language. A clerk sends gentle ones; firm ones need the owner's approval. | No, rules only, so every decision can be explained in one line |
+| **Bukti** | Read customer replies and payment-slip screenshots (Manglish, BM, Chinese), extract amount, invoice, reference and promised date, then check the bank statement. An invoice is marked paid **only if a matching bank line exists**, so the cash-gap number stays true. Unclear items go to a human. | Yes, for reading only. Rules decide everything about money |
 
-**Pitch line:** *"Tells you who to chase to make payroll, and proves the money really arrived."* Do not pitch it as "WhatsApp payment reminders"; that already exists (see section 9).
+**Pitch line:** *"Never be surprised on payroll day, and stop giving credit to customers who don't pay."* Supporting line: *"Kutip tells you who to chase first, and Bukti proves the money really arrived."* Do not pitch it as "WhatsApp payment reminders"; that already exists (see section 9).
+
+## 2a. What the owner can and cannot control
+
+| The owner **cannot** control | The owner **can** control | Kutip feature |
+|---|---|---|
+| Whether a customer pays | Whether to keep giving that customer goods on credit | **Credit check (R4)** |
+| When the customer's accounts team runs payments | Knowing early that payroll will be short, while there is still time to act | **Early warning (R6)** |
+| | Which customers to spend limited chasing time on | **Chase plan (R1-R3)** |
+| | Keeping records correct, so nobody chases a customer who already paid | **Bukti (M1-M5)** |
+
+Every promise in the pitch is in the right-hand column, so the product still delivers value when a customer never pays.
+
+Some late payers are not refusing: they forgot, lost the invoice, or pay on a fixed day such as the 25th. A reminder at the right time with the statement attached may help them. That is a reasonable guess but it is **not proven**, so it should not lead the pitch.
 
 ## 3. Who it is for
 
@@ -81,6 +98,27 @@ So every month the owner chases customers by hand on WhatsApp ("boss, can pay al
 
 Every row shows the rule that produced it. The clerk sees the same list but only "gap: yes", without bank or payroll amounts. At 08:47 she approves the gentle reminders; a wa.me link opens WhatsApp with the text prefilled and she presses send.
 
+**Step 1b, 08:00: early warning (owner only).** Even if nobody pays, the owner now has 11 days to act.
+
+```text
+┌────────────────────────────────────────────────────────────────────┐
+│ EARLY WARNING · payroll 31 Oct                   Owner only        │
+├────────────────────────────────────────────────────────────────────┤
+│ Short RM2,000 in 11 days, if nobody else pays                      │
+│ Chase plan sent: Kafe Dua Beradik RM3,180 (usually pays fast)      │
+├────────────────────────────────────────────────────────────────────┤
+│ YOUR OPTIONS (pick any, all logged)                                │
+│ [ ] Ask a regular customer to pay early                            │
+│ [ ] Ask paper supplier to move 5 Nov bill to 15 Nov                │
+│ [ ] Hold new credit for customers 30+ days late                    │
+│ [ ] Note: talk to my bank myself                                   │
+├────────────────────────────────────────────────────────────────────┤
+│ Kutip lists options only. It does not recommend a lender.          │
+└────────────────────────────────────────────────────────────────────┘
+```
+
+The options are a neutral checklist of the owner's own business levers. Kutip recommends no lender or financial product (the brief rules out financial advice).
+
 **Step 2, 09:15: the owner approves the firm reminder.**
 
 ```text
@@ -99,6 +137,24 @@ Every row shows the rule that produced it. The clerk sees the same list but only
 │ [ Approve & open WhatsApp ]  [ Edit ]  [ Snooze ]  [ I'll call ]   │
 └────────────────────────────────────────────────────────────────────┘
 ```
+
+**Step 2b, Wed 21 Oct 10:20: a late payer orders again (credit check, R4).** Hock Lee asks on WhatsApp for 300 more boxes on credit. When Aisyah enters the order (or the invoice draft arrives through Connect), Kutip stops it for the owner before any goods leave.
+
+```text
+┌────────────────────────────────────────────────────────────────────┐
+│ CREDIT CHECK · new order · Hock Lee Catering      Owner only       │
+├────────────────────────────────────────────────────────────────────┤
+│ New order: 300 food boxes · RM2,850 · on 60-day credit             │
+│ Already owes: INV-0398 RM4,750 · 42 days late                      │
+│ Promised (20 Oct reply): pay on Fri 30 Oct                         │
+│ Total owed if accepted: RM7,600                                    │
+├────────────────────────────────────────────────────────────────────┤
+│ [ Accept on credit ]  [ Ask 50% deposit ]  [ Cash on delivery ]    │
+│ [ Call first ]                                 rule R4             │
+└────────────────────────────────────────────────────────────────────┘
+```
+
+The owner cannot make Hock Lee pay the old invoice, but can stop the amount owed growing. Mei Ling asks for a 50% deposit.
 
 **Step 3, Fri 23 Oct 14:30: a customer says "dah bank in" (Bukti).**
 
@@ -162,11 +218,14 @@ The AI only reads. Rule M1 decides: the invoice is marked paid only if a matchin
 │ ACTIVITY LOG                                    append-only        │
 ├────────────────────────────────────────────────────────────────────┤
 │ 20 Oct 08:00  SYSTEM  scan: 4 overdue, payroll gap RM2,000         │
-│ 20 Oct 08:00  R2      skipped INV-0405: promise 30 Oct             │
+│ 20 Oct 08:00  R6      early warning: payroll 31 Oct short          │
+│ 20 Oct 08:05  Mei Ling chose: ask supplier to move 5 Nov bill      │
 │ 20 Oct 08:47  Aisyah  approved gentle reminder INV-0412, sent      │
 │ 20 Oct 09:15  Mei Ling approved FIRM reminder INV-0398, sent       │
 │ 20 Oct 11:02  AI      Hock Lee: promise, date unclear (64%)        │
-│ 20 Oct 11:10  Aisyah  confirmed promise date 30 Oct                │
+│ 20 Oct 11:10  Aisyah  confirmed Hock Lee promise date 30 Oct       │
+│ 21 Oct 10:20  R4      credit check: Hock Lee new order RM2,850     │
+│ 21 Oct 10:26  Mei Ling chose: ask 50% deposit                      │
 │ 23 Oct 14:30  AI      Kafe Dua Beradik: RM3,180, INV-0412 (98%)    │
 │ 23 Oct 14:30  M1      bank line matched 23/10 DUITNOW CR 3,180     │
 │ 23 Oct 14:41  Aisyah  approved INV-0412 → PAID                     │
@@ -177,9 +236,11 @@ The AI only reads. Rule M1 decides: the invoice is marked paid only if a matchin
 Summary of the journey:
 
 ```text
-Orbyte Connect / CSV ─▶ 08:00 cash scan ─▶ chase plan (rules) ─▶ clerk/owner approve
-  ─▶ wa.me send ─▶ reply + slip arrive ─▶ Bukti AI read ─▶ bank-line check (M1)
-  ─▶ clerk approves ─▶ meter + activity log
+Orbyte Connect / CSV ─▶ 08:00 cash scan ─▶ early warning (R6) + chase plan (R1-R3)
+  ─▶ clerk/owner approve ─▶ wa.me send ─▶ reply + slip arrive ─▶ Bukti AI read
+  ─▶ bank-line check (M1) ─▶ clerk approves ─▶ meter + activity log
+
+New credit order from a late payer ─▶ credit check (R4) ─▶ owner decides ─▶ log
 ```
 
 ## 6. Rules
@@ -193,8 +254,9 @@ These rules came out of the idea stage and are a starting point, not final.
 | R1 Tier | D-3 courtesy, D+1 nudge, D+14 firm with statement attached, D+30 (or a firm reminder unanswered for 7 days) becomes an owner-only escalation card with no automatic message |
 | R2 Suppress | Skip if the invoice is disputed, a promised date has not passed, a payment was logged in the last 2 days, it is quiet hours (before 9am or after 8pm), or the customer was messaged in the last 5 days |
 | R3 Priority | Expected cash before the next shortfall date = amount × the customer's own historical rate of paying within N days at this tier (default 50% for new customers). Pick the smallest set that covers the gap |
-| R4 Credit hold | A new credit order from a customer with an invoice 30+ days overdue raises an owner card: accept on credit / ask for cash on delivery / call first |
+| **R4 Credit check** (headline) | A new credit order or invoice draft for a customer with an invoice 30+ days overdue raises an owner card before goods leave: accept on credit / ask a deposit / cash on delivery / call first. The card shows what is already owed, any promise, and the total owed if accepted |
 | R5 Templates | Language and template come from the customer profile. Fixed templates per tier per language, merge fields only. AI never writes messages to customers |
+| **R6 Early warning** (headline) | When forecast cash (bank balance + expected receipts from on-time payers) falls short of a known outflow within 14 days, raise an owner card at least 10 days ahead with a neutral checklist of the owner's own levers. It never recommends a lender or financial product |
 
 **Bukti (proof)**
 
@@ -245,7 +307,9 @@ Full scan: `../research/02-competitor-scan.md`. Short version: **it mostly exist
 3. Manglish / BM / Chinese named and tested.
 4. A price under RM65/month: every WhatsApp + AI tool found costs about RM300+/month or is quote-only.
 
-**Positioning slide:** "Paidnice and Peakflo prove businesses pay for AI collections. They serve Xero users and bigger firms at RM300+/month. Kutip brings it to the Malaysian micro seller inside Orbyte: it ranks who to chase to make payroll, reads 'dah bank in boss', and checks the bank before marking anything paid."
+**Positioning slide:** "Paidnice and Peakflo prove businesses pay for AI collections. They serve Xero users and bigger firms at RM300+/month, and they are built around chasing. Kutip is built around what the owner controls: it warns before payroll day, stops new credit to late payers, ranks who to chase, reads 'dah bank in boss', and checks the bank before marking anything paid."
+
+**Honest note on the credit check:** credit blocks already exist in SQL Account (blocks new delivery orders and invoices for overdue customers) and AutoCount (approval over a credit limit), for firms that use them. Kutip's version is aimed at sellers whose orders arrive on WhatsApp and who do not run those systems, and it ties the decision to the live cash gap. Present it as part of the whole, not as a world first.
 
 ## 10. How it meets the Domain 2 requirements
 
@@ -253,10 +317,10 @@ Full scan: `../research/02-competitor-scan.md`. Short version: **it mostly exist
 
 | Must-have | How Kutip + Bukti covers it |
 |---|---|
-| 1. One clear SME problem | Customers pay late, cash runs short for payroll, and the owner chases by hand on WhatsApp |
-| 2. Core automated journey | Scan → invoices + history → rank → approve → reply read → bank check → meter + log |
+| 1. One clear SME problem | Customers pay late, the owner finds out on payroll day that cash is short, keeps giving credit to the same late payers, and chases by hand on WhatsApp |
+| 2. Core automated journey | Scan → invoices + history → early warning + chase plan → approve → reply read → bank check → meter + log; plus the credit check when a late payer orders again |
 | 3. Accuracy and ease of learning | A rule ID on every decision; nothing marked PAID without a bank line; exact words shown for every AI field; red/green meter a clerk learns in minutes |
-| 4. People stay in control | 4 roles; approvals for firm reminders, payment matches and deductions; append-only activity log |
+| 4. People stay in control | 4 roles; owner decides every credit check and early-warning action; approvals for firm reminders, payment matches and deductions; append-only activity log |
 | 5. Orbyte fit and reuse | Reuses Orbyte's clients records, roles, review-and-approval flows and audit trail; reads invoices through Orbyte Connect from accounting partners; sector packs (printing, catering, transport, wholesale); a small API (section 13) |
 | 6. Business benefit and SDG | Cash freed, zero invoices without a next step, zero paid customers chased; SDG 8.3 (MSME cash flow) and 8.2 (productivity), SDG 9 (digital tools for small firms) |
 
@@ -311,7 +375,8 @@ Full scan: `../research/02-competitor-scan.md`. Short version: **it mostly exist
 - `POST /receivables/approvals`: approve, edit, snooze or skip a reminder
 - `POST /proofs`: image and/or text in, extraction plus match proposal out
 - `POST /proofs/{id}/decision`: record the human decision
-- Webhooks: `invoice.overdue`, `gap.detected`, `chase.approved`, `proof.verified`, `shortpay.detected`, `promise.due`
+- `POST /receivables/credit-checks`: a new credit order or invoice draft in, an owner decision card out
+- Webhooks: `invoice.overdue`, `gap.detected`, `gap.warning`, `credit.check_raised`, `chase.approved`, `proof.verified`, `shortpay.detected`, `promise.due`
 
 ## 14. Measurable benefit (all estimates, to validate with owners)
 
@@ -319,13 +384,15 @@ Full scan: `../research/02-competitor-scan.md`. Short version: **it mostly exist
 |---|---|
 | Cash freed | On RM45,000/month of credit sales (synthetic), each day of faster collection frees about RM1,500 once; 5-7 days faster would free about RM7,500-10,500 once. Unproven: no source shows reminders shorten collection |
 | Clerk time | About 10 hours/month saved at roughly 120 slips/month (assumption) |
-| Measurable from day one | Overdue invoices with no next action: 0. First reminder sent the day after the due date. Payroll shortfall warned 10+ days ahead. Customers chased after already paying: 0. Field accuracy on a test set (target 95%+ on amount) |
+| Measurable from day one (these hold even if no customer pays faster) | Payroll shortfalls warned 10+ days ahead: 100%. New credit orders from customers 30+ days late that reached the owner before goods left: 100%. Overdue invoices with no next action: 0. First reminder sent the day after the due date. Customers chased after already paying: 0. Field accuracy on a test set (target 95%+ on amount) |
+| Exposure avoided | Credit not extended to late payers, in RM (in the example, RM2,850 moved to a 50% deposit). Measured per month in validation, not claimed in advance |
 
 ## 15. Risks and fallbacks
 
 | Risk | Fallback |
 |---|---|
-| No proof that reminders make customers pay faster | Lead with the cash-gap ranking, credit hold and visibility, not "reminders". Interview 3-5 owners |
+| A customer can always choose not to pay, and there is no proof that reminders make customers pay faster | The v2 reframe: the promise rests on early warning (R6) and the credit check (R4), which work even when a customer never pays. Reminders are the delivery channel, not the promise. Interview 3-5 owners |
+| Owners may override the credit check to keep a customer relationship | That is their right; the card records the decision and the total owed, so the risk is a conscious choice, not a surprise |
 | Customers may not send slips (they pay by DuitNow QR or payment link instead) | Validate first with 5-10 sellers. If slips are rare, Bukti shrinks to reading replies and promises |
 | WhatsApp Business Platform needs Meta verification, template approval and per-message fees; group chats likely cannot be read | wa.me click-to-send (owner presses send, which also strengthens human control); clerk forwards slips; the demo uses a simulated inbox |
 | AI misreads a slip | M1 (no PAID without a bank line), M4 (unsure fields go to a human), a cached extraction for the live demo |
@@ -337,14 +404,15 @@ Full scan: `../research/02-competitor-scan.md`. Short version: **it mostly exist
 
 The brief needs the single most important feature working live and backed by the GitHub repo.
 
-1. Load the CSV (about 15 invoices + 3 outflows) and press **Run 08:00 scan**. The meter shows "Short RM2,000 for payroll 31 Oct".
-2. The ranked list appears with a reason on every row. Tadika is greyed out ("promise 30 Oct").
+1. Load the CSV (about 15 invoices + 3 outflows) and press **Run 08:00 scan**. The early-warning card shows "Short RM2,000 for payroll in 11 days" with the owner's options.
+2. The ranked chase list appears with a reason on every row. Tadika is greyed out ("promise 30 Oct").
 3. Switch role to Owner and approve the firm Chinese reminder. WhatsApp opens with the text prefilled, or the send is simulated.
-4. A reply plus a slip arrive in the simulated inbox. A **live** AI call highlights the extracted fields with their exact words.
-5. The bank line matches, the clerk approves, and the meter turns green.
-6. Show the activity log: who, when and which rule.
+4. As the clerk, enter a new credit order from Hock Lee. The **credit check** card stops it for the owner, who picks "Ask 50% deposit".
+5. A reply plus a slip arrive in the simulated inbox. A **live** AI call highlights the extracted fields with their exact words.
+6. The bank line matches, the clerk approves, and the meter turns green.
+7. Show the activity log: who, when and which rule.
 
-**Build order:** (1) Kutip core, all rules and deterministic, must work live; (2) Bukti reading one reply and slip, with a cached result as fallback; (3) roadmap slide: credit hold, bank feeds, sector packs, and other modules on the same engine.
+**Build order:** (1) Kutip core: cash scan, early warning, credit check and chase plan, all rules and deterministic, must work live; (2) Bukti reading one reply and slip, with a cached result as fallback; (3) roadmap slide: bank feeds, Bukti reading order messages to trigger the credit check automatically, sector packs, and other modules on the same engine.
 
 **Test set to build:** 30-50 synthetic Manglish/BM/Chinese replies ("dah bank in boss", "bayar separuh dulu", "下礼拜五才过数") with expected fields, to show accuracy against Peakflo's generic "40+ languages".
 
@@ -357,6 +425,8 @@ The brief needs the single most important feature working live and backed by the
 5. Which LLM for slip reading, and where it is hosted (PDPA cross-border point).
 6. Sponsor company name (Alpha Red Pro vs Solutions): confirm on Discord.
 7. Final product name.
+8. How does a new order reach the credit check? Options: the clerk enters it, an invoice draft arrives through Connect, or (roadmap) Bukti reads order messages on WhatsApp. The demo assumes the clerk enters it.
+9. What counts as "late" for the credit check: 30+ days overdue by default, or set per business?
 
 ## 18. Other ideas considered
 
