@@ -1,4 +1,4 @@
-// Small derived counts the hub frame shows (sidebar badges, guide ticks).
+// Small derived counts the app frame shows (navigation badges, guide ticks).
 import type { State } from "@/engine/model";
 
 /** Arrived messages Bukti has not read yet, plus open hand-off questions. */

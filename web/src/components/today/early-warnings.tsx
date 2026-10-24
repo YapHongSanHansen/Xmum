@@ -31,7 +31,7 @@ function WarningCard({ state, w }: { state: State; w: Warning }) {
   const stillShort = now !== undefined && now.forecast < 0;
   const raised = `Raised ${fmtDateTime(w.raisedAt)} at a gap of ${fmtRM(w.gap)} · ${outflow.label} ${fmtRM(outflow.amount)}`;
   return (
-    <Card tone={stillShort ? "warn" : "good"} className="space-y-4 p-5">
+    <Card tone={stillShort ? "warn" : "good"} className="space-y-4 p-6">
       <div className="flex items-start gap-2.5">
         <TriangleAlert className={cx("mt-0.5 h-4 w-4 shrink-0", stillShort ? "text-amber-700" : "text-emerald-700")} aria-hidden />
         <h3 className="text-[15px] font-semibold tracking-[-0.01em] text-ink" title={raised}>
@@ -57,7 +57,7 @@ function WarningCard({ state, w }: { state: State; w: Warning }) {
                 aria-pressed={chosen}
                 onClick={() => dispatch({ type: "CHOOSE_WARNING_OPTION", warningId: w.id, option: opt })}
                 className={cx(
-                  "inline-flex min-h-[32px] items-center gap-1.5 rounded-[2px] border px-2.5 py-1 text-left text-xs transition-colors",
+                  "inline-flex min-h-[38px] items-center gap-1.5 rounded-xl border px-3 py-2 text-left text-xs transition-colors",
                   chosen
                     ? "cursor-default border-emerald-700 bg-emerald-50 font-medium text-emerald-800"
                     : "border-line-strong bg-surface text-ink hover:border-navy hover:bg-canvas",

@@ -3,7 +3,7 @@
 // the CSV imports and owner balance entry (FR-A1, FR-A4, FR-A5), Kutip's
 // illustrative API, and data handling.
 import type { ReactNode } from "react";
-import { ChevronDown, Lock } from "lucide-react";
+import { ChevronDown, Lock, Landmark, MessageCircle, Users, FileSpreadsheet } from "lucide-react";
 import { Badge, Card, CardHeader, PageTitle, cx, tbl } from "@/components/ui";
 import { BalanceEntry } from "@/components/connect/balance-entry";
 import { BankImport } from "@/components/connect/bank-import";
@@ -63,12 +63,15 @@ export default function ConnectPage() {
   const seedImport = `Seed · before ${fmtDateTime(DEMO_START)}`;
 
   return (
-    <div className="mx-auto max-w-[1100px]">
-      <PageTitle title="Connect" />
+    <div className="min-w-0">
+      <PageTitle
+        title="Connect"
+        subtitle="Bring your numbers together. Build a clearer picture."
+        right={<Badge tone="sky">Demo connections</Badge>}
+      />
 
-      <Card>
-        <CardHeader title="Data sources" />
-        <ul className="divide-y divide-hairline">
+      <section aria-label="Data sources">
+        <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <Source
             name="Accounting software"
             provides="Invoices, delivery orders, payroll"
@@ -112,9 +115,9 @@ export default function ConnectPage() {
             }
           />
         </ul>
-      </Card>
+      </section>
 
-      <details className="group mt-8">
+      <details open className="group mt-8">
         <summary className="flex cursor-pointer list-none items-center gap-2 border-b border-line pb-3 text-[15px] font-semibold tracking-[-0.01em] text-ink [&::-webkit-details-marker]:hidden">
           <ChevronDown className="h-4 w-4 -rotate-90 text-ink2 transition-transform group-open:rotate-0" aria-hidden />
           Import data
@@ -137,30 +140,41 @@ export default function ConnectPage() {
         </div>
       </details>
 
-      <Card className="mt-8">
-        <CardHeader title="API" right={<Badge tone="slate">Illustrative · not live</Badge>} />
-        <div className={tbl.wrap}>
-          <table className={cx(tbl.table, "min-w-[520px]")}>
-            <tbody>
-              {ENDPOINTS.map(([method, path, what]) => (
-                <tr key={path} className={tbl.row}>
-                  <td className={cx(tbl.td, "w-16 font-mono text-[11px] font-semibold", method === "GET" ? "text-sky-700" : "text-emerald-700")}>{method}</td>
-                  <td className={cx(tbl.td, "font-mono text-xs text-ink")}>{path}</td>
-                  <td className={cx(tbl.td, "text-xs text-ink2")}>{what}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="flex flex-wrap items-center gap-1.5 border-t border-hairline px-5 py-3">
-          <span className="mr-1 text-xs text-ink2">Webhooks</span>
-          {WEBHOOKS.map((w) => (
-            <code key={w} className="inline-flex h-5 items-center rounded-[2px] border border-line px-1.5 font-mono text-[11px] text-ink">
-              {w}
-            </code>
-          ))}
-        </div>
-      </Card>
+      <details className="group mt-8">
+        <summary className="cursor-pointer text-sm font-medium text-ink2">Integration details · illustrative API</summary>
+        <Card className="mt-4">
+          <CardHeader title="API" right={<Badge tone="slate">Illustrative · not live</Badge>} />
+          <div className={tbl.wrap}>
+            <table className={cx(tbl.table, "min-w-[520px]")}>
+              <tbody>
+                {ENDPOINTS.map(([method, path, what]) => (
+                  <tr key={path} className={tbl.row}>
+                    <td
+                      className={cx(
+                        tbl.td,
+                        "w-16 font-mono text-[11px] font-semibold",
+                        method === "GET" ? "text-sky-700" : "text-emerald-700",
+                      )}
+                    >
+                      {method}
+                    </td>
+                    <td className={cx(tbl.td, "font-mono text-xs text-ink")}>{path}</td>
+                    <td className={cx(tbl.td, "text-xs text-ink2")}>{what}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="flex flex-wrap items-center gap-1.5 border-t border-hairline px-5 py-3">
+            <span className="mr-1 text-xs text-ink2">Webhooks</span>
+            {WEBHOOKS.map((w) => (
+              <code key={w} className="inline-flex h-5 items-center rounded-xl border border-line px-1.5 font-mono text-[11px] text-ink">
+                {w}
+              </code>
+            ))}
+          </div>
+        </Card>
+      </details>
 
       <details className="group mt-6">
         <summary className="flex cursor-pointer list-none items-center gap-2 text-[13px] font-medium text-ink [&::-webkit-details-marker]:hidden">
@@ -181,17 +195,20 @@ export default function ConnectPage() {
 }
 
 function Source({ name, provides, meta, last }: { name: string; provides: string; meta: ReactNode; last: string }) {
+  const Icon =
+    name === "Bank statement" ? Landmark : name === "WhatsApp" ? MessageCircle : name === "Customer records" ? Users : FileSpreadsheet;
   return (
-    <li className="grid gap-x-6 gap-y-1 px-5 py-3.5 sm:grid-cols-[minmax(0,14rem)_minmax(0,1fr)_auto] sm:items-center">
-      <div className="min-w-0">
-        <div className="flex items-center gap-2">
-          <span className="text-[13px] font-semibold text-ink">{name}</span>
-          <Badge tone="amber">Simulated</Badge>
-        </div>
-        <div className="mt-0.5 text-xs text-ink2">{provides}</div>
+    <li className="panel flex flex-col p-6">
+      <div className="mb-6 flex items-center justify-between">
+        <span className="grid h-11 w-11 place-items-center rounded-2xl bg-[#eaf0fb] text-[#3973c8]">
+          <Icon className="h-5 w-5" aria-hidden />
+        </span>
+        <Badge>Simulated</Badge>
       </div>
-      <div className="min-w-0 text-xs tabular-nums text-ink2">{meta}</div>
-      <div className="font-mono text-[11px] text-ink2 sm:text-right">{last}</div>
+      <h2 className="text-lg font-medium tracking-tight">{name}</h2>
+      <p className="mt-1 text-xs text-ink2">{provides}</p>
+      <div className="mt-5 flex-1 text-xs leading-relaxed text-ink2">{meta}</div>
+      <div className="mt-5 border-t border-line pt-4 text-[11px] text-ink2">{last}</div>
     </li>
   );
 }

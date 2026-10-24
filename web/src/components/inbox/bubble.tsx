@@ -1,8 +1,9 @@
 "use client";
 // WhatsApp-style chat pieces: incoming / outgoing bubbles, slip thumbnail and
 // an inline lightbox (no browser dialogs).
+import { useDialog } from "@/lib/use-dialog";
 import Image from "next/image";
-import { useEffect, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { X } from "lucide-react";
 import { cx } from "@/components/ui";
 
@@ -10,7 +11,7 @@ const SLIP_W = 810;
 const SLIP_H = 1500;
 
 export function ChatBackdrop({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cx("rounded-lg bg-[#efeae2] p-3", className)}>{children}</div>;
+  return <div className={cx("rounded-2xl bg-[#edf1f3] p-4", className)}>{children}</div>;
 }
 
 export function ChatBubble({
@@ -28,8 +29,8 @@ export function ChatBubble({
     <div className={cx("flex", outgoing ? "justify-end" : "justify-start")}>
       <div
         className={cx(
-          "relative max-w-[92%] border border-black/5 px-3 py-2 text-[13px] leading-relaxed text-ink",
-          outgoing ? "bg-[#d9fdd3]" : "bg-white",
+          "relative max-w-[92%] rounded-2xl border border-black/5 px-4 py-3 text-[13px] leading-relaxed text-ink",
+          outgoing ? "bg-[#e2f5e7]" : "bg-white",
           className,
         )}
       >
@@ -65,16 +66,12 @@ export function SlipThumb({ src, onOpen, size = "sm" }: { src: string; onOpen?: 
 }
 
 export function SlipLightbox({ src, onClose }: { src: string; onClose: () => void }) {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  const dialogRef = useDialog<HTMLDivElement>(onClose);
 
   return (
     <div
+      ref={dialogRef}
+      tabIndex={-1}
       role="dialog"
       aria-modal="true"
       aria-label="Transfer slip"
@@ -92,7 +89,7 @@ export function SlipLightbox({ src, onClose }: { src: string; onClose: () => voi
         <button
           type="button"
           onClick={onClose}
-          className="absolute -right-3 -top-3 border border-line-strong bg-surface p-1.5 text-ink hover:bg-canvas"
+          className="absolute -right-3 -top-3 rounded-full border border-line-strong bg-surface p-1.5 text-ink hover:bg-canvas"
           aria-label="Close"
         >
           <X className="h-4 w-4" />

@@ -3,7 +3,7 @@
 // one list, with who may act. Acting happens on the page that owns the item.
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { useKutip, type Page } from "@/lib/store";
-import { Badge, Button, Card, CardHeader, Empty, PageTitle, RuleTag } from "@/components/ui";
+import { Badge, Button, Card, CardHeader, Empty, MetricRow, PageTitle, RuleTag } from "@/components/ui";
 import { customerOf, dayOf, fmtDate, fmtRM, invoiceOf, type Role, type State } from "@/engine/model";
 import { chasePlan, forecast } from "@/engine/rules";
 
@@ -48,7 +48,14 @@ function pendingItems(s: State): Pending[] {
       });
     }
     if (r.state === "escalate") {
-      items.push({ key: `esc-${r.invoice.id}`, rule: "R1", type: "Escalation", subject: `${r.invoice.number} · ${r.customer.name}`, who: ["owner"], page: "today" });
+      items.push({
+        key: `esc-${r.invoice.id}`,
+        rule: "R1",
+        type: "Escalation",
+        subject: `${r.invoice.number} · ${r.customer.name}`,
+        who: ["owner"],
+        page: "today",
+      });
     }
   }
   for (const b of s.bookings.filter((x) => x.status === "on_hold")) {
@@ -65,9 +72,25 @@ function pendingItems(s: State): Pending[] {
   for (const r of s.receipts) {
     const inv = invoiceOf(s, r.invoiceId);
     if (r.status === "proposed") {
-      items.push({ key: r.id, rule: "M1", type: "Receipt", subject: `${fmtRM(r.amount)} · ${inv.number}`, detail: "bank line matched", who: ["owner", "clerk"], page: "inbox" });
+      items.push({
+        key: r.id,
+        rule: "M1",
+        type: "Receipt",
+        subject: `${fmtRM(r.amount)} · ${inv.number}`,
+        detail: "bank line matched",
+        who: ["owner", "clerk"],
+        page: "inbox",
+      });
     } else if (r.deduction?.status === "pending") {
-      items.push({ key: `${r.id}-d`, rule: "M3", type: "Deduction", subject: `${fmtRM(r.deduction.amount)} · ${inv.number}`, detail: r.deduction.reason, who: ["owner"], page: "inbox" });
+      items.push({
+        key: `${r.id}-d`,
+        rule: "M3",
+        type: "Deduction",
+        subject: `${fmtRM(r.deduction.amount)} · ${inv.number}`,
+        detail: r.deduction.reason,
+        who: ["owner"],
+        page: "inbox",
+      });
     }
   }
   for (const h of s.handoffs.filter((x) => !x.resolved)) {
@@ -94,47 +117,49 @@ export default function ApprovalsPage() {
 
   const list = (rows: Pending[], canAct: boolean) => (
     <ul className="divide-y divide-hairline">
-      {rows.map((i) => (
-        <li
-          key={i.key}
-          className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1.5 px-5 py-3 sm:grid-cols-[11rem_minmax(0,1fr)_auto_auto]"
-        >
-          <div className="col-span-2 flex items-center gap-2 text-[13px] text-ink2 sm:col-span-1">
-            {i.type}
-            <RuleTag id={i.rule} />
+      {rows.map((item) => (
+        <li key={item.key} className="flex items-start justify-between gap-4 px-6 py-5">
+          <div className="min-w-0">
+            <div className="mb-2 flex flex-wrap items-center gap-2 text-xs text-ink2">
+              {item.type}
+              <RuleTag id={item.rule} />
+            </div>
+            <div className="text-sm font-medium">{item.subject}</div>
+            {item.detail && <p className="mt-1 text-xs text-ink2">{item.detail}</p>}
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {item.who.map((role) => (
+                <Badge key={role} tone={role === "owner" ? "violet" : "sky"}>
+                  {role === "owner" ? "Owner" : "Clerk"}
+                </Badge>
+              ))}
+            </div>
           </div>
-          <div className="min-w-0 text-[13px] text-ink">
-            <span className="font-medium">{i.subject}</span>
-            {i.detail && <span className="text-ink2"> · {i.detail}</span>}
-          </div>
-          <div className="flex gap-1.5 max-sm:hidden">
-            {i.who.map((w) => (
-              <Badge key={w} tone={w === "owner" ? "violet" : "sky"}>
-                {w === "owner" ? "Owner" : "Clerk"}
-              </Badge>
-            ))}
-          </div>
-          <Button size="sm" variant={canAct ? "primary" : "secondary"} onClick={() => go(i.page)}>
+          <Button
+            size="sm"
+            variant={canAct ? "primary" : "secondary"}
+            onClick={() => go(item.page)}
+            aria-label={`${canAct ? "Open" : "View"} ${item.type}: ${item.subject}`}
+          >
             {canAct ? "Open" : "View"}
             <ArrowRight className="h-3.5 w-3.5" aria-hidden />
           </Button>
-          <div className="col-span-2 flex gap-1.5 sm:hidden">
-            {i.who.map((w) => (
-              <Badge key={w} tone={w === "owner" ? "violet" : "sky"}>
-                {w === "owner" ? "Owner" : "Clerk"}
-              </Badge>
-            ))}
-          </div>
         </li>
       ))}
     </ul>
   );
 
   return (
-    <div className="mx-auto max-w-[1100px]">
-      <PageTitle title="Approvals" />
-      <div className="space-y-6">
-        <Card>
+    <div className="min-w-0">
+      <PageTitle title="Approvals" subtitle="A little human judgement, right where it matters." />
+      <MetricRow
+        items={[
+          { label: "Waiting for you", value: mine.length },
+          { label: "With another role", value: others.length },
+          { label: "Total pending", value: items.length },
+        ]}
+      />
+      <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
+        <Card className={others.length ? "" : "xl:col-span-2"}>
           <CardHeader title={`Waiting for you · ${mine.length}`} />
           {mine.length ? (
             list(mine, true)

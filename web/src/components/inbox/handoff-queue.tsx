@@ -33,7 +33,7 @@ export function HandoffQueue({ state, onOpen }: { state: State; onOpen: (message
   const waiting = waitingClaims(state);
   if (!open.length && !waiting.length) return null;
   return (
-    <div className="mb-8 space-y-6">
+    <div className="mb-5 space-y-5">
       {open.length > 0 && <OpenHandoffs state={state} open={open} onOpen={onOpen} />}
       {waiting.length > 0 && <WaitingClaims state={state} invoices={waiting} onOpen={onOpen} />}
     </div>
@@ -48,7 +48,7 @@ function OpenHandoffs({ state, open, onOpen }: { state: State; open: Handoff[]; 
   return (
     <section>
       <SectionTitle>{`Needs a human · ${open.length}`}</SectionTitle>
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4">
         {open.map((h) => (
           <HandoffCard key={h.id} state={state} h={h} onOpen={() => onOpen(h.messageId)} />
         ))}
@@ -110,7 +110,7 @@ function PromiseDateForm({ h, onConfirm }: { h: Handoff; onConfirm: (option: str
           Promised date
           <input
             type="date"
-            className="h-7 rounded-[2px] border border-line-strong bg-surface px-1.5 font-mono text-xs text-ink"
+            className="h-7 rounded-xl border border-line-strong bg-surface px-1.5 font-mono text-xs text-ink"
             onChange={(e) => setPicked(e.target.value || null)}
           />
         </label>
@@ -120,7 +120,7 @@ function PromiseDateForm({ h, onConfirm }: { h: Handoff; onConfirm: (option: str
           <label
             key={d}
             className={cx(
-              "flex h-[30px] cursor-pointer items-center gap-2 rounded-[2px] border px-3 text-[13px]",
+              "flex h-[30px] cursor-pointer items-center gap-2 rounded-xl border px-3 text-[13px]",
               picked === d ? "border-navy bg-navy-soft text-navy" : "border-line-strong bg-surface text-ink hover:bg-canvas",
             )}
           >
@@ -143,7 +143,7 @@ function WaitingClaims({ state, invoices, onOpen }: { state: State; invoices: In
   return (
     <section>
       <SectionTitle>{`Says paid, not in the bank · ${invoices.length}`}</SectionTitle>
-      <ul className="divide-y divide-hairline border border-line bg-surface">
+      <ul className="panel divide-y divide-hairline">
         {invoices.map((inv) => {
           const msg = state.messages.find((m) => m.id === inv.openClaimMessageId)!;
           const asked = state.handoffs.find((h) => h.messageId === msg.id && h.kind === "claim_unverified" && h.resolved === "send_reply");

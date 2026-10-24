@@ -8,10 +8,10 @@ import { STATUS_LABEL, STATUS_TONE, arrivedMessages, messageStatus } from "./sta
 export function MessageList({ state, selectedId, onSelect }: { state: State; selectedId: string | null; onSelect: (id: string) => void }) {
   const messages = arrivedMessages(state);
   if (!messages.length) {
-    return <Empty>No replies yet.</Empty>;
+    return <div className="px-5 pb-5"><Empty>No replies yet.</Empty></div>;
   }
   return (
-    <ul className="divide-y divide-hairline border border-line bg-surface">
+    <ul className="divide-y divide-hairline">
       {messages.map((m) => (
         <li key={m.id}>
           <MessageRow state={state} m={m} active={m.id === selectedId} onSelect={() => onSelect(m.id)} />
@@ -30,11 +30,11 @@ function MessageRow({ state, m, active, onSelect }: { state: State; m: InboundMe
       onClick={onSelect}
       aria-current={active || undefined}
       className={cx(
-        "block w-full border-l-[3px] px-4 py-3 text-left transition-colors",
-        active ? "border-l-navy bg-navy-soft" : "border-l-transparent hover:bg-canvas",
+        "block w-full border-l-[3px] px-5 py-5 text-left transition-colors",
+        active ? "border-l-[#397cf4] bg-navy-soft" : "border-l-transparent hover:bg-canvas",
       )}
     >
-      <div className="flex items-baseline justify-between gap-3">
+      <div className="flex flex-col gap-1.5">
         <div className="min-w-0 truncate text-[13px] font-semibold text-ink">{c.name}</div>
         <span className="num shrink-0 text-[11px] text-ink2">{fmtDateTime(m.receivedAt)}</span>
       </div>

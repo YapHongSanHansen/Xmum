@@ -20,7 +20,7 @@ const DEMO = {
 const EMPTY = { customerId: "", route: "", amount: "", terms: "credit" as Terms, creditDays: "30" };
 
 const inputCls =
-  "h-[34px] w-full rounded-[2px] border border-line-strong bg-surface px-2.5 text-[13px] text-ink placeholder:text-ink3 disabled:bg-canvas disabled:text-ink2";
+  "h-[34px] w-full rounded-xl border border-line-strong bg-surface px-2.5 text-[13px] text-ink placeholder:text-ink3 disabled:bg-canvas disabled:text-ink2";
 
 const NOTE_TONE = { good: "text-emerald-700", warn: "text-amber-800", bad: "text-rose-700" } as const;
 

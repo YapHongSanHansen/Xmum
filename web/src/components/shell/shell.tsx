@@ -1,7 +1,7 @@
 "use client";
 // Kutip app frame. The store persists to localStorage, so the shell renders
 // only on the client to avoid a hydration mismatch.
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { X } from "lucide-react";
 import { cx } from "@/components/ui";
 import { useKutip } from "@/lib/store";
@@ -14,7 +14,6 @@ import GuidePage from "@/components/pages/guide";
 import ApprovalsPage from "@/components/pages/approvals";
 import UsagePage from "@/components/pages/usage";
 import { Header } from "./header";
-import { ModuleStrip, Sidebar } from "./sidebar";
 
 const noopSubscribe = () => () => {};
 
@@ -29,6 +28,10 @@ function useMounted() {
 
 export default function Shell() {
   const mounted = useMounted();
+  const page = useKutip((s) => s.page);
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [page]);
   if (!mounted) {
     return (
       <div className="grid h-screen place-items-center bg-canvas font-mono text-xs text-ink2" aria-busy="true">
@@ -37,14 +40,15 @@ export default function Shell() {
     );
   }
   return (
-    <div className="flex h-screen flex-col bg-canvas">
+    <div className="app-frame">
+      <a className="skip-link" href="#main-content">
+        Skip to content
+      </a>
       <Header />
-      <ModuleStrip />
-      <div className="flex min-h-0 flex-1">
-        <Sidebar />
-        <main className="min-w-0 flex-1 overflow-y-auto">
+      <div>
+        <main id="main-content" className="min-w-0" tabIndex={-1}>
           <Toast />
-          <div className="mx-auto max-w-[1100px] px-4 py-6 lg:px-10 lg:py-8">
+          <div className="app-main">
             <CurrentPage />
           </div>
         </main>

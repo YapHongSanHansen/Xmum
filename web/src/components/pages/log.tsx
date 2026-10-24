@@ -27,7 +27,7 @@ const CHIP_ACTIVE: Record<ActorKind, string> = {
   BANK: "border-amber-800 bg-amber-800 text-white",
 };
 
-const CHIP = "inline-flex h-7 items-center rounded-[2px] border px-2.5 font-mono text-[11px] font-medium tabular-nums transition-colors";
+const CHIP = "inline-flex h-8 items-center rounded-full border px-3 font-sans text-[11px] font-medium tabular-nums transition-colors";
 const CHIP_OFF = "border-line-strong bg-surface text-ink2 hover:bg-canvas hover:text-ink";
 
 function ActorBadge({ e }: { e: LogEntry }) {
@@ -94,7 +94,7 @@ export default function LogPage() {
   const canExport = role === "owner";
 
   return (
-    <div className="mx-auto max-w-[1100px]">
+    <div className="min-w-0">
       <PageTitle
         title="Activity log"
         subtitle={
@@ -114,7 +114,7 @@ export default function LogPage() {
         }
       />
 
-      <div className="mb-4">
+      <div className="panel mb-5 p-5">
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative w-full sm:w-56">
             <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink2" aria-hidden />
@@ -124,7 +124,7 @@ export default function LogPage() {
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search, e.g. INV-2304"
               aria-label="Search the activity log"
-              className="h-8 w-full rounded-[2px] border border-line-strong bg-surface pl-8 pr-7 text-[13px] text-ink placeholder:text-ink3"
+              className="h-8 w-full rounded-xl border border-line-strong bg-surface pl-8 pr-7 text-[13px] text-ink placeholder:text-ink3"
             />
             {query && (
               <button

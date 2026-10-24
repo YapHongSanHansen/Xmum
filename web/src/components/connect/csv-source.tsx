@@ -44,13 +44,13 @@ export function CsvSource({
           rows={5}
           spellCheck={false}
           placeholder={placeholder}
-          className="w-full resize-y rounded-[2px] border border-line bg-surface px-3 py-2 font-mono text-[11px] leading-relaxed text-ink placeholder:text-ink3 focus:border-navy focus:outline-none"
+          className="w-full resize-y rounded-xl border border-line bg-surface px-3 py-2 font-mono text-[11px] leading-relaxed text-ink placeholder:text-ink3 focus:border-navy focus:outline-none"
         />
       )}
       <div className="flex flex-wrap items-center gap-2">
         <label
           className={cx(
-            "inline-flex h-7 cursor-pointer items-center gap-2 rounded-[2px] border border-line-strong bg-white px-2.5 text-xs font-medium text-ink hover:bg-canvas",
+            "inline-flex h-7 cursor-pointer items-center gap-2 rounded-xl border border-line-strong bg-white px-2.5 text-xs font-medium text-ink hover:bg-canvas",
             "focus-within:outline focus-within:outline-2 focus-within:outline-navy",
           )}
         >

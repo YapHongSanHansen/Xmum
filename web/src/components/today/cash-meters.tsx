@@ -1,120 +1,91 @@
 "use client";
-// FR-B4 / FR-B5: one meter per upcoming outflow. The Owner sees amounts; the
-// Clerk sees only "Gap: yes/no" and the due date (no balance, bill or gap figure).
+import { Wallet } from "lucide-react";
 import { useKutip } from "@/lib/store";
-import { Badge, Empty, Figure, NavyPanel, cx } from "@/components/ui";
-import { fmtDate, fmtDateTime, fmtRM, type State } from "@/engine/model";
-import { HORIZON_DAYS, cashNow, forecast, type OutflowForecast } from "@/engine/rules";
-import { daysAwayText } from "./bits";
+import { Badge, Card, CardHeader, Figure } from "@/components/ui";
+import { fmtDate, fmtDateTime, fmtRM } from "@/engine/model";
+import { cashNow, forecast } from "@/engine/rules";
 
 export default function CashMeters() {
   const state = useKutip((s) => s.state);
-  const isOwner = state.role === "owner";
+  const owner = state.role === "owner";
   const rows = forecast(state);
-
-  const meters =
-    rows.length === 0 ? (
-      <Empty>No bills due in the next {HORIZON_DAYS} days.</Empty>
-    ) : (
-      rows.map((f) => (isOwner ? <OwnerMeter key={f.outflowId} f={f} /> : <ClerkMeter key={f.outflowId} f={f} />))
-    );
-
   return (
-    <section aria-labelledby="cash-meters-title">
-      <div className="mb-3 flex items-baseline justify-between gap-3">
-        <h2 id="cash-meters-title" className="text-[13px] font-medium text-ink2">
-          Next {HORIZON_DAYS} days
-        </h2>
-        {!isOwner && <span className="text-xs text-ink2">Amounts: Owner only</span>}
-      </div>
-      {isOwner ? (
-        // Owner only (FR-B5): the cash position never renders for the Clerk.
-        <div className="grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <CashPosition state={state} />
-          {meters}
+    <Card className="flex flex-col">
+      <CardHeader
+        title={owner ? "Cash available" : "Upcoming bills"}
+        right={
+          <span className="icon-button h-9! w-9!" aria-hidden>
+            <Wallet className="h-4 w-4" />
+          </span>
+        }
+      />
+      {owner && (
+        <div className="px-6 pb-5">
+          <Figure>{fmtRM(cashNow(state))}</Figure>
+          <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-xs text-ink2">
+            <span>Bank {fmtRM(state.bankBalance.amount)}</span>
+            <span className="text-emerald-700">+{fmtRM(state.approvedReceiptTotal)} approved</span>
+          </div>
         </div>
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2">{meters}</div>
       )}
-    </section>
-  );
-}
-
-/** Owner-only navy summary: bank balance + approved receipts = cash now. */
-function CashPosition({ state }: { state: State }) {
-  const entered = `Bank balance entered ${fmtDateTime(state.bankBalance.enteredAt)} by ${state.bankBalance.enteredBy}`;
-  return (
-    <NavyPanel className="justify-between gap-4 sm:col-span-2 lg:col-span-1">
-      <div>
-        <div className="text-[13px] text-navy-muted">Cash now</div>
-        <Figure tone="white" className="mt-2 block">
-          {fmtRM(cashNow(state))}
-        </Figure>
-      </div>
-      <div className="space-y-1 text-xs text-navy-muted">
-        <div className="flex justify-between gap-3">
-          <span>Bank</span>
-          <span className="num">{fmtRM(state.bankBalance.amount)}</span>
+      <div className="mx-6 border-t border-line pt-5">
+        <div className="mb-4 flex items-center justify-between text-xs text-ink2">
+          <span>Upcoming bill coverage</span>
+          <span>Next 30 days</span>
         </div>
-        <div className="flex justify-between gap-3">
-          <span>Approved receipts</span>
-          <span className="num">+{fmtRM(state.approvedReceiptTotal)}</span>
+        <div className="space-y-5">
+          {rows.length === 0 ? (
+            <p className="pb-5 text-sm text-ink2">No bills due in the next 30 days.</p>
+          ) : (
+            rows.map((f, i) => {
+              const covered = f.amount > 0 ? Math.max(0, Math.min(1, (f.forecast + f.amount) / f.amount)) : 1;
+              const pct = Math.round(covered * 100);
+              return (
+                <div key={f.outflowId}>
+                  <div className="mb-2 flex items-center justify-between gap-3">
+                    <span className="text-sm capitalize">
+                      {owner ? f.short : "Bill"}
+                      <span className="ml-2 text-[11px] text-ink2">{fmtDate(f.dueDate)}</span>
+                    </span>
+                    {owner ? (
+                      <span className="text-sm tabular-nums">{fmtRM(f.amount)}</span>
+                    ) : (
+                      <Badge tone={f.gap > 0 ? "rose" : "emerald"}>Gap: {f.gap > 0 ? "yes" : "no"}</Badge>
+                    )}
+                  </div>
+                  {owner && (
+                    <>
+                      <div
+                        className="striped-meter"
+                        role="meter"
+                        aria-label={`${f.short} covered`}
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-valuenow={pct}
+                      >
+                        <div className="striped-fill" data-color={i % 2 === 0 ? "blue" : "pink"} style={{ width: `${pct}%` }} />
+                      </div>
+                      <div className="mt-1.5 flex justify-between text-[11px] text-ink2">
+                        <span>{pct}% covered</span>
+                        <span className={f.gap > 0 ? "text-rose-700" : "text-emerald-700"}>
+                          {f.gap > 0 ? `${fmtRM(f.gap)} short` : "Fully covered"}
+                        </span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              );
+            })
+          )}
         </div>
-        <details className="pt-1 text-[11px] leading-relaxed">
-          <summary className="cursor-pointer text-navy-muted hover:text-white">Details</summary>
-          <p className="mt-1">{entered}.</p>
-          <p>Bills also count invoices from on-time payers due before them. Promises are not counted.</p>
-        </details>
       </div>
-    </NavyPanel>
-  );
-}
-
-function OwnerMeter({ f }: { f: OutflowForecast }) {
-  const short = f.forecast < 0;
-  // Share of this bill covered by the money forecast to be there just before it.
-  const before = f.forecast + f.amount;
-  const covered = f.amount > 0 ? Math.max(0, Math.min(1, before / f.amount)) : 1;
-  const pct = Math.round(covered * 100);
-  return (
-    <div className="flex flex-col justify-between gap-4 border border-line bg-surface p-5">
-      <div className="flex items-baseline justify-between gap-3 text-[13px]">
-        <div className="min-w-0 truncate text-ink" title={`Due ${fmtDate(f.dueDate)}, ${daysAwayText(f.daysAway)}`}>
-          <span className="num text-ink2">{fmtDate(f.dueDate)}</span> · {f.label}
-        </div>
-        <div className="num shrink-0 text-xs text-ink2" title="Bill amount">
-          {fmtRM(f.amount)}
-        </div>
-      </div>
-      <div className={cx("flex items-baseline gap-2", short ? "text-rose-700" : "text-emerald-700")}>
-        <span className="text-[15px] font-medium">{short ? "Short" : "Covered"}</span>
-        <Figure tone={short ? "bad" : "good"}>{short ? fmtRM(f.gap) : fmtRM(f.forecast, { sign: true })}</Figure>
-      </div>
-      <div className="flex items-center gap-3">
-        <div
-          className="h-1 flex-1 overflow-hidden bg-hairline"
-          role="meter"
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={pct}
-          aria-label={`${f.short} covered`}
-        >
-          <div className={cx("h-full", short ? "bg-rose-700" : "bg-emerald-700")} style={{ width: `${covered * 100}%` }} />
-        </div>
-        <span className="num w-9 text-right text-xs text-ink2">{pct}%</span>
-      </div>
-    </div>
-  );
-}
-
-function ClerkMeter({ f }: { f: OutflowForecast }) {
-  const short = f.forecast < 0;
-  return (
-    <div className="flex items-center justify-between gap-3 border border-line bg-surface px-5 py-4">
-      <div className="text-[13px] text-ink" title={`Due ${daysAwayText(f.daysAway)}`}>
-        Bill due <span className="num">{fmtDate(f.dueDate)}</span>
-      </div>
-      <Badge tone={short ? "rose" : "emerald"}>Gap: {short ? "yes" : "no"}</Badge>
-    </div>
+      <details className="mx-6 mb-5 mt-auto pt-5 text-[11px] text-ink2">
+        <summary className="w-fit">How this is calculated</summary>
+        <p className="mt-2 leading-relaxed">
+          Coverage includes expected payments from reliable customers, after earlier bills. Promises are not counted.
+          {owner && ` Bank balance entered ${fmtDateTime(state.bankBalance.enteredAt)} by ${state.bankBalance.enteredBy}.`}
+        </p>
+      </details>
+    </Card>
   );
 }

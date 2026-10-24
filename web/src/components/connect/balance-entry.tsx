@@ -65,7 +65,7 @@ export function BalanceEntry() {
               }}
               placeholder="e.g. 9,800.00"
               aria-invalid={bad}
-              className="h-[34px] w-full rounded-[2px] border border-line bg-surface px-2.5 font-mono text-[13px] tabular-nums text-ink placeholder:text-ink3 focus:border-navy focus:outline-none aria-[invalid=true]:border-rose-700"
+              className="h-[34px] w-full rounded-xl border border-line bg-surface px-2.5 font-mono text-[13px] tabular-nums text-ink placeholder:text-ink3 focus:border-navy focus:outline-none aria-[invalid=true]:border-rose-700"
             />
             <Button type="submit" disabled={amount === null || bad}>
               Save

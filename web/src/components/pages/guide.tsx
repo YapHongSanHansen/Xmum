@@ -134,7 +134,8 @@ export default function GuidePage() {
   return (
     <div>
       <PageTitle
-        title="Demo guide"
+        title="A quick tour"
+        subtitle="Eight small steps. One complete collection story."
         right={
           <Badge tone={doneCount === STEPS.length ? "emerald" : "slate"}>
             {doneCount} of {STEPS.length} done
@@ -142,12 +143,12 @@ export default function GuidePage() {
         }
       />
 
-      <div className="mb-6 h-1 overflow-hidden bg-hairline">
-        <div className="h-full bg-navy transition-[width] duration-500" style={{ width: `${(doneCount / STEPS.length) * 100}%` }} />
+      <div className="mb-6 h-2 overflow-hidden rounded-full bg-white">
+        <div className="striped-fill transition-[width] duration-500" style={{ width: `${(doneCount / STEPS.length) * 100}%` }} />
       </div>
 
       <div className="grid items-start gap-8 lg:grid-cols-[1fr_240px]">
-        <ol className="divide-y divide-hairline border border-line bg-surface">
+        <ol className="panel overflow-hidden divide-y divide-hairline">
           {STEPS.map((step, idx) => {
             const isDone = done[idx];
             const isNext = idx === nextIdx;
@@ -155,7 +156,7 @@ export default function GuidePage() {
             const canAdvance = !!step.stop && step.stop > s.now;
             const hint = !isDone && step.progress ? step.progress(s) : null;
             return (
-              <li key={step.n} className={cx("relative px-5 py-4", isNext && "bg-navy-soft/40")}>
+              <li key={step.n} className={cx("relative px-6 py-6", isNext && "bg-navy-soft/40")}>
                 {isNext && <span className="absolute inset-y-0 left-0 w-[3px] bg-navy" aria-hidden />}
                 <div className="flex gap-3.5">
                   <StatusDot n={step.n} done={isDone} next={isNext} />
@@ -203,7 +204,7 @@ export default function GuidePage() {
           })}
         </ol>
 
-        <aside className="lg:sticky lg:top-6">
+        <aside className="panel p-6 lg:sticky lg:top-6">
           <h2 className="text-xs font-medium text-ink2">What to notice</h2>
           <ul className="mt-3 space-y-2.5">
             {NOTICE.map((n) => (

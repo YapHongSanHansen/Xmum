@@ -49,7 +49,8 @@ export default function ChasePlan({ selectedId, onReview }: { selectedId: string
   return (
     <Card>
       <CardHeader
-        title="Chase plan"
+        title="Collection plan"
+        kicker="The right follow-up, in the right order"
         right={<span className="text-[13px] text-ink2">{remindCount ? `${remindCount} to review` : "Nothing to review"}</span>}
       />
       {rows.length === 0 ? (

@@ -13,7 +13,7 @@ export default function ErrorPage({ retry }: { error: unknown; retry: () => void
     location.reload();
   };
   return (
-    <div className="mx-4 mt-24 max-w-md border border-line bg-surface p-6 text-center sm:mx-auto">
+    <div className="panel mx-4 mt-24 max-w-md p-8 text-center sm:mx-auto">
       <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-ink">The saved demo could not load.</h2>
       <div className="mt-5 flex justify-center gap-2">
         <Button type="button" variant="secondary" onClick={() => retry()}>

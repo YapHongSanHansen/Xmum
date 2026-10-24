@@ -4,7 +4,7 @@
 import { useCallback, useState } from "react";
 import { useKutip } from "@/lib/store";
 import { readMessage } from "@/lib/extract-client";
-import { PageTitle } from "@/components/ui";
+import { Badge, Card, CardHeader, Empty, PageTitle } from "@/components/ui";
 import { BankStatement } from "@/components/inbox/bank-statement";
 import { SlipLightbox } from "@/components/inbox/bubble";
 import { HandoffQueue } from "@/components/inbox/handoff-queue";
@@ -40,16 +40,26 @@ export default function InboxPage() {
 
   return (
     <div>
-      <PageTitle title="Inbox" subtitle="Nothing is paid without a bank line." />
+      <PageTitle
+        title="Bukti inbox"
+        subtitle="From “dah bank in” to a payment you can verify."
+        right={
+          <Badge tone="sky">
+            {arrived.length} {arrived.length === 1 ? "reply" : "replies"} received
+          </Badge>
+        }
+      />
 
-      <HandoffQueue state={state} onOpen={setSelectedId} />
-
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
-        <div className="space-y-6">
-          <MessageList state={state} selectedId={selected?.id ?? null} onSelect={setSelectedId} />
+      <div className="inbox-layout">
+        <div className="min-w-0 space-y-6">
+          <Card className="overflow-hidden">
+            <CardHeader title="Conversations" right={<Badge>{arrived.length}</Badge>} />
+            <MessageList state={state} selectedId={selected?.id ?? null} onSelect={setSelectedId} />
+          </Card>
           <BankStatement state={state} />
         </div>
-        <div>
+        <div id="message-detail" className="min-w-0 scroll-mt-6">
+          <HandoffQueue state={state} onOpen={setSelectedId} />
           {selected ? (
             <MessageDetail
               key={selected.id}
@@ -60,7 +70,15 @@ export default function InboxPage() {
               onEnlarge={setLightbox}
             />
           ) : (
-            <div className="border border-dashed border-line-strong px-4 py-10 text-center text-[13px] text-ink2">Select a message.</div>
+            <Card className="p-7">
+              <div className="mb-6 inline-flex rounded-xl bg-sky-100 px-3 py-2 text-xs text-sky-700">Bukti · payment assistant</div>
+              <h2 className="text-3xl tracking-tight">Every payment tells a story.</h2>
+              <p className="my-4 max-w-lg text-sm leading-relaxed text-ink2">
+                Select a customer reply to read the payment details, inspect the slip, and match it against your bank statement.
+              </p>
+              <Empty>No customer replies yet. Use “Advance to” to move the demo to the next message.</Empty>
+              <p className="mt-5 text-xs text-ink2">Nothing is marked paid without a bank check or an explicit Owner override.</p>
+            </Card>
           )}
         </div>
       </div>

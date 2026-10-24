@@ -88,11 +88,11 @@ export default function UsagePage() {
   const assumed = `Typical micro firm, assumed: ${TYPICAL.tracked} open invoices, ${TYPICAL.chased} chased, ${TYPICAL.reads} messages read, ${TYPICAL.checks} credit checks a month`;
 
   return (
-    <div className="mx-auto max-w-[1100px]">
-      <PageTitle title="Usage & credits" subtitle={`${monthName} so far`} right={<Badge tone="amber">Illustrative prices</Badge>} />
+    <div className="min-w-0">
+      <PageTitle title="Usage & credits" subtitle={`Simple, transparent usage. ${monthName} so far.`} right={<Badge tone="amber">Illustrative prices</Badge>} />
 
       <div className="space-y-6">
-        <section className="flex flex-wrap items-end justify-between gap-x-10 gap-y-4 border border-line bg-surface p-6">
+        <section className="panel flex flex-wrap items-end justify-between gap-x-10 gap-y-6 p-8">
           <div>
             <div className="text-[13px] text-ink2">This month</div>
             <div className="mt-2">

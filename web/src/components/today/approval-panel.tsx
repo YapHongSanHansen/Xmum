@@ -2,8 +2,9 @@
 // FR-C5–C9: the approval drawer for one remindable invoice. Text comes only from
 // the fixed R5 template; the sender may edit it, and the edit is logged. Snooze,
 // mark disputed and "I'll call instead" follow the same tier rules as approve.
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { CalendarClock, ExternalLink, Lock, MessageCircle, Moon, Phone, RotateCcw, Send, TriangleAlert, X } from "lucide-react";
+import { useDialog } from "@/lib/use-dialog";
 import { useKutip } from "@/lib/store";
 import { Badge, Button, RuleTag, cx } from "@/components/ui";
 import { addDays, dayOf, fmtDate, fmtDateTime, fmtRM, outstanding, userOf } from "@/engine/model";
@@ -23,13 +24,7 @@ export default function ApprovalPanel({ row, onClose }: { row: PlanRow; onClose:
   const allowed = canApprove(tier, state.role);
   const quiet = inQuietHours(state.now);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  const dialogRef = useDialog<HTMLElement>(onClose);
 
   // R3 payment pattern: under 3 past reminders at this tier, the engine assumes 50%.
   const points = customer.history.filter((h) => h.lastReminderTier === tier && h.lastReminderDate).length;
@@ -41,9 +36,9 @@ export default function ApprovalPanel({ row, onClose }: { row: PlanRow; onClose:
 
   return (
     <div className="fixed inset-0 z-40 flex justify-end">
-      <button type="button" aria-label="Close" className="absolute inset-0 bg-ink/30" onClick={onClose} />
-      <aside role="dialog" aria-modal="true" aria-label={`Review reminder for ${invoice.number}`} className="relative flex h-full w-full max-w-[520px] flex-col border-l border-line-strong bg-surface">
-        <header className="flex items-start justify-between gap-3 border-b border-line px-5 py-4">
+      <button type="button" aria-label="Close" className="absolute inset-0 bg-ink/25 backdrop-blur-sm" onClick={onClose} />
+      <aside ref={dialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label={`Review reminder for ${invoice.number}`} className="relative flex h-full w-full max-w-[560px] flex-col rounded-l-3xl border-l border-white bg-surface shadow-2xl">
+        <header className="flex items-start justify-between gap-3 border-b border-line px-6 py-6">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <span className="num text-[15px] font-semibold text-ink">{invoice.number}</span>
@@ -122,7 +117,7 @@ export default function ApprovalPanel({ row, onClose }: { row: PlanRow; onClose:
               onChange={(e) => setText(e.target.value)}
               rows={6}
               aria-label="Message"
-              className="w-full resize-y rounded-[2px] border border-line-strong bg-surface px-3 py-2 text-sm leading-relaxed text-ink focus:border-navy focus:outline-none"
+              className="w-full resize-y rounded-xl border border-line-strong bg-surface px-3 py-2 text-sm leading-relaxed text-ink focus:border-navy focus:outline-none"
             />
             <div className="mt-1 flex items-center justify-between gap-2 text-xs text-ink2">
               <span title={`Fixed Tier ${tier} (${tierName(tier)}) template, sender ${myName}`}>{edited ? "Edited · the edit is logged" : `T${tier} template · editable`}</span>
@@ -158,7 +153,7 @@ export default function ApprovalPanel({ row, onClose }: { row: PlanRow; onClose:
                     target="_blank"
                     rel="noreferrer"
                     title="Approves the reminder (logged), then opens WhatsApp. No number is filled in; a person presses send."
-                    className="inline-flex h-[34px] items-center justify-center gap-2 whitespace-nowrap rounded-[2px] border border-line-strong bg-white px-3.5 text-[13px] font-medium leading-none text-ink transition-colors hover:bg-canvas"
+                    className="inline-flex h-[34px] items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-line-strong bg-white px-3.5 text-[13px] font-medium leading-none text-ink transition-colors hover:bg-canvas"
                   >
                     <MessageCircle className="h-4 w-4 text-emerald-600" aria-hidden />
                     Open in WhatsApp
@@ -204,7 +199,7 @@ function CardActions({ invoiceId, invoiceNumber, today, onDone }: { invoiceId: s
             min={first}
             max={last}
             onChange={(e) => setUntil(e.target.value)}
-            className="h-7 rounded-[2px] border border-line bg-surface px-1.5 font-mono text-xs text-ink"
+            className="h-7 rounded-xl border border-line bg-surface px-1.5 font-mono text-xs text-ink"
           />
         </label>
         <Button
