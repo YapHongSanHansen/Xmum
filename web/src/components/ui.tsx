@@ -107,7 +107,8 @@ export function PageTitle({ title, subtitle, right, eyebrow }: { title: string; 
 }
 
 export function Empty({ children }: { children: ReactNode }) {
-  return <div className="border border-dashed border-line-strong px-4 py-6 text-center text-[13px] text-ink3">{children}</div>;
+  // Empty states teach the next step, so the copy keeps AA contrast (ink2, not the disabled ink3).
+  return <div className="border border-dashed border-line-strong px-4 py-6 text-center text-[13px] text-ink2">{children}</div>;
 }
 
 /** Ledger navy summary panel: mono label/value rows on the accent colour. */
@@ -123,3 +124,44 @@ export function NavyRow({ k, v, total }: { k: ReactNode; v: ReactNode; total?: b
     </div>
   );
 }
+
+/** Big mono figure (Ledger "amount"): money that matters on a page. */
+export function Figure({
+  children,
+  tone = "ink",
+  size = "lg",
+  className,
+}: {
+  children: ReactNode;
+  tone?: "ink" | "bad" | "good" | "white";
+  size?: "md" | "lg";
+  className?: string;
+}) {
+  const tones = { ink: "text-ink", bad: "text-rose-700", good: "text-emerald-700", white: "text-white" };
+  return (
+    <span
+      className={cx(
+        "font-mono font-medium leading-none tracking-[-0.02em] tabular-nums",
+        size === "lg" ? "text-[28px]" : "text-[20px]",
+        tones[tone],
+        className,
+      )}
+    >
+      {children}
+    </span>
+  );
+}
+
+/**
+ * Ledger table cells: 30px header row, 38px body rows, hairline dividers.
+ * Put `num` (or `num text-right`) on cells that hold figures.
+ */
+export const tbl = {
+  /** Wrapper that lets a wide table scroll sideways on a phone. */
+  wrap: "overflow-x-auto",
+  table: "w-full border-collapse text-left text-[13px]",
+  headRow: "h-[30px] border-b border-line",
+  th: "whitespace-nowrap px-3 align-middle text-xs font-normal text-ink2 first:pl-4 last:pr-4",
+  row: "h-[38px] border-b border-hairline last:border-b-0",
+  td: "px-3 py-2 align-middle first:pl-4 last:pr-4",
+};

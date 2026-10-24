@@ -138,9 +138,9 @@ export default function GuidePage() {
         title="Demo guide"
         subtitle="The 3–4 minute demo script. Ticks update from the demo state as you go."
         right={
-          <div className="flex items-center gap-3 text-sm">
-            <span className="text-slate-500">
-              Clock <span className="font-mono font-semibold text-slate-900">{fmtDateTime(s.now)}</span>
+          <div className="flex items-center gap-3 text-[13px]">
+            <span className="font-mono text-xs text-ink2">
+              Clock <span className="font-medium text-ink">{fmtDateTime(s.now)}</span>
             </span>
             <Badge tone={doneCount === STEPS.length ? "emerald" : "slate"}>
               {doneCount} of {STEPS.length} done
@@ -149,11 +149,11 @@ export default function GuidePage() {
         }
       />
 
-      <div className="mb-5 h-1.5 overflow-hidden rounded-full bg-slate-200">
-        <div className="h-full rounded-full bg-emerald-500 transition-all" style={{ width: `${(doneCount / STEPS.length) * 100}%` }} />
+      <div className="mb-5 h-1.5 overflow-hidden bg-hairline">
+        <div className="h-full bg-navy transition-[width] duration-500" style={{ width: `${(doneCount / STEPS.length) * 100}%` }} />
       </div>
 
-      <div className="grid grid-cols-[1fr_300px] items-start gap-5">
+      <div className="grid items-start gap-5 lg:grid-cols-[1fr_300px]">
         <ol className="space-y-3">
           {STEPS.map((step, idx) => {
             const isDone = done[idx];
@@ -163,27 +163,27 @@ export default function GuidePage() {
             const hint = !isDone && step.progress ? step.progress(s) : null;
             return (
               <li key={step.n}>
-                <Card className={cx("px-4 py-3.5", isNext && "ring-2 ring-emerald-400", isDone && "bg-slate-50/80")}>
+                <Card className={cx("px-4 py-3.5", isNext && "border-navy ring-1 ring-inset ring-navy", isDone && "bg-canvas")}>
                   <div className="flex gap-3">
                     <StatusDot n={step.n} done={isDone} next={isNext} />
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className={cx("text-sm font-semibold", isDone ? "text-slate-500" : "text-slate-900")}>{step.title}</span>
+                        <span className={cx("text-[13px] font-semibold", isDone ? "text-ink2" : "text-ink")}>{step.title}</span>
                         {step.who.map((r) => (
                           <Badge key={r} tone={r === "owner" ? "violet" : "sky"}>
                             {WHO_LABEL[r]}
                           </Badge>
                         ))}
                         {stop && (
-                          <span className="font-mono text-[11px] text-slate-500">{fmtDateTime(stop.at)}</span>
+                          <span className="font-mono text-[11px] text-ink2">{fmtDateTime(stop.at)}</span>
                         )}
                         {isNext && <Badge tone="emerald">next</Badge>}
                         {hint && <Badge tone="amber">{hint}</Badge>}
                       </div>
-                      <p className="mt-1 text-[13px] leading-relaxed text-slate-600">{step.look}</p>
+                      <p className="mt-1 text-[13px] leading-relaxed text-ink2">{step.look}</p>
                       <div className="mt-2.5 flex flex-wrap items-center gap-2">
                         {step.scan && needsScan && dayOf(s.now) === FIRST_DAY && (
-                          <Button size="sm" className="bg-amber-500 hover:bg-amber-600" onClick={() => dispatch({ type: "RUN_SCAN" })}>
+                          <Button size="sm" onClick={() => dispatch({ type: "RUN_SCAN" })}>
                             <Play className="h-3.5 w-3.5" aria-hidden />
                             Run 08:00 scan
                           </Button>
@@ -206,7 +206,7 @@ export default function GuidePage() {
                           Go
                           <ArrowRight className="h-3.5 w-3.5" aria-hidden />
                         </Button>
-                        <span className="ml-auto font-mono text-[10px] text-slate-400">{step.refs}</span>
+                        <span className="ml-auto font-mono text-[10px] text-ink2">{step.refs}</span>
                       </div>
                     </div>
                   </div>
@@ -216,23 +216,23 @@ export default function GuidePage() {
           })}
         </ol>
 
-        <Card tone="good" className="sticky top-6">
-          <div className="flex items-center gap-2 border-b border-emerald-200 px-4 py-3">
+        <Card tone="good" className="lg:sticky lg:top-6">
+          <div className="flex items-center gap-2 border-b border-hairline px-4 py-3">
             <Lightbulb className="h-4 w-4 text-emerald-700" aria-hidden />
-            <span className="text-sm font-semibold text-emerald-950">What to notice</span>
+            <span className="eyebrow">What to notice</span>
           </div>
           <ul className="space-y-3 px-4 py-3">
             {NOTICE.map((n) => (
               <li key={n.title} className="flex gap-2">
                 <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-600" aria-hidden />
                 <div>
-                  <div className="text-[13px] font-semibold text-slate-900">{n.title}</div>
-                  <div className="text-xs leading-relaxed text-slate-600">{n.text}</div>
+                  <div className="text-[13px] font-semibold text-ink">{n.title}</div>
+                  <div className="text-xs leading-relaxed text-ink2">{n.text}</div>
                 </div>
               </li>
             ))}
           </ul>
-          <div className="border-t border-emerald-200 px-4 py-2.5 text-[11px] text-emerald-900/70">
+          <div className="border-t border-hairline px-4 py-2.5 text-[11px] text-ink2">
             Start state: seed loaded, clock {fmtDateTime(DEMO_START)}. Use &ldquo;Reset demo&rdquo; in the header to start over.
           </div>
         </Card>
@@ -244,7 +244,7 @@ export default function GuidePage() {
 function StatusDot({ n, done, next }: { n: number; done: boolean; next: boolean }) {
   if (done) {
     return (
-      <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-emerald-500 text-white" aria-label={`Step ${n} done`}>
+      <span className="mt-0.5 grid h-[22px] w-[22px] shrink-0 place-items-center border border-emerald-100 bg-emerald-100 text-emerald-700" aria-label={`Step ${n} done`}>
         <Check className="h-3.5 w-3.5" />
       </span>
     );
@@ -252,8 +252,8 @@ function StatusDot({ n, done, next }: { n: number; done: boolean; next: boolean 
   return (
     <span
       className={cx(
-        "mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full text-xs font-semibold",
-        next ? "bg-emerald-50 text-emerald-700 ring-2 ring-emerald-400" : "bg-slate-100 text-slate-500 ring-1 ring-slate-200",
+        "mt-0.5 grid h-[22px] w-[22px] shrink-0 place-items-center border font-mono text-[11px]",
+        next ? "border-navy bg-navy text-white" : "border-line bg-surface text-ink2",
       )}
       aria-label={`Step ${n}`}
     >

@@ -2,7 +2,7 @@
 // Activity log (PRD FR-G1–G4): append-only, read-only view of state.log.
 import { useMemo, useState } from "react";
 import { ArrowDownUp, Download, Lock, Search, X } from "lucide-react";
-import { Badge, Button, Card, Empty, PageTitle, RuleTag, cx } from "@/components/ui";
+import { Badge, Button, Card, Empty, PageTitle, RuleTag, cx, tbl } from "@/components/ui";
 import { fmtDateTime, type ActorKind, type LogEntry } from "@/engine/model";
 import { useKutip } from "@/lib/store";
 
@@ -17,14 +17,18 @@ const KIND_TONE: Record<ActorKind, "slate" | "sky" | "emerald" | "violet" | "amb
   BANK: "amber",
 };
 
+// Pressed filter chips: the kind's status colour, solid, white text (all AA).
 const CHIP_ACTIVE: Record<ActorKind, string> = {
-  SYSTEM: "bg-slate-700 text-white ring-slate-700",
-  RULE: "bg-slate-900 text-white ring-slate-900",
-  AI: "bg-sky-600 text-white ring-sky-600",
-  USER: "bg-emerald-600 text-white ring-emerald-600",
-  INBOUND: "bg-violet-600 text-white ring-violet-600",
-  BANK: "bg-amber-500 text-white ring-amber-500",
+  SYSTEM: "border-ink2 bg-ink2 text-white",
+  RULE: "border-ink bg-ink text-white",
+  AI: "border-sky-700 bg-sky-700 text-white",
+  USER: "border-emerald-700 bg-emerald-700 text-white",
+  INBOUND: "border-navy bg-navy text-white",
+  BANK: "border-amber-800 bg-amber-800 text-white",
 };
+
+const CHIP = "inline-flex h-7 items-center rounded-[2px] border px-2.5 font-mono text-[11px] font-medium tabular-nums transition-colors";
+const CHIP_OFF = "border-line-strong bg-surface text-ink2 hover:bg-canvas hover:text-ink";
 
 function ActorBadge({ e }: { e: LogEntry }) {
   if (e.kind === "RULE") return <RuleTag id={e.rule ?? e.actor} />;
@@ -103,29 +107,29 @@ export default function LogPage() {
               <Download className="h-3.5 w-3.5" aria-hidden />
               Export CSV ({log.length})
             </Button>
-            {!canExport && <span className="text-[11px] text-slate-500">Export: Owner only. Clerk can view.</span>}
+            {!canExport && <span className="text-[11px] text-ink2">Export: Owner only. Clerk can view.</span>}
           </div>
         }
       />
 
       <Card className="mb-4 px-4 py-3">
         <div className="flex flex-wrap items-center gap-3">
-          <div className="relative w-72">
-            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" aria-hidden />
+          <div className="relative w-full sm:w-72">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink2" aria-hidden />
             <input
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search text or refs, e.g. INV-2304"
               aria-label="Search the activity log"
-              className="h-8 w-full rounded-md border border-slate-300 pl-8 pr-7 text-sm text-slate-800 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="h-8 w-full rounded-[2px] border border-line-strong bg-surface pl-8 pr-7 text-[13px] text-ink placeholder:text-ink3"
             />
             {query && (
               <button
                 type="button"
                 aria-label="Clear search"
                 onClick={() => setQuery("")}
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded p-0.5 text-slate-400 hover:text-slate-700"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 p-0.5 text-ink2 hover:text-ink"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -136,10 +140,7 @@ export default function LogPage() {
               type="button"
               onClick={() => setKinds([])}
               aria-pressed={kinds.length === 0}
-              className={cx(
-                "rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset",
-                kinds.length === 0 ? "bg-slate-800 text-white ring-slate-800" : "bg-white text-slate-600 ring-slate-300 hover:bg-slate-50",
-              )}
+              className={cx(CHIP, kinds.length === 0 ? "border-navy bg-navy text-white" : CHIP_OFF)}
             >
               All · {log.length}
             </button>
@@ -151,10 +152,7 @@ export default function LogPage() {
                   type="button"
                   onClick={() => toggleKind(k)}
                   aria-pressed={on}
-                  className={cx(
-                    "rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset",
-                    on ? CHIP_ACTIVE[k] : "bg-white text-slate-600 ring-slate-300 hover:bg-slate-50",
-                  )}
+                  className={cx(CHIP, on ? CHIP_ACTIVE[k] : CHIP_OFF)}
                 >
                   {k} · {counts[k]}
                 </button>
@@ -171,36 +169,36 @@ export default function LogPage() {
       {log.length === 0 ? (
         <Empty>No entries yet. Run the 08:00 scan to start the day.</Empty>
       ) : rows.length === 0 ? (
-        <Empty>No entries match this filter.</Empty>
+        <Empty>No entries match this filter. Clear the search or press &ldquo;All&rdquo; to see every entry.</Empty>
       ) : (
-        <Card className="overflow-hidden">
-          <table className="w-full table-fixed text-left text-sm">
+        <Card className={tbl.wrap}>
+          <table className={cx(tbl.table, "min-w-[760px] table-fixed")}>
             <colgroup>
-              <col className="w-12" />
+              <col className="w-14" />
               <col className="w-36" />
               <col className="w-36" />
               <col />
               <col className="w-52" />
             </colgroup>
-            <thead className="border-b border-slate-200 bg-slate-50 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-              <tr>
-                <th className="px-3 py-2">#</th>
-                <th className="px-3 py-2">Demo time</th>
-                <th className="px-3 py-2">Actor</th>
-                <th className="px-3 py-2">Action</th>
-                <th className="px-3 py-2">Refs · AI</th>
+            <thead>
+              <tr className={tbl.headRow}>
+                <th className={cx(tbl.th, "text-right")}>#</th>
+                <th className={tbl.th}>Demo time</th>
+                <th className={tbl.th}>Actor</th>
+                <th className={tbl.th}>Action</th>
+                <th className={tbl.th}>Refs · AI</th>
               </tr>
             </thead>
             <tbody>
               {rows.map((e) => (
-                <tr key={e.seq} className="border-b border-slate-100 align-top last:border-0 hover:bg-slate-50/60">
-                  <td className="px-3 py-2 font-mono text-xs text-slate-400">{e.seq}</td>
-                  <td className="whitespace-nowrap px-3 py-2 font-mono text-xs text-slate-600">{fmtDateTime(e.at)}</td>
-                  <td className="px-3 py-2">
+                <tr key={e.seq} className={cx(tbl.row, "align-top transition-colors hover:bg-canvas/60")}>
+                  <td className={cx(tbl.td, "num text-right text-xs text-ink2")}>{e.seq}</td>
+                  <td className={cx(tbl.td, "num whitespace-nowrap text-xs text-ink")}>{fmtDateTime(e.at)}</td>
+                  <td className={tbl.td}>
                     <ActorBadge e={e} />
                   </td>
-                  <td className="break-words px-3 py-2 text-[13px] text-slate-800">{role === "clerk" ? redactForClerk(e) : e.text}</td>
-                  <td className="px-3 py-2">
+                  <td className={cx(tbl.td, "break-words text-ink")}>{role === "clerk" ? redactForClerk(e) : e.text}</td>
+                  <td className={tbl.td}>
                     <div className="flex flex-wrap gap-1">
                       {(e.refs ?? []).map((r) => (
                         <button
@@ -208,7 +206,7 @@ export default function LogPage() {
                           type="button"
                           title={`Filter by ${r}`}
                           onClick={() => setQuery(r)}
-                          className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] text-slate-600 hover:bg-slate-200"
+                          className="inline-flex h-[18px] items-center border border-line px-1.5 font-mono text-[10px] text-ink2 hover:border-navy hover:text-navy"
                         >
                           {r}
                         </button>
@@ -227,7 +225,7 @@ export default function LogPage() {
           </table>
         </Card>
       )}
-      <p className="mt-3 text-[11px] text-slate-500">
+      <p className="mt-3 text-[11px] text-ink2">
         Showing {rows.length} of {log.length} entries. Times are the frozen demo clock (Asia/Kuala_Lumpur).
       </p>
     </div>

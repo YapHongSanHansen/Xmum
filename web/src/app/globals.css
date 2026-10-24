@@ -37,7 +37,8 @@
   --color-navy-soft: var(--accent-soft);
   --color-navy-muted: var(--on-accent-muted);
 
-  /* Status registers (Ledger): ready green, warning amber, error red, received blue. */
+  /* Status registers (Ledger): ready green, warning amber, error red, received blue.
+     Every shade used as text (600 and darker) meets WCAG AA on white and on its own 50/100 tint. */
   --color-emerald-50: #eef8f1;
   --color-emerald-100: #e1f3e7;
   --color-emerald-200: #c4e6cf;
@@ -48,26 +49,39 @@
   --color-emerald-700: #1e6b3a;
   --color-emerald-800: #17542d;
   --color-emerald-900: #113f22;
+  --color-emerald-950: #0b2c17;
   --color-amber-50: #fdf6e7;
   --color-amber-100: #fbedd3;
   --color-amber-200: #f4dcae;
   --color-amber-300: #e8c27a;
+  --color-amber-400: #d9a441;
+  --color-amber-500: #b7791f;
+  --color-amber-600: #8f5a00;
+  --color-amber-700: #7a4b00;
   --color-amber-800: #7a4b00;
   --color-amber-900: #5e3a00;
+  --color-amber-950: #3f2700;
   --color-rose-50: #fdf2f2;
   --color-rose-100: #fbe5e5;
   --color-rose-200: #f3c9c9;
   --color-rose-300: #e7a3a3;
+  --color-rose-400: #d06a6a;
+  --color-rose-500: #b83a3a;
   --color-rose-600: #a32d2d;
   --color-rose-700: #a32d2d;
   --color-rose-800: #8a2424;
+  --color-rose-900: #6e1c1c;
   --color-sky-50: #f1f6fc;
   --color-sky-100: #e4eefa;
   --color-sky-200: #c9daf0;
   --color-sky-300: #a9c4e6;
+  --color-sky-400: #5f8fcf;
+  --color-sky-500: #2f68ad;
   --color-sky-600: #1d4f8c;
   --color-sky-700: #1d4f8c;
   --color-sky-800: #183f70;
+  --color-sky-900: #13325a;
+  --color-sky-950: #0d2340;
 
   /* Square corners, flat surfaces. */
   --radius-xs: 2px;
@@ -108,6 +122,15 @@ body {
   font-size: 12px;
   font-weight: 500;
   color: var(--accent);
+}
+
+/* Keyboard focus: one navy ring everywhere (white ring on the navy panel). */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.bg-navy :focus-visible {
+  outline-color: #ffffff;
 }
 
 input:focus,

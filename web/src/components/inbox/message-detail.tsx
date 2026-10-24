@@ -52,7 +52,7 @@ export function MessageDetail({
           kicker={`WhatsApp · ${c.whatsapp} · linked to customer`}
           title={
             <span className="flex flex-wrap items-center gap-2">
-              {c.name} <span className="font-normal text-slate-500">({c.contact})</span>
+              {c.name} <span className="font-normal text-ink2">({c.contact})</span>
             </span>
           }
           right={<Badge tone={STATUS_TONE[status]}>{STATUS_LABEL[status]}</Badge>}
@@ -73,7 +73,7 @@ export function MessageDetail({
 
           <div className="mt-3 flex flex-wrap items-center gap-3">
             {!rec && (
-              <Button onClick={onRead} disabled={loading} className="bg-sky-600 hover:bg-sky-700 disabled:bg-sky-300">
+              <Button onClick={onRead} disabled={loading}>
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
                 {loading ? "Bukti is reading…" : "Read with Bukti AI"}
               </Button>
@@ -90,7 +90,7 @@ export function MessageDetail({
 }
 
 function RunLabel({ run, rec }: { run: RunInfo | undefined; rec: ExtractionRecord | undefined }) {
-  if (run?.loading) return <span className="text-xs text-slate-500">Sending the message to claude-opus-5-5…</span>;
+  if (run?.loading) return <span className="text-xs text-ink2">Sending the message to claude-opus-5-5…</span>;
   if (run && !run.loading) {
     return (
       <Badge tone={run.failed ? "rose" : run.cached ? "amber" : "sky"} className="text-xs">
@@ -105,7 +105,7 @@ function RunLabel({ run, rec }: { run: RunInfo | undefined; rec: ExtractionRecor
       </Badge>
     );
   }
-  return <span className="text-xs text-slate-500">Bukti extracts the fields; the rules decide. Nothing is marked paid without a bank line.</span>;
+  return <span className="text-xs text-ink2">Bukti extracts the fields; the rules decide. Nothing is marked paid without a bank line.</span>;
 }
 
 /* ---------- AI READ ---------- */
@@ -122,23 +122,23 @@ function AiReadPanel({ rec, rows }: { rec: ExtractionRecord; rows: FieldRow[] })
           </span>
         }
         title="What Bukti read"
-        right={<span className="font-mono text-[10px] text-slate-500">{rec.model}</span>}
+        right={<span className="font-mono text-[10px] text-ink2">{rec.model}</span>}
       />
-      <div className="divide-y divide-sky-100 px-4">
+      <div className="divide-y divide-hairline px-4">
         {rows.map((r) => (
-          <div key={r.key} className="grid grid-cols-[8.5rem_1fr_auto] items-start gap-3 py-2 text-sm">
-            <div className="text-xs font-medium text-slate-500">{r.label}</div>
+          <div key={r.key} className="grid min-h-[38px] grid-cols-[minmax(0,6.5rem)_minmax(0,1fr)_auto] items-start gap-3 py-2 text-[13px] sm:grid-cols-[8.5rem_minmax(0,1fr)_auto]">
+            <div className="text-xs font-medium text-ink2">{r.label}</div>
             <div className="min-w-0">
-              <div className="font-semibold text-slate-900">{r.value}</div>
+              <div className="font-semibold text-ink">{r.value}</div>
               {r.quote && r.tone && (
-                <div className="mt-0.5 text-xs text-slate-600">
+                <div className="mt-0.5 text-xs text-ink2">
                   quote: <mark className={cx("rounded px-0.5", MARK_CLASS[r.tone])}>{r.quote}</mark>
                 </div>
               )}
             </div>
             <div className="flex flex-col items-end gap-1">
               {r.confidence !== null && (
-                <span className={cx("font-mono text-xs", r.confidence < CONFIDENCE_MIN ? "font-semibold text-amber-700" : "text-slate-700")}>
+                <span className={cx("font-mono text-xs", r.confidence < CONFIDENCE_MIN ? "font-semibold text-amber-700" : "text-ink")}>
                   {pct(r.confidence)}
                 </span>
               )}
@@ -159,7 +159,7 @@ function AiReadPanel({ rec, rows }: { rec: ExtractionRecord; rows: FieldRow[] })
           </ul>
         </div>
       )}
-      <p className="px-4 pb-3 text-[11px] text-slate-500">
+      <p className="px-4 pb-3 text-[11px] text-ink2">
         Highlights show the exact words each field came from. Confidence below {pct(CONFIDENCE_MIN)} goes to a person (M4).
       </p>
     </Card>
@@ -191,7 +191,7 @@ function Outcome({ state, msg, rec }: { state: State; msg: InboundMessage; rec: 
       {isPromise ? (
         <Card>
           <CardHeader kicker={<RuleTag id="M5" />} title="Promise to pay" />
-          <div className="px-4 py-3 text-sm text-slate-700">
+          <div className="px-4 py-3 text-sm text-ink">
             {promised?.promise ? (
               <span className="flex items-center gap-1.5">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600" />
@@ -212,7 +212,7 @@ function Outcome({ state, msg, rec }: { state: State; msg: InboundMessage; rec: 
       {handoffs
         .filter((h) => h.resolved !== null)
         .map((h) => (
-          <div key={h.id} className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600">
+          <div key={h.id} className="flex items-center gap-2 rounded-md border border-line bg-white px-3 py-2 text-xs text-ink2">
             <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
             <span>
               {h.question} → <b>{resolvedText(h.resolved!)}</b> by {h.resolvedBy}
@@ -244,10 +244,10 @@ function BankCheck({ state, receipt, noLine }: { state: State; receipt: Receipt 
       <div className="px-4 py-3 text-sm">
         {line ? (
           <>
-            <div className="rounded-md border border-emerald-200 bg-white px-3 py-2 font-mono text-xs text-slate-800">
+            <div className="rounded-md border border-emerald-200 bg-white px-3 py-2 font-mono text-xs text-ink">
               {fmtDateTime(line.at)} · {fmtRM(line.amount, { cents: true })} · {line.description}
             </div>
-            <p className="mt-2 text-xs text-slate-600">Same amount, within 3 days of the claim, payer name or invoice number in the description.</p>
+            <p className="mt-2 text-xs text-ink2">Same amount, within 3 days of the claim, payer name or invoice number in the description.</p>
           </>
         ) : (
           <div className="flex items-start gap-1.5 text-rose-800">
@@ -277,10 +277,10 @@ function DeductionPanel({ state, receipt }: { state: State; receipt: Receipt }) 
         title={`${fmtRM(ded.amount, { cents: true })} · ${ded.reason}`}
         right={<AlertTriangle className="h-4 w-4 text-amber-600" />}
       />
-      <div className="space-y-2 px-4 py-3 text-sm text-slate-700">
+      <div className="space-y-2 px-4 py-3 text-sm text-ink">
         {ded.linkedDo ? (
           <div className="flex items-start gap-1.5">
-            <FileText className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" />
+            <FileText className="mt-0.5 h-4 w-4 shrink-0 text-ink2" />
             <span>
               Linked to <b>{ded.linkedDo}</b>: {d.route}, delivered {fmtDate(d.date)} (destination {d.destination} named in the reason).
             </span>
@@ -288,7 +288,7 @@ function DeductionPanel({ state, receipt }: { state: State; receipt: Receipt }) 
         ) : (
           <div>Not linked to any delivery on {inv.number}: the Owner should check the reason.</div>
         )}
-        <div className="text-xs text-slate-500">
+        <div className="text-xs text-ink2">
           Customer&apos;s words: <mark className={cx("rounded px-0.5", MARK_CLASS.deduction)}>{ded.quote}</mark>
         </div>
       </div>
@@ -316,8 +316,8 @@ function ProposedAction({ state, receipt }: { state: State; receipt: Receipt }) 
         title={`Receipt ${fmtRM(receipt.amount)} → ${inv.number}`}
         right={<Badge tone={inv.status === "paid" ? "violet" : inv.status === "part_paid" ? "amber" : "slate"}>{inv.status.replace("_", " ").toUpperCase()}</Badge>}
       />
-      <div className="space-y-3 px-4 py-3 text-sm text-slate-700">
-        <p className="text-xs text-slate-600">
+      <div className="space-y-3 px-4 py-3 text-sm text-ink">
+        <p className="text-xs text-ink2">
           {fmtRM(receipt.amount)} paid{ded ? ` + ${fmtRM(ded.amount)} stated deduction` : ""} = {fmtRM(receipt.amount + (ded?.amount ?? 0))}; {inv.number} was{" "}
           {fmtRM(original)}. Outstanding now {fmtRM(outstanding(inv))}.
         </p>
@@ -332,16 +332,16 @@ function ProposedAction({ state, receipt }: { state: State; receipt: Receipt }) 
             <Button onClick={() => dispatch({ type: "APPROVE_RECEIPT", receiptId: receipt.id })}>
               <CheckCircle2 className="h-4 w-4" /> Approve receipt
             </Button>
-            <span className="text-[11px] text-slate-500">Owner or Clerk: slip amount equals the bank line (FR-E12).</span>
+            <span className="text-[11px] text-ink2">Owner or Clerk: slip amount equals the bank line (FR-E12).</span>
           </div>
         )}
 
         {ded && (
           <div className="rounded-md border border-amber-200 bg-amber-50/60 p-3">
-            <div className="mb-2 text-xs font-semibold text-slate-800">
+            <div className="mb-2 text-xs font-semibold text-ink">
               Deduction {fmtRM(ded.amount)} <RuleTag id="M3" />
             </div>
-            {ded.status === "pending" && !approved && <p className="text-xs text-slate-600">Decided by the Owner after the receipt is approved.</p>}
+            {ded.status === "pending" && !approved && <p className="text-xs text-ink2">Decided by the Owner after the receipt is approved.</p>}
             {ded.status === "pending" && approved && isOwner && (
               <div className="flex flex-wrap gap-2">
                 <Button size="sm" onClick={() => dispatch({ type: "DECIDE_DEDUCTION", receiptId: receipt.id, decision: "accepted" })}>
@@ -353,7 +353,7 @@ function ProposedAction({ state, receipt }: { state: State; receipt: Receipt }) 
               </div>
             )}
             {ded.status === "pending" && approved && !isOwner && (
-              <p className="text-xs text-slate-600">Waiting for the Owner: accepting a deduction changes what the customer owes.</p>
+              <p className="text-xs text-ink2">Waiting for the Owner: accepting a deduction changes what the customer owes.</p>
             )}
             {ded.status === "accepted" && (
               <p className="flex items-center gap-1.5 text-xs text-emerald-800">

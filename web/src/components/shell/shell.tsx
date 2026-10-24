@@ -15,7 +15,7 @@ import ModulePage from "@/components/pages/module";
 import ApprovalsPage from "@/components/pages/approvals";
 import UsagePage from "@/components/pages/usage";
 import { Header } from "./header";
-import { Sidebar } from "./sidebar";
+import { ModuleStrip, Sidebar } from "./sidebar";
 
 const noopSubscribe = () => () => {};
 
@@ -32,19 +32,20 @@ export default function Shell() {
   const mounted = useMounted();
   if (!mounted) {
     return (
-      <div className="grid h-screen place-items-center bg-slate-50 text-sm text-slate-400" aria-busy="true">
+      <div className="grid h-screen place-items-center bg-canvas font-mono text-xs text-ink2" aria-busy="true">
         Loading Kutip…
       </div>
     );
   }
   return (
-    <div className="flex h-screen min-w-[1180px] flex-col bg-slate-50">
+    <div className="flex h-screen flex-col bg-canvas">
       <Header />
+      <ModuleStrip />
       <div className="flex min-h-0 flex-1">
         <Sidebar />
         <main className="min-w-0 flex-1 overflow-y-auto">
           <Toast />
-          <div className="mx-auto max-w-6xl px-6 py-6">
+          <div className="mx-auto max-w-6xl px-4 py-5 lg:px-8 lg:py-7">
             <CurrentPage />
           </div>
         </main>
@@ -88,8 +89,8 @@ function Toast() {
     <div
       role={error ? "alert" : "status"}
       className={cx(
-        "sticky top-0 z-20 flex items-start justify-between gap-3 border-b px-6 py-2.5 text-sm",
-        error ? "border-rose-200 bg-rose-50 text-rose-900" : "border-sky-200 bg-sky-50 text-sky-900",
+        "sticky top-0 z-20 flex items-start justify-between gap-3 border-b border-l-[3px] px-4 py-2.5 text-[13px] lg:px-8",
+        error ? "border-rose-200 border-l-rose-700 bg-rose-50 text-rose-800" : "border-sky-200 border-l-sky-700 bg-sky-50 text-sky-800",
       )}
     >
       <div>
@@ -100,7 +101,7 @@ function Toast() {
         type="button"
         onClick={clearToast}
         aria-label="Dismiss"
-        className={cx("rounded p-0.5", error ? "text-rose-700 hover:bg-rose-100" : "text-sky-700 hover:bg-sky-100")}
+        className={cx("p-0.5", error ? "text-rose-700 hover:bg-rose-100" : "text-sky-700 hover:bg-sky-100")}
       >
         <X className="h-4 w-4" />
       </button>

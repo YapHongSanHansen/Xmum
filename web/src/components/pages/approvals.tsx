@@ -87,15 +87,15 @@ export default function ApprovalsPage() {
   const others = items.filter((i) => !i.who.includes(state.role));
 
   const list = (rows: Pending[], canAct: boolean) => (
-    <ul className="divide-y divide-slate-100">
+    <ul className="divide-y divide-hairline">
       {rows.map((i) => (
-        <li key={i.key} className="flex items-center justify-between gap-3 px-4 py-3">
+        <li key={i.key} className="flex min-h-[38px] flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 py-2.5 transition-colors hover:bg-canvas/60">
           <div className="min-w-0">
-            <div className="flex items-center gap-2 text-sm font-medium text-slate-900">
+            <div className="flex items-center gap-2 text-[13px] font-medium text-ink">
               <RuleTag id={i.rule} />
               {i.title}
             </div>
-            <div className="mt-0.5 text-xs text-slate-500">{i.detail}</div>
+            <div className="mt-0.5 text-xs text-ink2">{i.detail}</div>
           </div>
           <div className="flex shrink-0 items-center gap-2">
             {i.who.map((w) => (
