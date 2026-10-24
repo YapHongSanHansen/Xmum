@@ -164,7 +164,7 @@ Priority: **P0** = preliminary demo; **P1** = final round; **P2** = roadmap.
 | FR-C4 | Every row shows its rule ID and a one-line reason | P0 | No row in the plan lacks a rule ID |
 | FR-C5 | Fixed templates per tier per language, merge fields only (rule R5) | P0 | Tier 1 EN/BM and Tier 2 ZH templates render with invoice number, amount and due date; no AI-generated text |
 | FR-C6 | Approval by tier: Clerk or Owner may approve Tier 0/1; Owner only for Tier 2; Owner decides Tier 3 | P0 | As Clerk, the Tier 2 card shows no approve button |
-| FR-C7 | Send by wa.me link (opens WhatsApp with the text prefilled; a person presses send) or simulated send. Reminders approved inside the customer's quiet hours are QUEUED and released when quiet hours end (rule S1) | P0 | Approving at 08:00 opens a correct `https://wa.me/<number>?text=<encoded>` link, or marks the reminder "sent (simulated)"; approving at 22:00 marks it "queued until 08:00"; all are logged |
+| FR-C7 | Send by wa.me link (opens WhatsApp with the text prefilled; a person presses send) or simulated send. Because every phone number in the demo is fictional, the P0 link carries no number (`https://wa.me/?text=…`): WhatsApp asks which chat to use. Reminders approved inside the customer's quiet hours are QUEUED and released when quiet hours end (rule S1) | P0 | Approving at 08:00 opens a correct `https://wa.me/<number>?text=<encoded>` link, or marks the reminder "sent (simulated)"; approving at 22:00 marks it "queued until 08:00"; all are logged |
 | FR-C8 | Approval card shows: invoice, amount, days late, past reminders and replies, payment pattern, message preview, rule, and gap impact (rule G1). The Clerk sees "helps cover the next bill: yes/no" instead of amounts | P0 | The Owner's Hup Seng card shows "If paid by 30 Oct: 31 Oct salaries short RM2,000 → covered; 5 Nov diesel short RM13,200 → RM6,350". The Clerk's Mega Bina card shows "helps cover the next bill: yes" and no amounts of balance, salaries or gap |
 | FR-C9 | Card actions: approve & send, edit text, snooze to date, mark disputed, "I'll call instead" | P0 (approve, edit, snooze) / P1 (rest) | Each action is logged with the actor |
 
@@ -313,7 +313,7 @@ Illustrative API: `POST /receivables/invoices`, `GET /receivables/chase-plan?dat
 |---|---|---|
 | NFR-1 | Explainability | Every automated decision shows a rule ID and a one-line reason |
 | NFR-2 | Determinism | The same data and clock always produce the same plan; covered by tests on the seed |
-| NFR-3 | AI containment | AI output never changes money state directly; verbatim gate and 0.85 confidence threshold enforced on the server |
+| NFR-3 | AI containment | AI output never changes money state directly; the verbatim gate and the 0.85 confidence threshold are enforced in the rules engine, never in the AI step. In P0 the engine runs in the browser with the demo state; with the P1 backend it runs on the server |
 | NFR-4 | Accuracy | ≥ 95% exact-match on the amount field across the synthetic test set; zero invoices PAID without a bank line (by construction and by test) |
 | NFR-5 | Performance | Scan under 2 s for 500 invoices; AI extraction under 10 s, otherwise the cached fallback is used |
 | NFR-6 | Learnability | Two or three first-time users complete "approve a gentle reminder" and "approve a payment match" in under 10 minutes without help |
@@ -364,6 +364,8 @@ Starting state: seed loaded, clock Tue 20 Oct 2026 08:00. Seeded inbound message
 ### 13a. Expected activity log for the demo script
 
 Timestamps come from the frozen demo clock, so every action in a step carries that step's time.
+
+As built (pinned in `web/src/engine/demo-script.test.ts`): the 21, 22 and 23 Oct scans each log the full scan summary, one R2 "skipped" line per promised invoice (INV-2268, INV-2296) and "no new reminders today", instead of the single line in row 14; row 5 reads "ask the diesel supplier to move the 5 Nov bill"; row 12 ends "for INV-2268". Everything else matches the table below in order.
 
 | # | Demo time | Actor | Action |
 |---|---|---|---|
@@ -541,3 +543,16 @@ Kutip is demoed as a module inside a simulated Orbyte hub, to show "fit the hub"
 | FR-O2 | Connect page: the data sources Kutip uses, each with status and what it provides: accounting partner (invoices, payroll total; simulated by CSV), bank statement (credits; CSV), WhatsApp (wa.me click-to-send; simulated inbox), clients records (shared Orbyte data) | P0 | Each source shows "simulated" and the last import time on the demo clock |
 | FR-O3 | Shared platform pieces are visibly reused: roles from Orbyte's org structure, approvals in an approvals inbox, and the activity log as Orbyte's audit trail | P0 | The role switcher is labelled as Orbyte roles; approvals show in one inbox |
 | FR-O4 | Billing preview: per-use credits in Orbyte's credit-wallet model (invoice chased, slip read), with illustrative prices only | P1 | Shows a month's illustrative usage; no real payment |
+
+## 22. Known limitations of the P0 build (25 Oct 2026)
+
+Found by the engine test suite and left for P1.
+
+| # | Limitation | Plan |
+|---|---|---|
+| 1 | Tier 0 courtesy reminders (D-3) are not proposed; the chase plan lists overdue invoices only | Add Tier 0 rows outside the R3 ranking (they are already F1 inflows) |
+| 2 | An unverified "already paid" claim pauses reminders until the Owner marks it paid; there is no expiry | Add a claim expiry or a "reject claim" action |
+| 3 | A verified but unapproved receipt on a not-yet-due invoice counts as neither cash nor inflow, so the forecast dips until it is approved | Count verified receipts as pending inflows |
+| 4 | Reset is not written to the activity log | Intentional for the demo, so the log starts at the 08:00 scan |
+| 5 | A reminder released after quiet hours keeps its approval time | Store the release time separately |
+| 6 | The live AI call has not been exercised against the API in this build (no key on the build machine); the cached results are the tested path | Run the three seeded messages live once a key is set, and record the result |
