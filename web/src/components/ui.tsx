@@ -1,7 +1,10 @@
 "use client";
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import type { ButtonHTMLAttributes, CSSProperties, ReactNode } from "react";
 
 export const cx = (...parts: (string | false | null | undefined)[]) => parts.filter(Boolean).join(" ");
+/** Inline style that sets the stagger index read by `.k-rise`, `.k-grow-*` and `.k-pop`. */
+export const stagger = (i: number, step?: string): CSSProperties =>
+  ({ "--i": i, ...(step ? { "--k-step": step } : {}) }) as CSSProperties;
 type Variant = "primary" | "secondary" | "ghost" | "danger";
 export function Button({
   variant = "primary",
@@ -12,8 +15,26 @@ export function Button({
 }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; size?: "sm" | "md" }) {
   return <button type={type} className={cx("btn", `btn-${variant}`, `btn-${size}`, className)} {...props} />;
 }
-export function Card({ children, className, tone }: { children: ReactNode; className?: string; tone?: "warn" | "bad" | "good" | "ai" }) {
-  return <div className={cx("panel", tone && `panel-${tone}`, className)}>{children}</div>;
+/** `rise` (a stagger index) makes the card fade and rise in on mount. */
+export function Card({
+  children,
+  className,
+  tone,
+  rise,
+}: {
+  children: ReactNode;
+  className?: string;
+  tone?: "warn" | "bad" | "good" | "ai";
+  rise?: number;
+}) {
+  return (
+    <div
+      className={cx("panel", tone && `panel-${tone}`, rise !== undefined && "k-rise", className)}
+      style={rise !== undefined ? stagger(rise) : undefined}
+    >
+      {children}
+    </div>
+  );
 }
 export function CardHeader({ title, kicker, right }: { title: ReactNode; kicker?: ReactNode; right?: ReactNode }) {
   return (
@@ -27,7 +48,18 @@ export function CardHeader({ title, kicker, right }: { title: ReactNode; kicker?
   );
 }
 type Tone = "slate" | "emerald" | "amber" | "rose" | "sky" | "violet";
-export function Badge({ children, tone = "slate", className }: { children: ReactNode; tone?: Tone; className?: string }) {
+export function Badge({
+  children,
+  tone = "slate",
+  className,
+  pulse,
+}: {
+  children: ReactNode;
+  tone?: Tone;
+  className?: string;
+  /** Soft pulsing dot, for "Live" states only. */
+  pulse?: boolean;
+}) {
   const tones: Record<Tone, string> = {
     slate: "bg-hairline text-ink2",
     emerald: "bg-emerald-100 text-emerald-700",
@@ -44,7 +76,7 @@ export function Badge({ children, tone = "slate", className }: { children: React
         className,
       )}
     >
-      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-current" aria-hidden />
+      <span className={cx("h-1.5 w-1.5 shrink-0 rounded-full bg-current", pulse && "k-pulse")} aria-hidden />
       {children}
     </span>
   );
@@ -116,8 +148,8 @@ export function Figure({
 export function MetricRow({ items }: { items: { label: string; value: ReactNode; detail?: string }[] }) {
   return (
     <dl className="metric-row">
-      {items.map((item) => (
-        <div className="panel metric-tile" key={item.label}>
+      {items.map((item, i) => (
+        <div className="panel metric-tile k-rise" style={stagger(i)} key={item.label}>
           <dt>{item.label}</dt>
           <dd>{item.value}</dd>
           {item.detail && <p className="mt-2 text-xs text-ink2">{item.detail}</p>}

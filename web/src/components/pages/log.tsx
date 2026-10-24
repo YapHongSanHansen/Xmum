@@ -114,7 +114,7 @@ export default function LogPage() {
         }
       />
 
-      <div className="panel mb-5 p-5">
+      <div className="panel k-rise mb-5 p-5">
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative w-full sm:w-56">
             <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink2" aria-hidden />
@@ -173,7 +173,7 @@ export default function LogPage() {
       ) : rows.length === 0 ? (
         <Empty>No entries match.</Empty>
       ) : (
-        <Card className={tbl.wrap}>
+        <Card className={tbl.wrap} rise={1}>
           <table className={cx(tbl.table, "min-w-[760px] table-fixed")}>
             <colgroup>
               <col className="w-14" />

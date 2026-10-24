@@ -167,7 +167,7 @@ export default function ApprovalsPage() {
         ]}
       />
       <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
-        <Card className={others.length ? "" : "xl:col-span-2"}>
+        <Card className={others.length ? "" : "xl:col-span-2"} rise={3}>
           <CardHeader title={`Waiting for you · ${mine.length}`} />
           {mine.length ? (
             list(mine, true)
@@ -181,7 +181,7 @@ export default function ApprovalsPage() {
           )}
         </Card>
         {others.length > 0 && (
-          <Card>
+          <Card rise={4}>
             <CardHeader title={`Other roles · ${others.length}`} />
             {list(others, false)}
           </Card>

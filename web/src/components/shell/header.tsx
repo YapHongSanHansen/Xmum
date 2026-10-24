@@ -7,6 +7,7 @@ import { Button, cx } from "@/components/ui";
 import { dayOf, fmtDateTime, type Role } from "@/engine/model";
 import { DEMO_STOPS } from "@/engine/seed";
 import { useKachingg } from "@/lib/store";
+import { useFlashOnChange } from "@/lib/motion";
 import { Wordmark } from "./wordmark";
 import { Navigation } from "./navigation";
 import { approvalsCount } from "@/components/pages/approvals";
@@ -23,6 +24,8 @@ export function Header() {
   const go = useKachingg((s) => s.go);
   const needsScan = !state.scannedDays.includes(dayOf(state.now));
   const pending = approvalsCount(state);
+  // The approvals dot pops briefly whenever the pending count changes.
+  const pop = useFlashOnChange(pending, { className: "k-pop" });
   return (
     <header className="app-header">
       <div className="header-main">
@@ -38,7 +41,12 @@ export function Header() {
             aria-label={`Approvals, ${pending} pending`}
           >
             <Bell className="h-[18px] w-[18px]" />
-            {pending > 0 && <span className="absolute right-2 top-2 h-2 w-2 rounded-full border-2 border-canvas bg-[#f2783c]" />}
+            {pending > 0 && (
+              <span
+                key={pop.key}
+                className={cx("absolute right-2 top-2 h-2 w-2 rounded-full border-2 border-canvas bg-[#f2783c]", pop.className)}
+              />
+            )}
           </button>
           <div
             className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br from-[#fed987] via-[#c9d7ef] to-[#6885c1] p-[2px]"

@@ -1,5 +1,5 @@
 "use client";
-import { PageTitle, MetricRow } from "@/components/ui";
+import { PageTitle, MetricRow, stagger } from "@/components/ui";
 import BookingForm from "@/components/bookings/booking-form";
 import BookingList from "@/components/bookings/booking-list";
 import { useKachingg } from "@/lib/store";
@@ -18,8 +18,10 @@ export default function BookingsPage() {
         ]}
       />
       <div className="workspace-split">
-        <BookingList />
-        <aside>
+        <div className="k-rise min-w-0" style={stagger(3)}>
+          <BookingList />
+        </div>
+        <aside className="k-rise" style={stagger(4)}>
           <BookingForm />
         </aside>
       </div>
