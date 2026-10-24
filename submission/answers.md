@@ -158,8 +158,7 @@ Next.js 16 and React 19 | Code (web framework and UI) | MIT
 Tailwind CSS 4 and lucide-react | Code (styling and icons) | MIT; ISC
 Zustand 5 and Zod 4 | Code (state store and schema validation) | MIT
 ILMU Mini v3.3 (ILMU, via Grafilab) | Model (pre-trained, called via API) | Grafilab terms of service
-Anthropic TypeScript SDK 1.3 | Code (API client, alternative provider) | Apache-2.0
-Claude Opus 5.5 (Anthropic) | Model (alternative provider, via API) | Anthropic Commercial Terms of Service
+Anthropic SDK 1.3 and Claude Opus 5.5 | Code and model (alternative AI provider, via API) | Apache-2.0; Anthropic Commercial Terms
 
 ### prelim.employment_yesno
 TODO
