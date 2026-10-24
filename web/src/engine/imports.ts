@@ -1,4 +1,4 @@
-// CSV imports through Orbyte Connect (PRD FR-A1, FR-A5). Pure: (text, state) →
+// CSV imports on the Connect page (PRD FR-A1, FR-A5). Pure: (text, state) →
 // preview. The reducer parses the same text again on import, so the preview and
 // the import can never disagree and the UI cannot slip a bad row past a check.
 import { addDays, dayOf, fmtDate, normInvoiceRef, type BankLine, type Customer, type Role, type State } from "./model";
@@ -93,7 +93,7 @@ function parseTerms(v: string): number | null {
 const NAME_SUFFIX = /\s+(SDN\s+BHD|BHD|ENTERPRISE)$/;
 const normName = (n: string) => n.toUpperCase().replace(/[^A-Z0-9\s]/g, " ").replace(/\s+/g, " ").trim().replace(NAME_SUFFIX, "");
 
-/** Customers come from Orbyte clients records (FR-A2); an invoice must name one of them. */
+/** Customers come from the customer records (FR-A2); an invoice must name one of them. */
 export function findCustomer(s: State, name: string): Customer | null {
   const key = normName(name);
   return s.customers.find((c) => c.id === name || normName(c.name) === key) ?? null;
@@ -165,7 +165,7 @@ export function parseInvoiceCsv(text: string, s: State): InvoiceImport {
     if (number && !seen.has(key)) seen.set(key, r.line);
 
     const customer = cell("customer") ? findCustomer(s, cell("customer")) : null;
-    if (cell("customer") && !customer) problems.push(`unknown customer "${cell("customer")}" (add them in Orbyte clients first)`);
+    if (cell("customer") && !customer) problems.push(`unknown customer "${cell("customer")}" (add them to your customer list first)`);
 
     const amount = cell("amount") ? parseAmount(cell("amount")) : null;
     if (cell("amount") && amount === null) problems.push(`bad amount "${cell("amount")}"`);
