@@ -206,7 +206,7 @@ export function parseInvoiceCsv(text: string, s: State): InvoiceImport {
   return { rows, invalid, error: null };
 }
 
-/* ---------- FR-A5 bank statement ---------- */
+/* ---------- FR-A5 bank transactions (CSV export from online banking) ---------- */
 
 export interface BankRow {
   line: number;
@@ -235,11 +235,11 @@ const BANK_COLUMNS = {
   description: ["description", "details", "narration", "reference"],
 };
 
-const sameLine = (a: { at: string; amount: number; description: string }, b: { at: string; amount: number; description: string }) =>
+export const sameLine = (a: { at: string; amount: number; description: string }, b: { at: string; amount: number; description: string }) =>
   dayOf(a.at) === dayOf(b.at) && a.amount === b.amount && a.description.toUpperCase() === b.description.toUpperCase();
 
 /**
- * Reads a bank statement CSV (date, amount, description; credits positive,
+ * Reads a bank transaction CSV export (date, amount, description; credits positive,
  * debits negative). Only the three columns are read: a balance column, if any,
  * is ignored and never stored.
  */
@@ -314,7 +314,14 @@ export function bankPreviewFor(p: BankImport, role: Role): BankPreview {
 }
 
 /** Rows ready for state, ids assigned by the reducer. */
-export const toBankLine = (r: BankRow, id: string): BankLine => ({ id, at: r.at, amount: r.amount, description: r.description, matchedInvoiceId: null });
+export const toBankLine = (r: BankRow, id: string): BankLine => ({
+  id,
+  at: r.at,
+  amount: r.amount,
+  description: r.description,
+  matchedInvoiceId: null,
+  source: "csv",
+});
 
 /* ---------- synthetic samples for "Load sample" ---------- */
 

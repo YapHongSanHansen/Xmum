@@ -6,12 +6,14 @@ import {
   dayOf,
   daysOverdue,
   fmtDate,
+  fmtDateTime,
   fmtRM,
   invoiceOf,
   outstanding,
   timeOf,
   userOf,
   type ActorKind,
+  type BankLine,
   type Booking,
   type Extraction,
   type Handoff,
@@ -37,7 +39,8 @@ import {
   resolveInvoice,
   shortfalls,
 } from "./rules";
-import { parseBankCsv, parseDate, parseInvoiceCsv, toBankLine } from "./imports";
+import { parseBankCsv, parseDate, parseInvoiceCsv, sameLine, toBankLine } from "./imports";
+import { parseBankAlert } from "./bank-alerts";
 import { seedState } from "./seed";
 
 export type CreditDecision = "accepted" | "deposit_requested" | "cod" | "call_first";
@@ -60,6 +63,8 @@ export type Action =
   | { type: "IMPORT_INVOICES"; csv: string }
   | { type: "ENTER_BANK_BALANCE"; amount: number }
   | { type: "IMPORT_BANK_STATEMENT"; csv: string }
+  /** One forwarded bank credit alert (simulated mailbox: in the demo a person pastes the text). */
+  | { type: "RECEIVE_BANK_ALERT"; text: string }
   | { type: "SNOOZE_REMINDER"; invoiceId: string; until: string }
   | { type: "MARK_DISPUTED"; invoiceId: string }
   | { type: "CALL_INSTEAD"; invoiceId: string }
@@ -621,7 +626,7 @@ export function apply(prev: State, action: Action): Result {
 
       case "IMPORT_BANK_STATEMENT": {
         // Either role may import (§9.3: the Clerk approves VERIFIED matches); debits stay Owner only.
-        requireRole(s, ["owner", "clerk"], "import a bank statement");
+        requireRole(s, ["owner", "clerk"], "import bank transactions");
         const p = parseBankCsv(action.csv, s);
         if (p.error) refuse(p.error);
         if (!p.credits.length && !p.debits.length) refuse("No valid lines to import.");
@@ -636,6 +641,30 @@ export function apply(prev: State, action: Action): Result {
           const amt = fmtRM(b.amount, { cents: true }).replace("RM", "");
           log(s, "BANK", "BANK", `line ${b.at.slice(8, 10)}/${b.at.slice(5, 7)} ${amt} ${b.description} (imported)`, { refs: [b.id] });
         }
+        break;
+      }
+
+      case "RECEIVE_BANK_ALERT": {
+        // As with the CSV import, either role may add a credit line; a person still approves every receipt.
+        requireRole(s, ["owner", "clerk"], "add a bank alert");
+        const p = parseBankAlert(action.text);
+        // Refusal reasons never carry a debit amount or a balance (FR-B5).
+        if (!p.ok) throw new Refused(p.reason);
+        const a = p.line;
+        if (a.at > s.now) refuse(`The alert is dated after the demo clock (${fmtDateTime(s.now)}).`);
+        if ([...s.bankLines, ...s.bankDebits].some((k) => sameLine(k, a))) refuse("This alert is already in the bank feed.");
+        const line: BankLine = { id: nextId(s, "BL"), at: a.at, amount: a.amount, description: a.description, matchedInvoiceId: null, source: "alert" };
+        s.bankLines.push(line);
+        s.bankLines.sort((x, y) => x.at.localeCompare(y.at));
+        const from = a.payer ? ` from ${a.payer}` : "";
+        const ref = a.reference ? `, ref ${a.reference}` : "";
+        log(
+          s,
+          "BANK",
+          "BANK",
+          `bank alert received (simulated): ${fmtRM(a.amount, { cents: true })} ${a.rail}${from}${ref} · line ${a.at.slice(8, 10)}/${a.at.slice(5, 7)} ${timeOf(a.at)}, added by ${me(s)}`,
+          { refs: [line.id] },
+        );
         break;
       }
 
