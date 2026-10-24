@@ -32,8 +32,8 @@ Called Kutip during research; the notes in `docs/research/` and `docs/idea/` kee
 | GitHub Repository | https://github.com/YapHongSanHansen/Xmum      |
 | Live Demo         | https://kachingg-app.vercel.app (Vercel)      |
 | RunPod Endpoint   | Not used (see [How We Use RunPod](#how-we-use-runpod-required)) |
-| Slide Deck        | [Google Drive folder](https://drive.google.com/drive/folders/1XHFuOC91ZWzTOTwDsceH2fLoAxz0lrAE?usp=sharing) |
-| Demo Video        | ⚠️ TODO: demo video link                        |
+| Slide Deck        | [Google Drive folder](https://drive.google.com/drive/folders/1XHFuOC91ZWzTOTwDsceH2fLoAxz0lrAE?usp=sharing) (also holds the signed Technology Declaration) |
+| Demo Video        | https://www.youtube.com/watch?v=Ty2e4yrqIww   |
 
 ---
 
@@ -342,7 +342,7 @@ Declared under handbook section 8.4.
 | AI tools used to build | Claude Code (Anthropic) for research, documentation and code generation, reviewed and adapted before committing |
 | Data | Synthetic only: every business, person, bank, slip and message is fictional. No pre-existing project code is used |
 
-Full declaration: [`submission/SDC2026_Taygood_TechDeclaration.pdf`](submission/SDC2026_Taygood_TechDeclaration.pdf).
+Full declaration (completed and signed): [`SDC2026_Taygood_TechDeclaration.pdf` in the Google Drive folder](https://drive.google.com/drive/folders/1XHFuOC91ZWzTOTwDsceH2fLoAxz0lrAE?usp=sharing). Draft in the repo: [`submission/SDC2026_Taygood_TechDeclaration.pdf`](submission/SDC2026_Taygood_TechDeclaration.pdf).
 
 ## Status
 
@@ -399,11 +399,11 @@ Full declaration: [`submission/SDC2026_Taygood_TechDeclaration.pdf`](submission/
 
 - [x] Team name, domain (Domain 1 / Domain 2) and SDG track filled in
 - [x] Slide deck link added
-- [ ] Demo video link added
+- [x] Demo video link added
 - [x] Replit use declared (not used), with a statement in `submission/`
 - [x] RunPod use declared (not used), with a statement in `submission/`
 - [ ] Preliminary submission completed (`SDC2026_Taygood_Preliminary.pdf`) *(drafted; phone, workshops and signature TODO)*
-- [ ] Technology declaration completed (`SDC2026_Taygood_TechDeclaration.pdf`) *(drafted; phone and signature TODO)*
+- [x] Technology declaration completed (`SDC2026_Taygood_TechDeclaration.pdf`) *(signed copy in the Google Drive folder)*
 - [x] Submission files renamed with your team name (replace `TeamName`)
 - [x] "How to Run" steps verified
 - [x] No API keys or secrets committed to the repository
