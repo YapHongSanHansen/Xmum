@@ -15,8 +15,8 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Kutip · Orbyte (simulated)",
-  description: "Kutip cash-collection module, demoed inside a simulated Orbyte business hub with synthetic data.",
+  title: "Kutip",
+  description: "Kutip cash-collection demo with synthetic data.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
